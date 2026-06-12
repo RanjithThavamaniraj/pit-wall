@@ -1,7 +1,17 @@
 import type { ReactNode } from "react";
 
-export function Container({ children, className = "" }: { children: ReactNode; className?: string }) {
-  return <div className={`mx-auto w-full max-w-7xl px-5 sm:px-8 lg:px-10 ${className}`}>{children}</div>;
+export function Container({
+  children,
+  className = "",
+}: {
+  children: ReactNode;
+  className?: string;
+}) {
+  return (
+    <div className={`mx-auto w-full max-w-7xl px-5 sm:px-8 lg:px-10 ${className}`}>
+      {children}
+    </div>
+  );
 }
 
 export function SectionHeading({
@@ -15,14 +25,26 @@ export function SectionHeading({
 }) {
   return (
     <div className="max-w-3xl">
-      <p className="text-sm font-semibold uppercase tracking-[0.28em] text-amber-300">{eyebrow}</p>
-      <h2 className="mt-4 text-3xl font-semibold tracking-[-0.04em] text-white sm:text-5xl">{title}</h2>
-      <p className="mt-5 text-base leading-8 text-slate-300 sm:text-lg">{description}</p>
+      <p className="text-sm font-semibold uppercase tracking-[0.28em] text-amber-300">
+        {eyebrow}
+      </p>
+      <h2 className="mt-4 text-3xl font-semibold tracking-[-0.04em] text-white sm:text-5xl">
+        {title}
+      </h2>
+      <p className="mt-5 text-base leading-8 text-slate-300 sm:text-lg">
+        {description}
+      </p>
     </div>
   );
 }
 
-export function GlassCard({ children, className = "" }: { children: ReactNode; className?: string }) {
+export function GlassCard({
+  children,
+  className = "",
+}: {
+  children: ReactNode;
+  className?: string;
+}) {
   return (
     <div
       className={`rounded-[2rem] border border-white/10 bg-white/[0.06] p-6 shadow-2xl shadow-black/30 backdrop-blur-xl ${className}`}
@@ -32,7 +54,13 @@ export function GlassCard({ children, className = "" }: { children: ReactNode; c
   );
 }
 
-export function StatusPill({ children, tone = "neutral" }: { children: ReactNode; tone?: "green" | "amber" | "red" | "blue" | "neutral" }) {
+export function StatusPill({
+  children,
+  tone = "neutral",
+}: {
+  children: ReactNode;
+  tone?: "green" | "amber" | "red" | "blue" | "neutral";
+}) {
   const tones = {
     green: "border-emerald-300/30 bg-emerald-300/10 text-emerald-200",
     amber: "border-amber-300/30 bg-amber-300/10 text-amber-200",
@@ -42,8 +70,22 @@ export function StatusPill({ children, tone = "neutral" }: { children: ReactNode
   };
 
   return (
-    <span className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold ${tones[tone]}`}>
+    <span
+      className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold ${tones[tone]}`}
+    >
       {children}
     </span>
+  );
+}
+
+/**
+ * Skeleton placeholder — shows while data is loading.
+ */
+export function Skeleton({ className = "" }: { className?: string }) {
+  return (
+    <div
+      className={`animate-pulse rounded-xl bg-white/[0.06] ${className}`}
+      aria-hidden="true"
+    />
   );
 }
