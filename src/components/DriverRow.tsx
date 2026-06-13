@@ -1,9 +1,7 @@
 import type { DriverStanding } from "@/lib/standings";
-import { formatGap } from "@/lib/utils";
 
 type Props = {
   driver: DriverStanding;
-  rank: number;
 };
 
 const POSITION_STYLES: Record<number, string> = {
@@ -12,7 +10,7 @@ const POSITION_STYLES: Record<number, string> = {
   3: "text-amber-600",
 };
 
-export function DriverRow({ driver, rank }: Props) {
+export function DriverRow({ driver }: Props) {
   const positionColor = POSITION_STYLES[driver.position] ?? "text-slate-500";
 
   return (

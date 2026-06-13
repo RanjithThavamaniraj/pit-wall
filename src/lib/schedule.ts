@@ -119,7 +119,7 @@ function buildSessions(race: JolpicaRace): RaceSession[] {
   ];
 
   return pairs
-    .filter(({ key, src }) => {
+    .filter(({ key }) => {
       // Skip fp3 on sprint weekends (replaced by sprint_qualifying)
       if (key === "fp3" && race.SprintQualifying) return false;
       return true;

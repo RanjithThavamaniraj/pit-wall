@@ -4,7 +4,7 @@ import { Container, GlassCard, SectionHeading, StatusPill, Skeleton } from "@/co
 import { features } from "@/lib/data";
 import { fetchSeasonSchedule, getNextRace, getCurrentRace } from "@/lib/schedule";
 import { fetchDriverStandings } from "@/lib/standings";
-import { countryCodeToFlag, formatShortDate } from "@/lib/utils";
+import { countryCodeToFlag } from "@/lib/utils";
 import { SessionCountdown } from "@/components/SessionCountdown";
 
 // ─── Next Race Widget ─────────────────────────────────────────────────────────
@@ -26,7 +26,6 @@ async function NextRaceWidget() {
     const liveSession = race.sessions.find((s) => s.status === "live");
     const nextSession = race.sessions.find((s) => s.status === "upcoming");
     const countdownSession = liveSession ?? nextSession;
-    const raceSession = race.sessions.find((s) => s.key === "race");
 
     return (
       <GlassCard className="relative overflow-hidden p-5 sm:p-7">

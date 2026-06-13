@@ -93,10 +93,10 @@ export function StandingsTabs({ drivers, constructors, season, round }: Props) {
             </thead>
             <tbody>
               {activeTab === "drivers"
-                ? drivers.map((d, i) => (
-                    <DriverRow key={d.driverCode} driver={d} rank={i + 1} />
+                ? drivers.map((d) => (
+                    <DriverRow key={d.driverCode} driver={d} />
                   ))
-                : constructors.map((c, i) => (
+                : constructors.map((c) => (
                     <ConstructorRow
                       key={c.name}
                       constructor={c}

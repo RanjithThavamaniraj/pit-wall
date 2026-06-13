@@ -30,7 +30,6 @@ export default async function RacesPage() {
   const pastRaces = schedule.races.filter((r) => r.isPast);
   const upcomingRaces = schedule.races.filter((r) => !r.isPast);
   const nextRace = upcomingRaces.find((r) => r.isNext);
-  const futureRaces = upcomingRaces.filter((r) => !r.isNext && !r.isCurrent);
 
   return (
     <>
