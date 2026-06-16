@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { Suspense } from "react";
 import { Container, GlassCard, SectionHeading, StatusPill, Skeleton } from "@/components/ui";
-import { features } from "@/lib/data";
 import { fetchSeasonSchedule, getNextRace, getCurrentRace } from "@/lib/schedule";
 import { fetchDriverStandings } from "@/lib/standings";
 import { countryCodeToFlag } from "@/lib/utils";
@@ -245,28 +244,46 @@ function Hero() {
 // ─── Feature Grid ──────────────────────────────────────────────────────────────
 
 function FeatureGrid() {
+  const companionCards = [
+    {
+      eyebrow: "RACE BRIEFING",
+      title: "Know the story before the race.",
+      description: "Track facts, weather outlook, previous winners, and the key talking points heading into the weekend.",
+    },
+    {
+      eyebrow: "COMMUNITY PULSE",
+      title: "See who fans are backing.",
+      description: "Follow community favourites, prediction trends, and the drivers gaining momentum before lights out.",
+    },
+    {
+      eyebrow: "CHAMPIONSHIP BATTLE",
+      title: "Compete all season long.",
+      description: "Track prediction standings, race results, and the battle for the top spot on the Pit Wall leaderboard.",
+    },
+  ];
+
   return (
     <section id="features" className="py-20 sm:py-28">
       <Container>
         <SectionHeading
-          eyebrow="Built for the decisive lap"
-          title="Everything a race strategist sees, redesigned for fans."
-          description="Pit Wall gives context to every call: what changed, why it matters, and how it reshapes the race before the broadcast catches up."
+          eyebrow="RACE WEEKEND COMPANION"
+          title="Everything you need before lights out."
+          description="Pit Wall helps fans follow the race weekend, track community sentiment, and compete throughout the season."
         />
         <div className="mt-12 grid gap-5 md:grid-cols-3">
-          {features.map((feature) => (
+          {companionCards.map((card) => (
             <GlassCard
-              key={feature.title}
+              key={card.title}
               className="transition hover:-translate-y-1 hover:bg-white/[0.08]"
             >
               <p className="text-sm font-semibold uppercase tracking-[0.24em] text-amber-200">
-                {feature.eyebrow}
+                {card.eyebrow}
               </p>
               <h3 className="mt-5 text-2xl font-semibold text-white">
-                {feature.title}
+                {card.title}
               </h3>
               <p className="mt-4 leading-7 text-slate-300">
-                {feature.description}
+                {card.description}
               </p>
             </GlassCard>
           ))}
@@ -279,44 +296,37 @@ function FeatureGrid() {
 // ─── Strategy Section (preserved, honest) ─────────────────────────────────────
 
 function StrategySection() {
-  const stints = [
-    { compound: "Medium", laps: "Optimal first stint", status: "Modelled" },
-    { compound: "Hard", laps: "Long run capability", status: "Modelled" },
-    { compound: "Soft", laps: "Qualifying / attack", status: "Modelled" },
+  const predictions = [
+    { name: "Hamilton", percentage: 44 },
+    { name: "Verstappen", percentage: 33 },
+    { name: "Antonelli", percentage: 27 },
+    { name: "Piastri", percentage: 15 },
+    { name: "Norris", percentage: 10 },
+    { name: "Russell", percentage: 6 },
+    { name: "Others", percentage: 4 },
   ];
 
   return (
     <section id="strategy" className="border-y border-white/10 bg-white/[0.03] py-20 sm:py-28">
       <Container className="grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
         <SectionHeading
-          eyebrow="Strategy layer — coming soon"
-          title="Know the next move before the radio message."
-          description="Live tyre degradation models, undercut windows, and safety car probability — combined into confident, readable race strategy intelligence. Launching with live timing."
+          eyebrow="COMMUNITY PREDICTIONS"
+          title="See who Pit Wall is backing this weekend."
+          description="Track the community favourite for race victory and compare your prediction with the rest of the grid."
         />
         <GlassCard>
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <h3 className="text-2xl font-semibold text-white">
-                Tyre strategy model
-              </h3>
-              <p className="mt-2 text-slate-400">Optimal plan per stint.</p>
-            </div>
-            <StatusPill tone="amber">In development</StatusPill>
-          </div>
-          <div className="mt-8 grid gap-4">
-            {stints.map((stint) => (
-              <div
-                key={stint.compound}
-                className="rounded-3xl border border-white/10 bg-slate-950/60 p-5"
-              >
-                <div className="flex items-center justify-between gap-4">
-                  <div>
-                    <p className="text-lg font-semibold text-white">
-                      {stint.compound}
-                    </p>
-                    <p className="text-sm text-slate-400">{stint.laps}</p>
-                  </div>
-                  <StatusPill tone="neutral">{stint.status}</StatusPill>
+          <div className="space-y-4">
+            {predictions.map((pred) => (
+              <div key={pred.name} className="space-y-2">
+                <div className="flex items-center justify-between text-sm">
+                  <span className="font-semibold text-slate-200">{pred.name}</span>
+                  <span className="font-bold text-amber-300">{pred.percentage}%</span>
+                </div>
+                <div className="h-2.5 w-full overflow-hidden rounded-full bg-slate-950/60 border border-white/5">
+                  <div
+                    className="h-full rounded-full bg-gradient-to-r from-amber-500 to-amber-300"
+                    style={{ width: `${pred.percentage}%` }}
+                  />
                 </div>
               </div>
             ))}
@@ -367,8 +377,8 @@ export default function Home() {
   return (
     <>
       <Hero />
-      <FeatureGrid />
       <StrategySection />
+      <FeatureGrid />
       <CTA />
     </>
   );

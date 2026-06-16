@@ -52,7 +52,6 @@ export const viewport: Viewport = {
 };
 
 const desktopNavLinks = [
-  { href: "/races", label: "Schedule" },
   { href: "/live", label: "Live" },
   { href: "/standings", label: "Standings" },
 ];
@@ -101,13 +100,6 @@ export default function RootLayout({
                 </Link>
               ))}
             </nav>
-
-            <Link
-              href="/races"
-              className="hidden rounded-full bg-white px-5 py-3 text-sm font-semibold text-slate-950 transition hover:bg-amber-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-300 md:block"
-            >
-              View schedule
-            </Link>
           </div>
         </header>
 
