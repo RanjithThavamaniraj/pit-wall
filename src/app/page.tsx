@@ -258,7 +258,7 @@ function FeatureGrid() {
     {
       eyebrow: "CHAMPIONSHIP BATTLE",
       title: "Compete all season long.",
-      description: "Track prediction standings, race results, and the battle for the top spot on the Pit Wall leaderboard.",
+      description: "Track prediction standings, race results, and the battle for the top spot on the PitWall Apex leaderboard.",
     },
   ];
 
@@ -268,7 +268,7 @@ function FeatureGrid() {
         <SectionHeading
           eyebrow="RACE WEEKEND COMPANION"
           title="Everything you need before lights out."
-          description="Pit Wall helps fans follow the race weekend, track community sentiment, and compete throughout the season."
+          description="PitWall Apex helps fans follow the race weekend, track community sentiment, and compete throughout the season."
         />
         <div className="mt-12 grid gap-5 md:grid-cols-3">
           {companionCards.map((card) => (
@@ -311,7 +311,7 @@ function StrategySection() {
       <Container className="grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
         <SectionHeading
           eyebrow="COMMUNITY PREDICTIONS"
-          title="See who Pit Wall is backing this weekend."
+          title="See who PitWall Apex is backing this weekend."
           description="Track the community favourite for race victory and compare your prediction with the rest of the grid."
         />
         <GlassCard>
@@ -350,7 +350,7 @@ function CTA() {
                 Season {new Date().getFullYear()}
               </p>
               <h2 className="mt-4 max-w-3xl text-4xl font-black tracking-[-0.05em] sm:text-6xl">
-                Bring the pit wall to your sofa.
+                Bring PitWall Apex to your sofa.
               </h2>
               <p className="mt-5 max-w-2xl text-lg leading-8 text-slate-800">
                 Session schedules in your timezone. Live championship standings.

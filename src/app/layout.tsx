@@ -18,12 +18,12 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "Pit Wall — F1 Race Companion",
-    template: "%s | Pit Wall",
+    default: "PitWall Apex — F1 Race Companion",
+    template: "%s | PitWall Apex",
   },
   description:
     "Your Formula 1 race weekend companion. Live timing, session schedules, championship standings, and race intelligence for every Grand Prix.",
-  applicationName: "Pit Wall",
+  applicationName: "PitWall Apex",
   keywords: [
     "Formula 1",
     "F1",
@@ -34,9 +34,9 @@ export const metadata: Metadata = {
     "race strategy",
     "telemetry",
   ],
-  authors: [{ name: "Pit Wall" }],
+  authors: [{ name: "PitWall Apex" }],
   openGraph: {
-    title: "Pit Wall — F1 Race Companion",
+    title: "PitWall Apex — F1 Race Companion",
     description:
       "Live timing, session schedules, championship standings, and race intelligence for every Grand Prix.",
     type: "website",
@@ -73,11 +73,11 @@ export default function RootLayout({
               className="group inline-flex items-center gap-3 rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-300"
             >
               <span className="flex size-11 items-center justify-center rounded-2xl bg-amber-300 text-lg font-black text-slate-950 shadow-lg shadow-amber-500/20">
-                PW
+                PWA
               </span>
               <span>
                 <span className="block text-base font-semibold tracking-tight text-white">
-                  Pit Wall
+                  PitWall Apex
                 </span>
                 <span className="block text-xs uppercase tracking-[0.22em] text-slate-400">
                   F1 race companion
@@ -109,7 +109,7 @@ export default function RootLayout({
         {/* ─── Footer (desktop only — mobile has bottom tab bar) ────────── */}
         <footer className="hidden border-t border-white/10 py-8 md:block">
           <div className="mx-auto flex w-full max-w-7xl flex-col gap-3 px-5 text-sm text-slate-400 sm:flex-row sm:items-center sm:justify-between sm:px-8 lg:px-10">
-            <p>© {new Date().getFullYear()} Pit Wall. F1 race companion.</p>
+            <p>© {new Date().getFullYear()} PitWall Apex. F1 race companion.</p>
             <p>Data provided by OpenF1 &amp; Jolpica. Not affiliated with Formula 1.</p>
           </div>
         </footer>
