@@ -233,3 +233,8 @@ export function getNextRace(schedule: SeasonSchedule): RaceWeekend | null {
 export function getCurrentRace(schedule: SeasonSchedule): RaceWeekend | null {
   return schedule.races.find((r) => r.isCurrent) ?? null;
 }
+
+export function getPreviousRace(schedule: SeasonSchedule): RaceWeekend | null {
+  const pastRaces = schedule.races.filter((race) => race.isPast);
+  return pastRaces.length > 0 ? pastRaces[pastRaces.length - 1] : null;
+}

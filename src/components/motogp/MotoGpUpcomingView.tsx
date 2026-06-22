@@ -1,3 +1,4 @@
+import type { MotoGpEvent } from "@/lib/motogp";
 import type { MotoGpWeekendContext } from "@/lib/motogp-weekend";
 import type { MotoGpStandings } from "@/lib/motogp";
 import {
@@ -6,6 +7,7 @@ import {
   WeekendHero,
   WeekendPreviewGrid,
   NextSessionPanel,
+  PreviousRoundCard,
   WeekendQuickLinks,
   type SnapshotMetric,
 } from "@/components/live/WeekendPreviewShared";
@@ -14,6 +16,7 @@ import { countryCodeToFlag } from "@/lib/utils";
 type Props = {
   context: MotoGpWeekendContext;
   standings?: MotoGpStandings | null;
+  previousEvent?: MotoGpEvent | null;
 };
 
 function buildStandingsMetrics(
@@ -51,7 +54,11 @@ function buildStandingsMetrics(
   ];
 }
 
-export function MotoGpUpcomingView({ context, standings }: Props) {
+export function MotoGpUpcomingView({
+  context,
+  standings,
+  previousEvent,
+}: Props) {
   const { currentWeekend, nextSession } = context;
   const flag = countryCodeToFlag(currentWeekend.countryCode);
 
@@ -113,6 +120,20 @@ export function MotoGpUpcomingView({ context, standings }: Props) {
         <LivePreviewExplainer sport="motogp" />
       </div>
 
+      {previousEvent && previousEvent.round < currentWeekend.round && (
+        <PreviousRoundCard
+          round={previousEvent.round}
+          title={previousEvent.name}
+          subtitle={previousEvent.circuit}
+          href={`/motogp/races/${previousEvent.slug}`}
+          podium={previousEvent.podium.map((finisher) => ({
+            position: finisher.position,
+            name: finisher.riderName,
+            detail: `#${finisher.riderNumber}`,
+          }))}
+        />
+      )}
+
       {metrics.length > 0 && (
         <section aria-label="Championship snapshot">
           <h2 className="mb-4 text-xs font-semibold uppercase tracking-[0.28em] text-slate-500">
@@ -128,6 +149,7 @@ export function MotoGpUpcomingView({ context, standings }: Props) {
             href: `/motogp/races/${currentWeekend.slug}`,
             label: "Full weekend schedule",
           },
+          { href: "/motogp/live", label: "Weekend hub" },
           { href: "/motogp/standings", label: "Championship standings" },
           { href: "/motogp/races", label: "Season calendar" },
         ]}

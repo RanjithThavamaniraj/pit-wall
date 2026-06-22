@@ -1,3 +1,5 @@
+"use client";
+
 import { useEffect, useState, useRef } from "react";
 import type { BriefingItem } from "@/lib/briefings";
 import { BriefingCard } from "./BriefingCard";

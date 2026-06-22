@@ -1,11 +1,16 @@
+"use client";
+
 import type { WeekendContext } from "@/lib/weekend";
+import type { RaceWeekend } from "@/lib/schedule";
 import type { Standings } from "@/lib/standings";
+import { BriefingFeed } from "@/components/live/BriefingFeed";
 import {
   ChampionshipSnapshot,
   LivePreviewExplainer,
   WeekendHero,
   WeekendPreviewGrid,
   NextSessionPanel,
+  PreviousRoundCard,
   WeekendQuickLinks,
   type SnapshotMetric,
 } from "./WeekendPreviewShared";
@@ -14,6 +19,7 @@ import { countryCodeToFlag } from "@/lib/utils";
 type Props = {
   context: WeekendContext;
   standings?: Standings | null;
+  previousRace?: RaceWeekend | null;
 };
 
 function buildStandingsMetrics(
@@ -51,7 +57,11 @@ function buildStandingsMetrics(
   ];
 }
 
-export function UpcomingSessionView({ context, standings }: Props) {
+export function UpcomingSessionView({
+  context,
+  standings,
+  previousRace,
+}: Props) {
   const { currentWeekend, nextSession } = context;
   const flag = countryCodeToFlag(currentWeekend.countryCode);
   const isSprintWeekend = currentWeekend.sessions.some(
@@ -74,6 +84,13 @@ export function UpcomingSessionView({ context, standings }: Props) {
   }));
 
   const metrics = buildStandingsMetrics(standings);
+
+  const nextSessionData = {
+    raceName: currentWeekend.name,
+    circuit: currentWeekend.circuit,
+    sessionName: nextSession.label,
+    dateUtc: nextSession.dateUtc,
+  };
 
   return (
     <div className="space-y-6">
@@ -100,13 +117,32 @@ export function UpcomingSessionView({ context, standings }: Props) {
             <div className="hidden lg:block">
               <LivePreviewExplainer sport="f1" />
             </div>
+            <div className="hidden lg:block">
+              <BriefingFeed
+                nextSessionData={nextSessionData}
+                isActiveSession={false}
+              />
+            </div>
           </>
         }
       />
 
-      <div className="lg:hidden">
+      <div className="space-y-5 lg:hidden">
         <LivePreviewExplainer sport="f1" />
+        <BriefingFeed
+          nextSessionData={nextSessionData}
+          isActiveSession={false}
+        />
       </div>
+
+      {previousRace && previousRace.round < currentWeekend.round && (
+        <PreviousRoundCard
+          round={previousRace.round}
+          title={previousRace.name}
+          subtitle={previousRace.circuit}
+          href={`/races/${previousRace.slug}`}
+        />
+      )}
 
       {metrics.length > 0 && (
         <section aria-label="Championship snapshot">
@@ -123,6 +159,7 @@ export function UpcomingSessionView({ context, standings }: Props) {
             href: `/races/${currentWeekend.slug}`,
             label: "Full weekend schedule",
           },
+          { href: "/live", label: "Live timing hub" },
           { href: "/standings", label: "Championship standings" },
           { href: "/races", label: "Season calendar" },
         ]}

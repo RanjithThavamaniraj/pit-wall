@@ -47,49 +47,62 @@ export function RaceCard({ race }: Props) {
 
   if (race.isNext || race.isCurrent) {
     const countdown = liveSession ?? nextSession;
+    const showLiveLink = race.isCurrent || Boolean(liveSession);
+
     return (
-      <Link
-        href={`/races/${race.slug}`}
-        className="group relative block overflow-hidden rounded-[2rem] border border-amber-300/20 bg-white/[0.06] p-6 shadow-2xl shadow-amber-500/10 backdrop-blur-xl transition hover:border-amber-300/30 hover:bg-white/[0.08] focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-300"
-        aria-label={`${race.name} — Round ${race.round}. ${race.isCurrent ? "Race weekend is happening now." : "Next race."}`}
-      >
-        {/* Amber top accent */}
-        <div
-          className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-amber-300/0 via-amber-300 to-amber-300/0"
-          aria-hidden="true"
-        />
-        <div className="flex items-start justify-between gap-2">
-          <div className="flex items-center gap-3">
-            <span className="text-3xl" aria-hidden="true">{flag}</span>
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.22em] text-amber-300">
-                Round {race.round} · {race.isCurrent ? "This weekend" : "Next race"}
-              </p>
-              <h3 className="mt-1 text-lg font-semibold text-white">
-                {race.name}
-              </h3>
-              <p className="text-sm text-slate-400">
-                {race.circuit} · {race.locality}
-              </p>
+      <div className="relative overflow-hidden rounded-[2rem] border border-amber-300/20 bg-white/[0.06] shadow-2xl shadow-amber-500/10 backdrop-blur-xl">
+        <Link
+          href={`/races/${race.slug}`}
+          className="group block p-6 transition hover:bg-white/[0.08] focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-300 focus-visible:ring-inset"
+          aria-label={`${race.name} — Round ${race.round}. ${race.isCurrent ? "Race weekend is happening now." : "Next race."}`}
+        >
+          <div
+            className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-amber-300/0 via-amber-300 to-amber-300/0"
+            aria-hidden="true"
+          />
+          <div className="flex items-start justify-between gap-2">
+            <div className="flex items-center gap-3">
+              <span className="text-3xl" aria-hidden="true">{flag}</span>
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.22em] text-amber-300">
+                  Round {race.round} · {race.isCurrent ? "This weekend" : "Next race"}
+                </p>
+                <h3 className="mt-1 text-lg font-semibold text-white">
+                  {race.name}
+                </h3>
+                <p className="text-sm text-slate-400">
+                  {race.circuit} · {race.locality}
+                </p>
+              </div>
             </div>
+            {liveSession ? (
+              <StatusPill tone="red">Live now</StatusPill>
+            ) : (
+              <StatusPill tone="green">Upcoming</StatusPill>
+            )}
           </div>
-          {liveSession ? (
-            <StatusPill tone="red">Live now</StatusPill>
-          ) : (
-            <StatusPill tone="green">Upcoming</StatusPill>
+          <p className="mt-3 text-xs text-slate-500">{dateRange}</p>
+          {countdown && countdown.dateUtc && (
+            <div className="mt-5">
+              <SessionCountdown
+                targetDate={countdown.dateUtc}
+                sessionLabel={countdown.label}
+                variant="full"
+              />
+            </div>
           )}
-        </div>
-        <p className="mt-3 text-xs text-slate-500">{dateRange}</p>
-        {countdown && countdown.dateUtc && (
-          <div className="mt-5">
-            <SessionCountdown
-              targetDate={countdown.dateUtc}
-              sessionLabel={countdown.label}
-              variant="full"
-            />
+        </Link>
+        {showLiveLink && (
+          <div className="border-t border-white/10 px-6 py-3">
+            <Link
+              href="/live"
+              className="text-sm font-semibold text-amber-300 transition hover:text-amber-200"
+            >
+              Watch live timing →
+            </Link>
           </div>
         )}
-      </Link>
+      </div>
     );
   }
 

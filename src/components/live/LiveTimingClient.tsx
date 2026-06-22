@@ -4,7 +4,9 @@ import { useEffect, useState, useRef } from "react";
 import type { LiveTimingPayload } from "@/lib/timing";
 import type { Standings } from "@/lib/standings";
 import type { WeekendContext } from "@/lib/weekend";
+import type { RaceWeekend } from "@/lib/schedule";
 import { Container } from "@/components/ui";
+import { EmptyWeekendState } from "@/components/live/WeekendPreviewShared";
 import { SessionStatusHeader } from "@/components/live/SessionStatusHeader";
 import { TimingBoard } from "@/components/live/TimingBoard";
 import { BriefingFeed } from "@/components/live/BriefingFeed";
@@ -14,9 +16,11 @@ import { CompletedSessionView } from "@/components/live/CompletedSessionView";
 export default function LiveTimingClient({
   initialContext,
   initialStandings = null,
+  previousRace = null,
 }: {
   initialContext: WeekendContext | null;
   initialStandings?: Standings | null;
+  previousRace?: RaceWeekend | null;
 }) {
   const [data, setData] = useState<LiveTimingPayload | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -70,13 +74,10 @@ export default function LiveTimingClient({
 
   if (!currentContext) {
     return (
-      <section className="relative isolate flex flex-col items-center justify-center gap-4 py-16">
-        <p className="text-slate-400 animate-pulse">
-          Initializing weekend state...
-        </p>
-        <p className="text-sm text-slate-500">
-          If this persists, the season may be between race weekends.
-        </p>
+      <section className="relative isolate py-16">
+        <Container wide>
+          <EmptyWeekendState sport="f1" />
+        </Container>
       </section>
     );
   }
@@ -141,13 +142,24 @@ export default function LiveTimingClient({
           <UpcomingSessionView
             context={currentContext}
             standings={initialStandings}
+            previousRace={previousRace}
           />
         ) : showSessionResults ? (
-          <CompletedSessionView
-            context={currentContext}
-            timing={data?.timing || []}
-            betweenSessions={isBetweenSessions}
-          />
+          <div className="space-y-5">
+            <CompletedSessionView
+              context={currentContext}
+              timing={data?.timing || []}
+              betweenSessions={isBetweenSessions}
+            />
+            {isBetweenSessions && (
+              <div className="lg:max-w-md">
+                <BriefingFeed
+                  nextSessionData={nextSessionData}
+                  isActiveSession={false}
+                />
+              </div>
+            )}
+          </div>
         ) : (
           <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(300px,360px)]">
             <div className="flex min-w-0 flex-col gap-5">

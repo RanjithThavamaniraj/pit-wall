@@ -253,23 +253,45 @@ function Hero() {
 // ─── Feature Grid ──────────────────────────────────────────────────────────────
 
 function FeatureGrid({ sport }: { sport: Sport }) {
+  const routes =
+    sport === "motogp"
+      ? {
+          briefing: "/motogp/live",
+          pulse: "/#strategy",
+          championship: "/motogp/standings",
+        }
+      : {
+          briefing: "/live",
+          pulse: "/#strategy",
+          championship: "/standings",
+        };
+
   const companionCards = [
     {
       eyebrow: "RACE BRIEFING",
       title: "Know the story before the race.",
-      description: "Track facts, weather outlook, previous winners, and the key talking points heading into the weekend.",
+      description:
+        "Follow live session updates, race control messages, and weekend progression as each session runs.",
+      href: routes.briefing,
+      cta: sport === "motogp" ? "Open weekend hub" : "Open live timing",
     },
     {
       eyebrow: "COMMUNITY PULSE",
       title: "See who fans are backing.",
-      description: sport === "motogp"
-        ? "Follow community favourites, prediction trends, and the riders gaining momentum before lights out."
-        : "Follow community favourites, prediction trends, and the drivers gaining momentum before lights out.",
+      description:
+        sport === "motogp"
+          ? "Preview how community race-win favourites could look once predictions launch."
+          : "Preview how community race-win favourites could look once predictions launch.",
+      href: routes.pulse,
+      cta: "View prediction preview",
     },
     {
       eyebrow: "CHAMPIONSHIP BATTLE",
-      title: "Compete all season long.",
-      description: "Track prediction standings, race results, and the battle for the top spot on the PitWall Apex leaderboard.",
+      title: "Track the title fight.",
+      description:
+        "Live drivers' and constructors' standings updated after every round.",
+      href: routes.championship,
+      cta: "View standings",
     },
   ];
 
@@ -279,27 +301,26 @@ function FeatureGrid({ sport }: { sport: Sport }) {
         <SectionHeading
           eyebrow="MOTORSPORT WEEKEND HUB"
           title="Everything you need before lights out."
-          description="PitWall Apex helps fans follow the race weekend. More community features are on the way."
+          description="Schedules, live hubs, and championship standings — with more community features on the way."
         />
         <div className="mt-10 grid gap-5 md:grid-cols-3">
           {companionCards.map((card) => (
-            <GlassCard
-              key={card.title}
-              className="relative transition hover:-translate-y-1 hover:bg-white/[0.08]"
-            >
-              <StatusPill tone="neutral" className="absolute right-4 top-4">
-                Coming soon
-              </StatusPill>
-              <p className="text-sm font-semibold uppercase tracking-[0.24em] text-amber-200">
-                {card.eyebrow}
-              </p>
-              <h3 className="mt-5 text-2xl font-semibold text-white">
-                {card.title}
-              </h3>
-              <p className="mt-4 leading-7 text-slate-300">
-                {card.description}
-              </p>
-            </GlassCard>
+            <Link key={card.title} href={card.href} className="group block">
+              <GlassCard className="h-full transition hover:-translate-y-1 hover:bg-white/[0.08]">
+                <p className="text-sm font-semibold uppercase tracking-[0.24em] text-amber-200">
+                  {card.eyebrow}
+                </p>
+                <h3 className="mt-5 text-2xl font-semibold text-white group-hover:text-amber-100 transition">
+                  {card.title}
+                </h3>
+                <p className="mt-4 leading-7 text-slate-300">
+                  {card.description}
+                </p>
+                <p className="mt-5 text-sm font-semibold text-amber-300 group-hover:text-amber-200">
+                  {card.cta} →
+                </p>
+              </GlassCard>
+            </Link>
           ))}
         </div>
       </Container>

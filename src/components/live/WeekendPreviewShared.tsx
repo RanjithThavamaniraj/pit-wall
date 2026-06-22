@@ -288,3 +288,113 @@ export function WeekendQuickLinks({
     </div>
   );
 }
+
+export type PodiumFinisher = {
+  position: number;
+  name: string;
+  detail?: string;
+};
+
+export function PreviousRoundCard({
+  round,
+  title,
+  subtitle,
+  href,
+  podium = [],
+}: {
+  round: number;
+  title: string;
+  subtitle: string;
+  href: string;
+  podium?: PodiumFinisher[];
+}) {
+  return (
+    <GlassCard className="p-5 sm:p-6">
+      <h2 className="text-xs font-semibold uppercase tracking-[0.28em] text-slate-500">
+        Previous round
+      </h2>
+      <p className="mt-2 text-lg font-semibold text-white">{title}</p>
+      <p className="mt-1 text-sm text-slate-400">
+        Round {round} · {subtitle}
+      </p>
+
+      {podium.length > 0 && (
+        <div className="mt-4 space-y-2 border-t border-white/[0.06] pt-4">
+          {podium.map((finisher) => (
+            <div
+              key={finisher.position}
+              className="flex items-center justify-between text-sm"
+            >
+              <span className="font-mono text-slate-500">
+                P{finisher.position}
+              </span>
+              <span className="flex-1 px-3 text-slate-300">
+                {finisher.detail ? (
+                  <span className="font-mono text-amber-200/80">
+                    {finisher.detail}{" "}
+                  </span>
+                ) : null}
+                {finisher.name}
+              </span>
+            </div>
+          ))}
+        </div>
+      )}
+
+      <Link
+        href={href}
+        className="mt-4 inline-flex text-sm font-semibold text-amber-300 transition hover:text-amber-200"
+      >
+        View round details →
+      </Link>
+    </GlassCard>
+  );
+}
+
+export function EmptyWeekendState({
+  sport,
+}: {
+  sport: "f1" | "motogp";
+}) {
+  const isMotogp = sport === "motogp";
+  const racesHref = isMotogp ? "/motogp/races" : "/races";
+  const standingsHref = isMotogp ? "/motogp/standings" : "/standings";
+  const liveHref = isMotogp ? "/motogp/live" : "/live";
+
+  return (
+    <div className="mx-auto max-w-lg text-center">
+      <GlassCard className="p-8 sm:p-10">
+        <p className="text-sm font-semibold uppercase tracking-[0.28em] text-amber-300">
+          Off weekend
+        </p>
+        <h2 className="mt-3 text-2xl font-semibold text-white">
+          No active race weekend
+        </h2>
+        <p className="mt-3 text-sm leading-7 text-slate-400">
+          The season may be between events or on a scheduled break. Check the
+          calendar for the next Grand Prix or browse championship standings.
+        </p>
+        <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
+          <Link
+            href={racesHref}
+            className="rounded-full bg-amber-300 px-6 py-3 text-sm font-bold text-slate-950 transition hover:bg-amber-200"
+          >
+            View race schedule
+          </Link>
+          <Link
+            href={standingsHref}
+            className="rounded-full border border-white/15 px-6 py-3 text-sm font-semibold text-white transition hover:bg-white/10"
+          >
+            Championship standings
+          </Link>
+        </div>
+        <p className="mt-6 text-xs text-slate-600">
+          Live hub:{" "}
+          <Link href={liveHref} className="text-amber-300 hover:text-amber-200">
+            {liveHref}
+          </Link>
+        </p>
+      </GlassCard>
+    </div>
+  );
+}

@@ -55,21 +55,12 @@ export const metadata: Metadata = {
     description:
       "Your motorsport weekend hub. Live timing, session schedules, championship standings, and race intelligence for Formula 1 and MotoGP.",
     type: "website",
-    images: [
-      {
-        url: "/brand/pitwall-apex-logo-full.png",
-        width: 1024,
-        height: 682,
-        alt: "PitWall Apex — Motorsport Weekend Hub",
-      },
-    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "PitWall Apex — Motorsport Weekend Hub",
     description:
       "Your motorsport weekend hub. Live timing, session schedules, championship standings, and race intelligence for Formula 1 and MotoGP.",
-    images: ["/brand/pitwall-apex-logo-full.png"],
   },
 };
 

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import LiveTimingClient from "@/components/live/LiveTimingClient";
-import { fetchSeasonSchedule } from "@/lib/schedule";
+import { fetchSeasonSchedule, getPreviousRace } from "@/lib/schedule";
+import type { RaceWeekend } from "@/lib/schedule";
 import { fetchAllStandings } from "@/lib/standings";
 import { getWeekendContext } from "@/lib/weekend";
 
@@ -15,6 +16,7 @@ export const revalidate = 3600; // Cache the schedule for an hour
 export default async function LivePage() {
   let initialContext = null;
   let initialStandings = null;
+  let previousRace: RaceWeekend | null = null;
 
   try {
     const [scheduleResult, standingsResult] = await Promise.allSettled([
@@ -24,6 +26,7 @@ export default async function LivePage() {
 
     if (scheduleResult.status === "fulfilled") {
       initialContext = getWeekendContext(scheduleResult.value);
+      previousRace = getPreviousRace(scheduleResult.value);
     }
     if (standingsResult.status === "fulfilled") {
       initialStandings = standingsResult.value;
@@ -36,6 +39,7 @@ export default async function LivePage() {
     <LiveTimingClient
       initialContext={initialContext}
       initialStandings={initialStandings}
+      previousRace={previousRace}
     />
   );
 }

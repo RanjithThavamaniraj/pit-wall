@@ -4,6 +4,8 @@ import {
   fetchMotoGpSchedule,
   fetchMotoGpStandings,
   fetchSessionResults,
+  getPreviousMotoGpEvent,
+  type MotoGpEvent,
   type MotoGpFinisher,
 } from "@/lib/motogp";
 import { getMotoGpWeekendContext } from "@/lib/motogp-weekend";
@@ -20,6 +22,7 @@ export default async function MotoGpLivePage() {
   let initialContext = null;
   let initialResults: MotoGpFinisher[] = [];
   let initialStandings = null;
+  let previousEvent: MotoGpEvent | null = null;
 
   try {
     const [scheduleResult, standingsResult] = await Promise.allSettled([
@@ -29,6 +32,7 @@ export default async function MotoGpLivePage() {
 
     if (scheduleResult.status === "fulfilled") {
       initialContext = getMotoGpWeekendContext(scheduleResult.value);
+      previousEvent = getPreviousMotoGpEvent(scheduleResult.value) ?? null;
 
       if (initialContext) {
         const resultsSession =
@@ -55,6 +59,7 @@ export default async function MotoGpLivePage() {
       initialContext={initialContext}
       initialResults={initialResults}
       initialStandings={initialStandings}
+      previousEvent={previousEvent}
     />
   );
 }

@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import Link from "next/link";
-import type { MotoGpFinisher, MotoGpStandings } from "@/lib/motogp";
+import type { MotoGpEvent, MotoGpFinisher, MotoGpStandings } from "@/lib/motogp";
 import type { MotoGpWeekendContext } from "@/lib/motogp-weekend";
 import { MotoGpUpcomingView } from "@/components/motogp/MotoGpUpcomingView";
+import { EmptyWeekendState } from "@/components/live/WeekendPreviewShared";
 import { SessionCountdown } from "@/components/SessionCountdown";
 import { Container, GlassCard, StatusPill } from "@/components/ui";
 import { countryCodeToFlag } from "@/lib/utils";
@@ -13,12 +13,14 @@ type Props = {
   initialContext: MotoGpWeekendContext | null;
   initialResults: MotoGpFinisher[];
   initialStandings?: MotoGpStandings | null;
+  previousEvent?: MotoGpEvent | null;
 };
 
 export default function MotoGpLiveClient({
   initialContext,
   initialResults,
   initialStandings = null,
+  previousEvent = null,
 }: Props) {
   const [context, setContext] = useState(initialContext);
   const [results, setResults] = useState(initialResults);
@@ -58,14 +60,10 @@ export default function MotoGpLiveClient({
 
   if (!context) {
     return (
-      <section className="relative isolate flex flex-col items-center justify-center gap-4 py-16">
-        <p className="text-slate-400">No active MotoGP weekend on the calendar.</p>
-        <Link
-          href="/motogp/races"
-          className="text-sm font-semibold text-amber-300 hover:text-amber-200 transition"
-        >
-          View race calendar →
-        </Link>
+      <section className="relative isolate py-16">
+        <Container wide>
+          <EmptyWeekendState sport="motogp" />
+        </Container>
       </section>
     );
   }
@@ -130,6 +128,7 @@ export default function MotoGpLiveClient({
           <MotoGpUpcomingView
             context={context}
             standings={initialStandings}
+            previousEvent={previousEvent}
           />
         ) : (
           <div className="grid gap-5 lg:grid-cols-2 lg:items-start">

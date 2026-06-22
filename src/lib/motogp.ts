@@ -618,4 +618,11 @@ export function getNextMotoGpEvent(
   return schedule.races.find((race) => race.isNext);
 }
 
+export function getPreviousMotoGpEvent(
+  schedule: MotoGpSchedule
+): MotoGpEvent | undefined {
+  const pastRaces = schedule.races.filter((race) => race.isPast);
+  return pastRaces.length > 0 ? pastRaces[pastRaces.length - 1] : undefined;
+}
+
 export { splitRiderName, MAIN_CATEGORIES };

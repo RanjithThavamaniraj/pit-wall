@@ -49,7 +49,7 @@ export default async function MotoGpRacesPage() {
             {schedule.season} season · MotoGP
           </p>
           <h1 className="mt-3 text-4xl font-semibold tracking-[-0.04em] text-white sm:text-6xl">
-            Race calendar
+            Race schedule
           </h1>
           <p className="mt-4 max-w-xl text-base leading-7 text-slate-400">
             {schedule.totalRaces} rounds. All session times shown in your local
