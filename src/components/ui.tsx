@@ -3,12 +3,18 @@ import type { ReactNode } from "react";
 export function Container({
   children,
   className = "",
+  wide = false,
 }: {
   children: ReactNode;
   className?: string;
+  wide?: boolean;
 }) {
   return (
-    <div className={`mx-auto w-full max-w-7xl px-5 sm:px-8 lg:px-10 ${className}`}>
+    <div
+      className={`mx-auto w-full px-5 sm:px-8 lg:px-10 ${
+        wide ? "max-w-[88rem]" : "max-w-7xl"
+      } ${className}`}
+    >
       {children}
     </div>
   );
@@ -57,9 +63,11 @@ export function GlassCard({
 export function StatusPill({
   children,
   tone = "neutral",
+  className = "",
 }: {
   children: ReactNode;
   tone?: "green" | "amber" | "red" | "blue" | "neutral";
+  className?: string;
 }) {
   const tones = {
     green: "border-emerald-300/30 bg-emerald-300/10 text-emerald-200",
@@ -71,7 +79,7 @@ export function StatusPill({
 
   return (
     <span
-      className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold ${tones[tone]}`}
+      className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold ${tones[tone]} ${className}`}
     >
       {children}
     </span>

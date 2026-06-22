@@ -1,6 +1,10 @@
 import type { RaceWeekend, RaceSession, SeasonSchedule } from "./schedule";
 
-export type WeekendState = "UPCOMING" | "LIVE" | "COMPLETED";
+export type WeekendState =
+  | "UPCOMING"
+  | "LIVE"
+  | "BETWEEN_SESSIONS"
+  | "COMPLETED";
 
 export type WeekendContext = {
   currentWeekend: RaceWeekend;
@@ -36,10 +40,8 @@ export function getWeekendContext(schedule: SeasonSchedule): WeekendContext | nu
     state = "LIVE";
     activeSession = liveSession;
   } else if (nextSession) {
-    // There is no live session, but there is an upcoming one.
-    // Have we completed any sessions yet?
     if (lastCompletedSession) {
-      state = "COMPLETED";
+      state = "BETWEEN_SESSIONS";
       activeSession = lastCompletedSession;
     } else {
       state = "UPCOMING";

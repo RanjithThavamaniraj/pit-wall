@@ -7,41 +7,43 @@ export function UpcomingSessionView({ context }: { context: WeekendContext }) {
 
   if (!nextSession) {
     return (
-      <div className="flex justify-center items-center h-48 border border-white/10 bg-white/[0.04] rounded-[2rem]">
+      <div className="flex h-40 items-center justify-center rounded-[2rem] border border-white/10 bg-white/[0.04]">
         <p className="text-sm text-slate-400">Waiting for schedule data...</p>
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col items-center justify-center py-12 px-4 space-y-8">
-      <div className="text-center space-y-2">
-        <h2 className="text-sm font-semibold uppercase tracking-[0.24em] text-emerald-400">
-          Upcoming Session
-        </h2>
-        <h3 className="text-3xl sm:text-4xl font-semibold text-white">
-          {nextSession.label}
-        </h3>
-        <p className="text-slate-400">{currentWeekend.circuit}</p>
+    <div className="grid gap-6 lg:grid-cols-2 lg:items-start">
+      <div className="space-y-5">
+        <div className="space-y-2">
+          <h2 className="text-sm font-semibold uppercase tracking-[0.24em] text-emerald-400">
+            Upcoming Session
+          </h2>
+          <h3 className="text-3xl font-semibold text-white sm:text-4xl">
+            {nextSession.label}
+          </h3>
+          <p className="text-slate-400">{currentWeekend.circuit}</p>
+        </div>
+
+        <GlassCard className="p-6 text-center sm:p-8">
+          <SessionCountdown
+            targetDate={nextSession.dateUtc}
+            sessionLabel={nextSession.label}
+            variant="full"
+          />
+        </GlassCard>
       </div>
 
-      <GlassCard className="w-full max-w-md p-8 text-center">
-        <SessionCountdown
-          targetDate={nextSession.dateUtc}
-          sessionLabel={nextSession.label}
-          variant="full"
-        />
-      </GlassCard>
-
-      <div className="w-full max-w-2xl mt-12">
-        <h4 className="text-xs font-semibold uppercase tracking-widest text-slate-500 mb-6 text-center">
+      <div>
+        <h4 className="mb-4 text-xs font-semibold uppercase tracking-widest text-slate-500">
           Weekend Progression
         </h4>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           {currentWeekend.sessions.map((session) => (
             <div
               key={session.key}
-              className={`p-4 rounded-xl border ${
+              className={`rounded-xl border p-4 ${
                 session.status === "completed"
                   ? "border-emerald-500/20 bg-emerald-500/10"
                   : session.status === "live"
@@ -51,8 +53,10 @@ export function UpcomingSessionView({ context }: { context: WeekendContext }) {
                   : "border-white/5 bg-white/[0.02]"
               }`}
             >
-              <p className="text-sm font-medium text-white mb-1">{session.label}</p>
-              <p className="text-xs text-slate-400 uppercase tracking-widest">
+              <p className="mb-1 text-sm font-medium text-white">
+                {session.label}
+              </p>
+              <p className="text-xs uppercase tracking-widest text-slate-400">
                 {session.status === "completed"
                   ? "Completed"
                   : session.status === "live"

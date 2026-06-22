@@ -6,32 +6,37 @@ import { GlassCard } from "@/components/ui";
 type Props = {
   context: WeekendContext;
   timing: TimingRowData[];
+  betweenSessions?: boolean;
 };
 
-export function CompletedSessionView({ context, timing }: Props) {
+export function CompletedSessionView({
+  context,
+  timing,
+  betweenSessions = false,
+}: Props) {
   const { currentWeekend, activeSession, nextSession } = context;
 
   return (
-    <div className="flex flex-col gap-8">
-      {/* Header */}
-      <div className="flex flex-col items-center justify-center py-8 text-center space-y-4">
+    <div className="flex flex-col gap-6">
+      <div className="space-y-3 py-2 text-center lg:text-left">
         <h2 className="text-sm font-semibold uppercase tracking-[0.24em] text-slate-400">
-          Session Completed
+          {betweenSessions ? "Between Sessions" : "Session Completed"}
         </h2>
-        <h3 className="text-3xl sm:text-4xl font-semibold text-white">
+        <h3 className="text-3xl font-semibold text-white sm:text-4xl">
           {activeSession?.label || "Session"}
         </h3>
         <p className="text-slate-400">{currentWeekend.circuit}</p>
       </div>
 
-      {/* Top 3 Podium (if we have timing data) */}
       {timing.length >= 3 && (
-        <div className="grid grid-cols-3 gap-4 max-w-3xl mx-auto w-full">
+        <div className="mx-auto grid w-full max-w-4xl grid-cols-3 gap-4">
           {[timing[1], timing[0], timing[2]].map((driver, idx) => (
             <GlassCard
               key={driver.driverNumber}
               className={`p-4 flex flex-col items-center text-center ${
-                idx === 1 ? "border-amber-400/30 bg-amber-400/5 scale-110 z-10" : "opacity-90"
+                idx === 1
+                  ? "border-amber-400/30 bg-amber-400/5 lg:scale-110 z-10"
+                  : "opacity-90"
               }`}
             >
               <span className="text-2xl font-bold text-white mb-1">
@@ -43,7 +48,9 @@ export function CompletedSessionView({ context, timing }: Props) {
                 style={{ backgroundColor: driver.teamColor }}
               />
               <span className="text-xs text-slate-400 font-mono">
-                {idx === 1 ? driver.intervalToLeader : driver.intervalToLeader}
+                {idx === 1
+                  ? driver.intervalToLeader
+                  : driver.intervalToNext || driver.intervalToLeader}
               </span>
             </GlassCard>
           ))}
@@ -95,11 +102,11 @@ export function CompletedSessionView({ context, timing }: Props) {
 
       {/* Next Session Panel */}
       {nextSession && (
-        <GlassCard className="mt-8 p-6 text-center max-w-xl mx-auto w-full">
-          <h4 className="text-xs font-semibold uppercase tracking-widest text-slate-500 mb-4">
+        <GlassCard className="mx-auto w-full max-w-2xl p-6 text-center lg:mx-0 lg:text-left">
+          <h4 className="mb-3 text-xs font-semibold uppercase tracking-widest text-slate-500">
             Coming Up Next
           </h4>
-          <h3 className="text-2xl font-semibold text-white mb-6">{nextSession.label}</h3>
+          <h3 className="mb-5 text-2xl font-semibold text-white">{nextSession.label}</h3>
           <SessionCountdown
             targetDate={nextSession.dateUtc}
             sessionLabel={nextSession.label}

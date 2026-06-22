@@ -100,7 +100,7 @@ function buildSessionDateUtc(
 ): string {
   if (!sessionObj?.date) return "";
   const time = sessionObj.time ?? "00:00:00Z";
-  const timeClean = time.endsWith("Z") ? time : time + "Z";
+  const timeClean = /[zZ]|[+-]\d{2}/.test(time) ? time : `${time}Z`;
   return `${sessionObj.date}T${timeClean}`;
 }
 
@@ -148,12 +148,14 @@ function jolpicaToRaceWeekend(
   const sessions = buildSessions(race);
   const raceSession = sessions.find((s) => s.key === "race");
   const raceDate = raceSession?.dateUtc ?? "";
-  const isPast = raceDate ? new Date(raceDate).getTime() < Date.now() : false;
+  const raceEndMs = raceDate
+    ? new Date(raceDate).getTime() + 120 * 60 * 1000
+    : 0;
+  const isPast = raceDate ? raceEndMs < Date.now() : false;
   const fp1Date = sessions.find((s) => s.key === "fp1")?.dateUtc ?? "";
   const isCurrent =
     fp1Date && raceDate
-      ? new Date(fp1Date).getTime() <= Date.now() &&
-        new Date(raceDate).getTime() > Date.now() - 3 * 60 * 60 * 1000
+      ? new Date(fp1Date).getTime() <= Date.now() && raceEndMs > Date.now()
       : false;
 
   return {

@@ -1,33 +1,58 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { fetchAllStandings } from "@/lib/standings";
-import { StandingsTabs } from "@/components/StandingsTabs";
+import {
+  fetchMotoGpStandings,
+  MAIN_CATEGORIES,
+  type MotoGpCategoryName,
+} from "@/lib/motogp";
+import { MotoGpStandingsTabs } from "@/components/motogp/MotoGpStandingsTabs";
 import { Container } from "@/components/ui";
 
 export const metadata: Metadata = {
   title: "Championship Standings",
   description:
-    "Live Formula 1 World Drivers' and Constructors' Championship standings. Updated after every race.",
+    "Live MotoGP, Moto2, and Moto3 championship standings. Updated after every race.",
 };
 
-export const revalidate = 1800; // 30 minutes
+export const revalidate = 1800;
 
-export default async function StandingsPage() {
-  let standings;
+export default async function MotoGpStandingsPage() {
+  let standingsByCategory;
+  let season = new Date().getFullYear();
+  let round = 0;
+
   try {
-    standings = await fetchAllStandings();
+    const results = await Promise.all(
+      MAIN_CATEGORIES.map(async (category) => {
+        const standings = await fetchMotoGpStandings(category);
+        return [category, standings] as const;
+      })
+    );
+
+    standingsByCategory = Object.fromEntries(
+      results.map(([category, standings]) => [
+        category,
+        { riders: standings.riders, teams: standings.teams },
+      ])
+    ) as Record<
+      MotoGpCategoryName,
+      { riders: typeof results[0][1]["riders"]; teams: typeof results[0][1]["teams"] }
+    >;
+
+    season = results[0][1].season;
+    round = results[0][1].round;
   } catch {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
         <Container>
           <p className="text-center text-slate-400">
-            Unable to load standings. Please try again shortly.
+            Unable to load MotoGP standings. Please try again shortly.
           </p>
           <div className="mt-6 flex justify-center gap-4">
             <Link href="/" className="text-sm font-semibold text-amber-300 hover:text-amber-200">
               Back to home
             </Link>
-            <Link href="/races" className="text-sm font-semibold text-slate-300 hover:text-white">
+            <Link href="/motogp/races" className="text-sm font-semibold text-slate-300 hover:text-white">
               View schedule
             </Link>
           </div>
@@ -36,12 +61,12 @@ export default async function StandingsPage() {
     );
   }
 
-  const leader = standings.drivers[0];
-  const constructorLeader = standings.constructors[0];
+  const motoGpLeader = standingsByCategory["MotoGP™"].riders[0];
+  const motoGpP2 = standingsByCategory["MotoGP™"].riders[1];
+  const teamLeader = standingsByCategory["MotoGP™"].teams[0];
 
   return (
     <>
-      {/* ─── Hero ──────────────────────────────────────────────────────── */}
       <section className="relative isolate overflow-hidden pt-10 pb-6 sm:pt-12 sm:pb-8">
         <div
           aria-hidden="true"
@@ -49,30 +74,27 @@ export default async function StandingsPage() {
         />
         <Container>
           <p className="text-sm font-semibold uppercase tracking-[0.28em] text-amber-300">
-            {standings.season} season
+            {season} season · MotoGP
           </p>
           <h1 className="mt-3 text-4xl font-semibold tracking-[-0.04em] text-white sm:text-6xl">
             Championship
           </h1>
-          <p className="mt-4 text-base text-slate-400">
-            After Round {standings.round}
-          </p>
+          <p className="mt-4 text-base text-slate-400">After Round {round}</p>
 
-          {/* Quick stats */}
-          {leader && constructorLeader && (
+          {motoGpLeader && teamLeader && (
             <dl className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
               <div className="rounded-2xl border border-white/10 bg-white/[0.05] p-4">
                 <dt className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">
-                  WDC Leader
+                  Championship leader
                 </dt>
                 <dd className="mt-2 text-lg font-semibold text-white">
                   <span className="font-mono text-amber-200">
-                    {leader.driverCode}
+                    #{motoGpLeader.riderNumber}
                   </span>{" "}
-                  {leader.lastName}
+                  {motoGpLeader.riderName}
                 </dd>
                 <dd className="mt-0.5 text-sm text-slate-400">
-                  {leader.points} pts
+                  {motoGpLeader.points} pts
                 </dd>
               </div>
 
@@ -81,24 +103,22 @@ export default async function StandingsPage() {
                   P2 Gap
                 </dt>
                 <dd className="mt-2 text-lg font-semibold text-white">
-                  {standings.drivers[1]
-                    ? `−${standings.drivers[1].gapToLeader} pts`
-                    : "—"}
+                  {motoGpP2 ? `−${motoGpP2.gapToLeader} pts` : "—"}
                 </dd>
                 <dd className="mt-0.5 text-sm text-slate-400">
-                  {standings.drivers[1]?.lastName ?? ""}
+                  {motoGpP2?.riderName ?? ""}
                 </dd>
               </div>
 
               <div className="rounded-2xl border border-white/10 bg-white/[0.05] p-4">
                 <dt className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">
-                  WCC Leader
+                  Teams leader
                 </dt>
                 <dd className="mt-2 text-lg font-semibold text-white">
-                  {constructorLeader.name}
+                  {teamLeader.name}
                 </dd>
                 <dd className="mt-0.5 text-sm text-slate-400">
-                  {constructorLeader.points} pts
+                  {teamLeader.points} pts
                 </dd>
               </div>
 
@@ -107,10 +127,10 @@ export default async function StandingsPage() {
                   Races completed
                 </dt>
                 <dd className="mt-2 text-lg font-semibold text-white">
-                  {standings.round}
+                  {round}
                 </dd>
                 <dd className="mt-0.5 text-sm text-slate-400">
-                  {standings.season} season
+                  {season} season
                 </dd>
               </div>
             </dl>
@@ -118,17 +138,15 @@ export default async function StandingsPage() {
         </Container>
       </section>
 
-      {/* ─── Standings tables ──────────────────────────────────────────── */}
-      <section className="pt-2 pb-12" aria-labelledby="standings-table-heading">
+      <section className="pt-2 pb-12" aria-labelledby="motogp-standings-table-heading">
         <Container wide>
-          <h2 id="standings-table-heading" className="sr-only">
-            Standings tables
+          <h2 id="motogp-standings-table-heading" className="sr-only">
+            MotoGP standings tables
           </h2>
-          <StandingsTabs
-            drivers={standings.drivers}
-            constructors={standings.constructors}
-            season={standings.season}
-            round={standings.round}
+          <MotoGpStandingsTabs
+            standingsByCategory={standingsByCategory}
+            season={season}
+            round={round}
           />
         </Container>
       </section>

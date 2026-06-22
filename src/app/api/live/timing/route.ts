@@ -59,6 +59,10 @@ export async function GET() {
       currentSession = sessionData[0];
     }
 
+    const isSessionResults =
+      weekendContext.state === "COMPLETED" ||
+      weekendContext.state === "BETWEEN_SESSIONS";
+
     // If there is NO active or completed session, and we are UPCOMING
     if (weekendContext.state === "UPCOMING" || !currentSession) {
       return NextResponse.json(
@@ -78,9 +82,15 @@ export async function GET() {
       fetch(`${OPENF1_BASE}/race_control?session_key=latest`, { next: { revalidate: 10 } }),
     ]);
 
-    const drivers: OpenF1Driver[] = await driversRes.json();
-    const weather: OpenF1Weather[] = await weatherRes.json();
-    const raceControl: OpenF1RaceControl[] = await raceControlRes.json();
+    const drivers: OpenF1Driver[] = driversRes.ok
+      ? await driversRes.json()
+      : [];
+    const weather: OpenF1Weather[] = weatherRes.ok
+      ? await weatherRes.json()
+      : [];
+    const raceControl: OpenF1RaceControl[] = raceControlRes.ok
+      ? await raceControlRes.json()
+      : [];
 
     // Determine flag / session state.
     const RAW_FLAG_MAP: Record<string, SessionStatus["flag"]> = {
@@ -142,10 +152,9 @@ export async function GET() {
                               currentSession.session_name.toLowerCase().includes("qualifying");
     let timingRows: TimingRowData[] = [];
 
-    if (weekendContext.state === "COMPLETED" && isPracticeOrQuali) {
-      // Fetch /laps to compute fastest lap classification
+    if (isSessionResults && isPracticeOrQuali) {
       const lapsRes = await fetch(`${OPENF1_BASE}/laps?session_key=latest`, { next: { revalidate: 3600 } });
-      const laps: OpenF1Lap[] = await lapsRes.json();
+      const laps: OpenF1Lap[] = lapsRes.ok ? await lapsRes.json() : [];
 
       const bestLaps = new Map<number, number>(); // driver_number -> best lap duration
       for (const lap of laps) {
@@ -186,8 +195,12 @@ export async function GET() {
         fetch(`${OPENF1_BASE}/position?session_key=latest`, { next: { revalidate: 2 } }),
         fetch(`${OPENF1_BASE}/intervals?session_key=latest`, { next: { revalidate: 2 } }),
       ]);
-      const positions: OpenF1Position[] = await positionsRes.json();
-      const intervals: OpenF1Interval[] = await intervalsRes.json();
+      const positions: OpenF1Position[] = positionsRes.ok
+        ? await positionsRes.json()
+        : [];
+      const intervals: OpenF1Interval[] = intervalsRes.ok
+        ? await intervalsRes.json()
+        : [];
 
       const latestPositions = new Map<number, number>();
       positions.forEach((p) => latestPositions.set(p.driver_number, p.position));
@@ -234,7 +247,8 @@ export async function GET() {
     };
 
     // Cache long if completed, short if live
-    const maxAge = weekendContext.state === "COMPLETED" ? 60 : 2;
+    const maxAge =
+      weekendContext.state === "LIVE" ? 2 : isSessionResults ? 60 : 10;
 
     return NextResponse.json(payload, {
       headers: {

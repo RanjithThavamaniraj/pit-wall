@@ -112,6 +112,14 @@ const SESSION_DURATION_MINUTES: Record<string, number> = {
   fp1: 60,
   fp2: 60,
   fp3: 60,
+  // MotoGP
+  fp: 45,
+  pr: 30,
+  q1: 15,
+  q2: 15,
+  wup: 20,
+  motogp_race: 45,
+  motogp_sprint: 30,
 };
 
 export function getSessionStatus(

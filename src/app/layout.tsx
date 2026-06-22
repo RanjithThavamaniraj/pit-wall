@@ -1,7 +1,12 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Rajdhani } from "next/font/google";
 import Link from "next/link";
 import { BottomTabBar } from "@/components/BottomTabBar";
+import { NavbarBrand } from "@/components/brand/NavbarBrand";
+import { PitWallBrandLockup } from "@/components/brand/PitWallBrandLockup";
+import { SportAwareDesktopNav } from "@/components/SportAwareDesktopNav";
+import { SportPreferenceProvider } from "@/components/SportPreferenceProvider";
+import { SportSwitcher } from "@/components/SportSwitcher";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -16,30 +21,55 @@ const geistMono = Geist_Mono({
   display: "swap",
 });
 
+const rajdhani = Rajdhani({
+  weight: "700",
+  subsets: ["latin"],
+  variable: "--font-rajdhani",
+  display: "swap",
+});
+
 export const metadata: Metadata = {
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_SITE_URL ?? "https://pitwall-apex.vercel.app"
+  ),
   title: {
-    default: "PitWall Apex — F1 Race Companion",
+    default: "PitWall Apex — Motorsport Weekend Hub",
     template: "%s | PitWall Apex",
   },
   description:
-    "Your Formula 1 race weekend companion. Live timing, session schedules, championship standings, and race intelligence for every Grand Prix.",
+    "Your motorsport weekend hub. Live timing, session schedules, championship standings, and race intelligence for Formula 1 and MotoGP.",
   applicationName: "PitWall Apex",
   keywords: [
     "Formula 1",
     "F1",
+    "MotoGP",
     "live timing",
     "race schedule",
-    "F1 standings",
+    "standings",
     "Grand Prix",
     "race strategy",
-    "telemetry",
   ],
   authors: [{ name: "PitWall Apex" }],
   openGraph: {
-    title: "PitWall Apex — F1 Race Companion",
+    title: "PitWall Apex — Motorsport Weekend Hub",
     description:
-      "Live timing, session schedules, championship standings, and race intelligence for every Grand Prix.",
+      "Your motorsport weekend hub. Live timing, session schedules, championship standings, and race intelligence for Formula 1 and MotoGP.",
     type: "website",
+    images: [
+      {
+        url: "/brand/pitwall-apex-logo-full.png",
+        width: 1024,
+        height: 682,
+        alt: "PitWall Apex — Motorsport Weekend Hub",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "PitWall Apex — Motorsport Weekend Hub",
+    description:
+      "Your motorsport weekend hub. Live timing, session schedules, championship standings, and race intelligence for Formula 1 and MotoGP.",
+    images: ["/brand/pitwall-apex-logo-full.png"],
   },
 };
 
@@ -48,13 +78,8 @@ export const viewport: Viewport = {
   colorScheme: "dark",
   width: "device-width",
   initialScale: 1,
-  viewportFit: "cover", // enables safe-area-inset for notched iPhones
+  viewportFit: "cover",
 };
-
-const desktopNavLinks = [
-  { href: "/live", label: "Live" },
-  { href: "/standings", label: "Standings" },
-];
 
 export default function RootLayout({
   children,
@@ -62,60 +87,63 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} scroll-smooth antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${rajdhani.variable} scroll-smooth antialiased`}
     >
       <body className="pb-16 md:pb-0">
-        {/* ─── Desktop header ─────────────────────────────────────────── */}
-        <header className="sticky top-0 z-50 border-b border-white/10 bg-[#07090f]/80 backdrop-blur-xl">
-          <div className="mx-auto flex h-20 w-full max-w-7xl items-center justify-between px-5 sm:px-8 lg:px-10">
-            <Link
-              href="/"
-              className="group inline-flex items-center gap-3 rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-300"
-            >
-              <span className="flex size-11 items-center justify-center rounded-2xl bg-amber-300 text-lg font-black text-slate-950 shadow-lg shadow-amber-500/20">
-                PWA
-              </span>
-              <span>
-                <span className="block text-base font-semibold tracking-tight text-white">
-                  PitWall Apex
-                </span>
-                <span className="block text-xs uppercase tracking-[0.22em] text-slate-400">
-                  F1 race companion
-                </span>
-              </span>
-            </Link>
+        <SportPreferenceProvider>
+          <a
+            href="#main-content"
+            className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[100] focus:rounded-lg focus:bg-amber-300 focus:px-4 focus:py-2 focus:text-slate-950 focus:outline-none"
+          >
+            Skip to main content
+          </a>
+          <header className="sticky top-0 z-50 border-b border-white/10 bg-[#07090f]/80 backdrop-blur-xl">
+            <div className="mx-auto flex h-20 w-full max-w-7xl items-center justify-between px-5 sm:px-8 lg:px-10">
+              <Link
+                href="/"
+                aria-label="PitWall Apex home"
+                className="focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-300"
+              >
+                <NavbarBrand />
+              </Link>
 
-            {/* Desktop nav — hidden on mobile (bottom tab bar handles mobile) */}
-            <nav
-              aria-label="Primary navigation"
-              className="hidden items-center gap-7 md:flex"
-            >
-              {desktopNavLinks.map((item) => (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className="text-sm font-medium text-slate-300 transition hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-300"
-                >
-                  {item.label}
-                </Link>
-              ))}
-            </nav>
-          </div>
-        </header>
+              <div className="hidden md:flex">
+                <SportAwareDesktopNav />
+              </div>
+              <div className="md:hidden">
+                <SportSwitcher />
+              </div>
+            </div>
+          </header>
 
-        {/* ─── Page content ─────────────────────────────────────────────── */}
-        <main>{children}</main>
+          <main id="main-content" aria-label="Main content">
+            {children}
+          </main>
 
-        {/* ─── Footer (desktop only — mobile has bottom tab bar) ────────── */}
-        <footer className="hidden border-t border-white/10 py-8 md:block">
-          <div className="mx-auto flex w-full max-w-7xl flex-col gap-3 px-5 text-sm text-slate-400 sm:flex-row sm:items-center sm:justify-between sm:px-8 lg:px-10">
-            <p>© {new Date().getFullYear()} PitWall Apex. F1 race companion.</p>
-            <p>Data provided by OpenF1 &amp; Jolpica. Not affiliated with Formula 1.</p>
-          </div>
-        </footer>
+          <footer className="border-t border-white/10 py-6 md:py-8">
+            <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-5 sm:flex-row sm:items-center sm:justify-between sm:px-8 lg:px-10">
+              <div className="hidden md:block">
+                <PitWallBrandLockup
+                  variant="footer"
+                  subtitle="Motorsport Weekend Hub"
+                  showSubtitle
+                />
+              </div>
+              <div className="flex flex-col gap-2 text-sm text-slate-400">
+                <p className="hidden md:block">
+                  © {new Date().getFullYear()} PitWall Apex. Motorsport Weekend
+                  Hub.
+                </p>
+                <p className="text-xs md:text-sm">
+                  Data provided by OpenF1 &amp; Jolpica (F1) and PulseLive
+                  (MotoGP). Not affiliated with Formula 1 or MotoGP.
+                </p>
+              </div>
+            </div>
+          </footer>
 
-        {/* ─── Mobile bottom tab bar ───────────────────────────────────── */}
-        <BottomTabBar />
+          <BottomTabBar />
+        </SportPreferenceProvider>
       </body>
     </html>
   );

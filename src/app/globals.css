@@ -10,6 +10,7 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-brand: var(--font-rajdhani);
 }
 
 * {
@@ -33,6 +34,10 @@ body {
 
 a {
   text-decoration: none;
+}
+
+.font-brand {
+  font-family: var(--font-rajdhani), var(--font-geist-sans), sans-serif;
 }
 
 ::selection {
