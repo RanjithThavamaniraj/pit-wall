@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useSportPreference } from "@/hooks/useSportPreference";
-import { getSportRoutes } from "@/lib/sport";
+import { getSportRoutes, isNavRouteActive } from "@/lib/sport";
 
 const tabs = [
   { key: "home" as const, label: "Home", icon: HomeIcon },
@@ -60,10 +60,7 @@ export function BottomTabBar() {
       >
         {tabs.map(({ key, label, icon: Icon }) => {
           const href = routes[key];
-          const isActive =
-            href === "/"
-              ? pathname === "/"
-              : pathname === href || pathname.startsWith(href + "/");
+          const isActive = isNavRouteActive(pathname, href);
           const showLiveDot = key === "live" && liveActive;
 
           return (

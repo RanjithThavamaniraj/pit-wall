@@ -25,9 +25,15 @@ export async function generateMetadata({
   const { slug } = await params;
   const event = await fetchMotoGpEventBySlug(slug);
   if (!event) return { title: "Race not found" };
+  const description = `${event.name} session schedule, times, and details. ${event.circuit}, ${event.locality}.`;
   return {
     title: event.name,
-    description: `${event.name} session schedule, times, and details. ${event.circuit}, ${event.locality}.`,
+    description,
+    openGraph: {
+      title: event.name,
+      description,
+      type: "website",
+    },
   };
 }
 
@@ -212,10 +218,40 @@ export default async function MotoGpRaceDetailPage({
 
           {event.isPast && (
             <GlassCard>
-              <p className="text-sm text-slate-400">
-                This Grand Prix has concluded. Full results and standings are
-                available.
-              </p>
+              {event.podium.length > 0 ? (
+                <>
+                  <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">
+                    Race podium
+                  </p>
+                  <ol className="mt-4 space-y-3">
+                    {event.podium.map((finisher) => (
+                      <li
+                        key={finisher.position}
+                        className="flex items-center justify-between rounded-xl border border-white/[0.06] bg-slate-950/40 px-4 py-3"
+                      >
+                        <div className="flex items-center gap-4">
+                          <span className="font-mono text-sm text-amber-200">
+                            P{finisher.position}
+                          </span>
+                          <div>
+                            <p className="text-sm font-semibold text-white">
+                              {finisher.riderName}
+                            </p>
+                            <p className="text-xs text-slate-500">
+                              #{finisher.riderNumber} · {finisher.teamName}
+                            </p>
+                          </div>
+                        </div>
+                      </li>
+                    ))}
+                  </ol>
+                </>
+              ) : (
+                <p className="text-sm text-slate-400">
+                  This Grand Prix has concluded. Points from this round are
+                  reflected in the championship standings.
+                </p>
+              )}
               <Link
                 href="/motogp/standings"
                 className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-amber-300 hover:text-amber-200 transition"

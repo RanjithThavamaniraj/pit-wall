@@ -12,6 +12,7 @@ import {
 import { usePathname, useRouter } from "next/navigation";
 import {
   getEquivalentRoute,
+  isRaceDetailPath,
   isValidSport,
   setSportCookie,
   SPORT_COOKIE_KEY,
@@ -49,15 +50,22 @@ export function SportPreferenceProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const fromCookie = readSportCookie();
     const stored = localStorage.getItem(SPORT_STORAGE_KEY);
-    const sport = isValidSport(fromCookie)
-      ? fromCookie
-      : isValidSport(stored)
-      ? stored
-      : "f1";
+
+    let sport: Sport = "f1";
+    if (isValidSport(fromCookie)) {
+      sport = fromCookie;
+      if (stored !== fromCookie) {
+        localStorage.setItem(SPORT_STORAGE_KEY, fromCookie);
+      }
+    } else if (isValidSport(stored)) {
+      sport = stored;
+      setSportCookie(stored);
+    } else {
+      localStorage.setItem(SPORT_STORAGE_KEY, "f1");
+      setSportCookie("f1");
+    }
 
     setPreferredSport(sport);
-    localStorage.setItem(SPORT_STORAGE_KEY, sport);
-    setSportCookie(sport);
     setHydrated(true);
   }, []);
 
@@ -82,10 +90,38 @@ export function SportPreferenceProvider({ children }: { children: ReactNode }) {
         return;
       }
 
-      const nextRoute = getEquivalentRoute(pathname, targetSport);
-      if (nextRoute !== pathname) {
-        router.push(nextRoute);
-      }
+      const navigate = async () => {
+        let nextRoute = getEquivalentRoute(pathname, targetSport);
+
+        if (isRaceDetailPath(pathname)) {
+          const fromSport = sportFromPathname(pathname);
+          const slug = pathname.split("/").pop();
+          if (slug) {
+            try {
+              const res = await fetch(
+                `/api/equivalent-race?from=${fromSport}&slug=${encodeURIComponent(slug)}`
+              );
+              if (res.ok) {
+                const data: { slug?: string } = await res.json();
+                if (data.slug) {
+                  nextRoute =
+                    targetSport === "motogp"
+                      ? `/motogp/races/${data.slug}`
+                      : `/races/${data.slug}`;
+                }
+              }
+            } catch {
+              // Fall back to the schedule list route from getEquivalentRoute.
+            }
+          }
+        }
+
+        if (nextRoute !== pathname) {
+          router.push(nextRoute);
+        }
+      };
+
+      void navigate();
     },
     [pathname, router]
   );

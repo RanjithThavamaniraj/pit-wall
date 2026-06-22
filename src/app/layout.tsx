@@ -3,8 +3,8 @@ import { Geist, Geist_Mono, Rajdhani } from "next/font/google";
 import Link from "next/link";
 import { BottomTabBar } from "@/components/BottomTabBar";
 import { NavbarBrand } from "@/components/brand/NavbarBrand";
-import { PitWallBrandLockup } from "@/components/brand/PitWallBrandLockup";
 import { SportAwareDesktopNav } from "@/components/SportAwareDesktopNav";
+import { SportAwareFooter } from "@/components/SportAwareFooter";
 import { SportPreferenceProvider } from "@/components/SportPreferenceProvider";
 import { SportSwitcher } from "@/components/SportSwitcher";
 import "./globals.css";
@@ -111,27 +111,7 @@ export default function RootLayout({
             {children}
           </main>
 
-          <footer className="border-t border-white/10 py-6 md:py-8">
-            <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-5 sm:flex-row sm:items-center sm:justify-between sm:px-8 lg:px-10">
-              <div className="hidden md:block">
-                <PitWallBrandLockup
-                  variant="footer"
-                  subtitle="Motorsport Weekend Hub"
-                  showSubtitle
-                />
-              </div>
-              <div className="flex flex-col gap-2 text-sm text-slate-400">
-                <p className="hidden md:block">
-                  © {new Date().getFullYear()} PitWall Apex. Motorsport Weekend
-                  Hub.
-                </p>
-                <p className="text-xs md:text-sm">
-                  Data provided by OpenF1 &amp; Jolpica (F1) and PulseLive
-                  (MotoGP). Not affiliated with Formula 1 or MotoGP.
-                </p>
-              </div>
-            </div>
-          </footer>
+          <SportAwareFooter />
 
           <BottomTabBar />
         </SportPreferenceProvider>

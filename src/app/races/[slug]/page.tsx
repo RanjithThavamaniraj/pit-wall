@@ -29,9 +29,15 @@ export async function generateMetadata({
   const { slug } = await params;
   const race = await fetchRaceBySlug(slug);
   if (!race) return { title: "Race not found" };
+  const description = `${race.name} session schedule, times, and details. ${race.circuit}, ${race.locality}.`;
   return {
     title: race.name,
-    description: `${race.name} session schedule, times, and details. ${race.circuit}, ${race.locality}.`,
+    description,
+    openGraph: {
+      title: race.name,
+      description,
+      type: "website",
+    },
   };
 }
 
@@ -226,8 +232,8 @@ export default async function RaceDetailPage({
           {race.isPast && (
             <GlassCard>
               <p className="text-sm text-slate-400">
-                This race has concluded. Full results and standings are
-                available.
+                This race has concluded. Points from this round are reflected in
+                the championship standings.
               </p>
               <Link
                 href="/standings"

@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useSportPreference } from "@/hooks/useSportPreference";
-import { getSportRoutes } from "@/lib/sport";
+import { getSportRoutes, isNavRouteActive } from "@/lib/sport";
 import { SportSwitcher } from "./SportSwitcher";
 
 const navItems = [
@@ -12,6 +13,7 @@ const navItems = [
 ];
 
 export function SportAwareDesktopNav() {
+  const pathname = usePathname();
   const { activeSport } = useSportPreference();
   const routes = getSportRoutes(activeSport);
 
@@ -22,15 +24,25 @@ export function SportAwareDesktopNav() {
         aria-label="Primary navigation"
         className="flex items-center gap-7"
       >
-        {navItems.map((item) => (
-          <Link
-            key={item.key}
-            href={routes[item.key]}
-            className="text-sm font-medium text-slate-300 transition hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-300"
-          >
-            {item.label}
-          </Link>
-        ))}
+        {navItems.map((item) => {
+          const href = routes[item.key];
+          const isActive = isNavRouteActive(pathname, href);
+
+          return (
+            <Link
+              key={item.key}
+              href={href}
+              aria-current={isActive ? "page" : undefined}
+              className={`text-sm font-medium transition focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-300 ${
+                isActive
+                  ? "text-amber-300"
+                  : "text-slate-300 hover:text-white"
+              }`}
+            >
+              {item.label}
+            </Link>
+          );
+        })}
       </nav>
     </div>
   );

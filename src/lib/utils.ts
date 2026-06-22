@@ -94,6 +94,14 @@ export function generateRaceSlug(raceName: string, round: number): string {
   );
 }
 
+/** Extract round number from a race slug suffix, e.g. `british-gp-r12` → 12. */
+export function parseRoundFromSlug(slug: string): number | null {
+  const match = slug.match(/-r(\d+)$/);
+  if (!match) return null;
+  const round = Number(match[1]);
+  return Number.isFinite(round) && round > 0 ? round : null;
+}
+
 // ─── Session Status ───────────────────────────────────────────────────────────
 
 export type SessionStatus = "upcoming" | "live" | "completed";

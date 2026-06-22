@@ -43,6 +43,12 @@ export default function LiveTimingClient({
 
       try {
         const res = await fetch("/api/live/timing");
+        if (res.status === 404) {
+          if (cancelled || requestId !== requestIdRef.current) return;
+          setError(null);
+          timeoutId = setTimeout(fetchTiming, 15000);
+          return;
+        }
         if (!res.ok) {
           throw new Error("Failed to fetch live timing");
         }

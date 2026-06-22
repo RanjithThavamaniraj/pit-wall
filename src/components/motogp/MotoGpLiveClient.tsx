@@ -32,6 +32,7 @@ export default function MotoGpLiveClient({
 
     const refresh = async () => {
       const requestId = ++requestIdRef.current;
+      let pollIntervalMs = 60000;
 
       try {
         const res = await fetch("/api/motogp/weekend");
@@ -40,12 +41,12 @@ export default function MotoGpLiveClient({
         if (cancelled || requestId !== requestIdRef.current) return;
         setContext(payload.context);
         setResults(payload.results ?? []);
+        pollIntervalMs = payload.context?.state === "LIVE" ? 30000 : 60000;
       } catch {
         // Keep existing state on failure.
       } finally {
         if (!cancelled) {
-          const isLive = context?.state === "LIVE";
-          timeoutId = setTimeout(refresh, isLive ? 30000 : 60000);
+          timeoutId = setTimeout(refresh, pollIntervalMs);
         }
       }
     };
@@ -56,7 +57,7 @@ export default function MotoGpLiveClient({
       cancelled = true;
       clearTimeout(timeoutId);
     };
-  }, [context?.state]);
+  }, []);
 
   if (!context) {
     return (
@@ -90,7 +91,7 @@ export default function MotoGpLiveClient({
               {isUpcoming
                 ? "Weekend Preview"
                 : isLive
-                ? "Race Weekend"
+                ? "Live Weekend Hub"
                 : "Session Results"}
             </h1>
             {!isUpcoming && (

@@ -45,20 +45,23 @@ export function getSportRoutes(sport: Sport) {
   };
 }
 
+const RACE_DETAIL_PATTERN = /^\/(?:motogp\/)?races\/[^/]+$/;
+
+export function isRaceDetailPath(pathname: string): boolean {
+  return RACE_DETAIL_PATTERN.test(pathname);
+}
+
+export function isNavRouteActive(pathname: string, href: string): boolean {
+  if (href === "/") return pathname === "/";
+  return pathname === href || pathname.startsWith(`${href}/`);
+}
+
 export function getEquivalentRoute(pathname: string, targetSport: Sport): string {
   const currentSport = sportFromPathname(pathname);
   if (currentSport === targetSport) return pathname;
 
-  if (pathname.startsWith("/races/")) {
-    return targetSport === "motogp"
-      ? pathname.replace("/races/", "/motogp/races/")
-      : pathname;
-  }
-
-  if (pathname.startsWith("/motogp/races/")) {
-    return targetSport === "f1"
-      ? pathname.replace("/motogp/races/", "/races/")
-      : pathname;
+  if (isRaceDetailPath(pathname)) {
+    return targetSport === "motogp" ? "/motogp/races" : "/races";
   }
 
   if (targetSport === "motogp") {

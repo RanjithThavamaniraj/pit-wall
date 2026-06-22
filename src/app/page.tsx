@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { Suspense } from "react";
@@ -13,6 +14,7 @@ import {
 import { countryCodeToFlag } from "@/lib/utils";
 import { SessionCountdown } from "@/components/SessionCountdown";
 import { PitWallHeroLogo } from "@/components/brand/PitWallHeroLogo";
+import { HomePageGate } from "@/components/HomePageGate";
 import { isValidSport, SPORT_COOKIE_KEY, type Sport } from "@/lib/sport";
 
 // ─── Next Race Widget ─────────────────────────────────────────────────────────
@@ -289,7 +291,9 @@ function FeatureGrid({ sport }: { sport: Sport }) {
       eyebrow: "CHAMPIONSHIP BATTLE",
       title: "Track the title fight.",
       description:
-        "Live drivers' and constructors' standings updated after every round.",
+        sport === "motogp"
+          ? "MotoGP, Moto2, and Moto3 standings updated after every round."
+          : "Live drivers' and constructors' standings updated after every round.",
       href: routes.championship,
       cta: "View standings",
     },
@@ -713,10 +717,47 @@ function MotoGpHome() {
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
-export default async function Home() {
+export async function generateMetadata(): Promise<Metadata> {
   const cookieStore = await cookies();
   const sportCookie = cookieStore.get(SPORT_COOKIE_KEY)?.value ?? null;
   const sport: Sport = isValidSport(sportCookie) ? sportCookie : "f1";
 
-  return sport === "motogp" ? <MotoGpHome /> : <F1Home />;
+  if (sport === "motogp") {
+    return {
+      title: "MotoGP Weekend Hub",
+      description:
+        "MotoGP session schedules, weekend hubs, and championship standings from PitWall Apex.",
+      openGraph: {
+        title: "MotoGP Weekend Hub | PitWall Apex",
+        description:
+          "MotoGP session schedules, weekend hubs, and championship standings from PitWall Apex.",
+        type: "website",
+      },
+    };
+  }
+
+  return {
+    title: "Formula 1 Weekend Hub",
+    description:
+      "Live timing, session schedules, and F1 championship standings from PitWall Apex.",
+    openGraph: {
+      title: "Formula 1 Weekend Hub | PitWall Apex",
+      description:
+        "Live timing, session schedules, and F1 championship standings from PitWall Apex.",
+    },
+  };
+}
+
+export default async function Home() {
+  const cookieStore = await cookies();
+  const sportCookie = cookieStore.get(SPORT_COOKIE_KEY)?.value ?? null;
+  const serverSport: Sport | null = isValidSport(sportCookie) ? sportCookie : null;
+
+  return (
+    <HomePageGate
+      serverSport={serverSport}
+      f1={<F1Home />}
+      motogp={<MotoGpHome />}
+    />
+  );
 }
