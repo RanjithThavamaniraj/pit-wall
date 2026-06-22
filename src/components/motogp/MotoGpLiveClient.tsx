@@ -2,8 +2,9 @@
 
 import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
-import type { MotoGpFinisher } from "@/lib/motogp";
+import type { MotoGpFinisher, MotoGpStandings } from "@/lib/motogp";
 import type { MotoGpWeekendContext } from "@/lib/motogp-weekend";
+import { MotoGpUpcomingView } from "@/components/motogp/MotoGpUpcomingView";
 import { SessionCountdown } from "@/components/SessionCountdown";
 import { Container, GlassCard, StatusPill } from "@/components/ui";
 import { countryCodeToFlag } from "@/lib/utils";
@@ -11,11 +12,13 @@ import { countryCodeToFlag } from "@/lib/utils";
 type Props = {
   initialContext: MotoGpWeekendContext | null;
   initialResults: MotoGpFinisher[];
+  initialStandings?: MotoGpStandings | null;
 };
 
 export default function MotoGpLiveClient({
   initialContext,
   initialResults,
+  initialStandings = null,
 }: Props) {
   const [context, setContext] = useState(initialContext);
   const [results, setResults] = useState(initialResults);
@@ -92,16 +95,20 @@ export default function MotoGpLiveClient({
                 ? "Race Weekend"
                 : "Session Results"}
             </h1>
-            <p className="mt-2 text-sm text-slate-400">
-              <span className="mr-2" aria-hidden="true">
-                {flag}
-              </span>
-              {currentWeekend.name} · {currentWeekend.circuit}
-            </p>
-            {!isLive && (
-              <p className="mt-1 text-xs text-slate-500">
-                Live timing is not available from the public MotoGP API.
-              </p>
+            {!isUpcoming && (
+              <>
+                <p className="mt-2 text-sm text-slate-400">
+                  <span className="mr-2" aria-hidden="true">
+                    {flag}
+                  </span>
+                  {currentWeekend.name} · {currentWeekend.circuit}
+                </p>
+                {!isLive && (
+                  <p className="mt-1 text-xs text-slate-500">
+                    Live timing is not available from the public MotoGP API.
+                  </p>
+                )}
+              </>
             )}
           </div>
 
@@ -119,75 +126,84 @@ export default function MotoGpLiveClient({
           )}
         </div>
 
-        <div className="grid gap-5 lg:grid-cols-2 lg:items-start">
-          <div className="space-y-5">
-            {countdownSession?.dateUtc && (isUpcoming || isBetweenSessions) && (
-              <GlassCard className="p-6 text-center sm:p-8">
-                <p className="text-sm font-semibold uppercase tracking-[0.24em] text-emerald-400">
-                  {isBetweenSessions ? "Coming up next" : "Next session"}
-                </p>
-                <h2 className="mt-2 text-2xl font-semibold text-white">
-                  {countdownSession.label}
-                </h2>
-                <div className="mt-5">
-                  <SessionCountdown
-                    targetDate={countdownSession.dateUtc}
-                    sessionLabel={countdownSession.label}
-                    variant="full"
-                  />
-                </div>
-              </GlassCard>
-            )}
-
-            {isLive && activeSession && (
-              <GlassCard className="border-amber-300/20 p-5">
-                <p className="text-sm font-semibold uppercase tracking-[0.24em] text-amber-300">
-                  Session in progress
-                </p>
-                <h2 className="mt-2 text-2xl font-semibold text-white">
-                  {activeSession.label}
-                </h2>
-                <p className="mt-2 text-sm text-slate-400">
-                  Follow session progression and results below while the session
-                  runs.
-                </p>
-              </GlassCard>
-            )}
-          </div>
-
-          <div>
-            <h2 className="mb-4 text-xs font-semibold uppercase tracking-[0.28em] text-slate-500">
-              Session progression
-            </h2>
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-              {currentWeekend.sessions.map((session) => (
-                <div
-                  key={session.sessionId}
-                  className={`rounded-xl border p-4 ${
-                    session.status === "completed"
-                      ? "border-emerald-500/20 bg-emerald-500/10"
-                      : session.status === "live"
-                      ? "border-amber-500/30 bg-amber-500/10"
-                      : nextSession?.sessionId === session.sessionId
-                      ? "border-sky-500/30 bg-sky-500/10"
-                      : "border-white/5 bg-white/[0.02]"
-                  }`}
-                >
-                  <p className="text-sm font-medium text-white">{session.label}</p>
-                  <p className="mt-1 text-xs uppercase tracking-widest text-slate-400">
-                    {session.status === "completed"
-                      ? "Completed"
-                      : session.status === "live"
-                      ? "Live now"
-                      : "Upcoming"}
+        {isUpcoming ? (
+          <MotoGpUpcomingView
+            context={context}
+            standings={initialStandings}
+          />
+        ) : (
+          <div className="grid gap-5 lg:grid-cols-2 lg:items-start">
+            <div className="space-y-5">
+              {countdownSession?.dateUtc && isBetweenSessions && (
+                <GlassCard className="p-6 text-center sm:p-8">
+                  <p className="text-sm font-semibold uppercase tracking-[0.24em] text-emerald-400">
+                    Coming up next
                   </p>
-                </div>
-              ))}
+                  <h2 className="mt-2 text-2xl font-semibold text-white">
+                    {countdownSession.label}
+                  </h2>
+                  <div className="mt-5">
+                    <SessionCountdown
+                      targetDate={countdownSession.dateUtc}
+                      sessionLabel={countdownSession.label}
+                      variant="full"
+                    />
+                  </div>
+                </GlassCard>
+              )}
+
+              {isLive && activeSession && (
+                <GlassCard className="border-amber-300/20 p-5">
+                  <p className="text-sm font-semibold uppercase tracking-[0.24em] text-amber-300">
+                    Session in progress
+                  </p>
+                  <h2 className="mt-2 text-2xl font-semibold text-white">
+                    {activeSession.label}
+                  </h2>
+                  <p className="mt-2 text-sm text-slate-400">
+                    Follow session progression and results below while the session
+                    runs.
+                  </p>
+                </GlassCard>
+              )}
+            </div>
+
+            <div>
+              <h2 className="mb-4 text-xs font-semibold uppercase tracking-[0.28em] text-slate-500">
+                Session progression
+              </h2>
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                {currentWeekend.sessions.map((session) => (
+                  <div
+                    key={session.sessionId}
+                    className={`rounded-xl border p-4 ${
+                      session.status === "completed"
+                        ? "border-emerald-500/20 bg-emerald-500/10"
+                        : session.status === "live"
+                        ? "border-amber-500/30 bg-amber-500/10"
+                        : nextSession?.sessionId === session.sessionId
+                        ? "border-sky-500/30 bg-sky-500/10"
+                        : "border-white/5 bg-white/[0.02]"
+                    }`}
+                  >
+                    <p className="text-sm font-medium text-white">
+                      {session.label}
+                    </p>
+                    <p className="mt-1 text-xs uppercase tracking-widest text-slate-400">
+                      {session.status === "completed"
+                        ? "Completed"
+                        : session.status === "live"
+                        ? "Live now"
+                        : "Upcoming"}
+                    </p>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
-        </div>
+        )}
 
-        {results.length > 0 && (
+        {!isUpcoming && results.length > 0 && (
           <GlassCard className="mt-5 p-5">
             <h2 className="text-xs font-semibold uppercase tracking-[0.28em] text-slate-500">
               {activeSession

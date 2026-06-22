@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useRef } from "react";
 import type { LiveTimingPayload } from "@/lib/timing";
+import type { Standings } from "@/lib/standings";
 import type { WeekendContext } from "@/lib/weekend";
 import { Container } from "@/components/ui";
 import { SessionStatusHeader } from "@/components/live/SessionStatusHeader";
@@ -12,8 +13,10 @@ import { CompletedSessionView } from "@/components/live/CompletedSessionView";
 
 export default function LiveTimingClient({
   initialContext,
+  initialStandings = null,
 }: {
   initialContext: WeekendContext | null;
+  initialStandings?: Standings | null;
 }) {
   const [data, setData] = useState<LiveTimingPayload | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -135,7 +138,10 @@ export default function LiveTimingClient({
         )}
 
         {isUpcoming ? (
-          <UpcomingSessionView context={currentContext} />
+          <UpcomingSessionView
+            context={currentContext}
+            standings={initialStandings}
+          />
         ) : showSessionResults ? (
           <CompletedSessionView
             context={currentContext}

@@ -1,5 +1,5 @@
-import type { WeekendContext } from "@/lib/weekend";
-import type { Standings } from "@/lib/standings";
+import type { MotoGpWeekendContext } from "@/lib/motogp-weekend";
+import type { MotoGpStandings } from "@/lib/motogp";
 import {
   ChampionshipSnapshot,
   LivePreviewExplainer,
@@ -8,55 +8,52 @@ import {
   NextSessionPanel,
   WeekendQuickLinks,
   type SnapshotMetric,
-} from "./WeekendPreviewShared";
+} from "@/components/live/WeekendPreviewShared";
 import { countryCodeToFlag } from "@/lib/utils";
 
 type Props = {
-  context: WeekendContext;
-  standings?: Standings | null;
+  context: MotoGpWeekendContext;
+  standings?: MotoGpStandings | null;
 };
 
 function buildStandingsMetrics(
-  standings: Standings | null | undefined
+  standings: MotoGpStandings | null | undefined
 ): SnapshotMetric[] {
   if (!standings) return [];
 
-  const leader = standings.drivers[0];
-  const p2 = standings.drivers[1];
-  const constructorLeader = standings.constructors[0];
+  const leader = standings.riders[0];
+  const p2 = standings.riders[1];
+  const teamLeader = standings.teams[0];
 
   if (!leader) return [];
 
   return [
     {
-      label: "WDC leader",
-      value: `${leader.driverCode} · ${leader.lastName}`,
+      label: "Championship leader",
+      value: `#${leader.riderNumber} · ${leader.riderName}`,
       sub: `${leader.points} pts`,
     },
     {
-      label: "P2 gap",
+      label: "Gap to P2",
       value: p2 ? `−${p2.gapToLeader} pts` : "—",
-      sub: p2?.lastName ?? "",
+      sub: p2?.riderName ?? "",
     },
     {
-      label: "WCC leader",
-      value: constructorLeader?.name ?? "—",
-      sub: constructorLeader ? `${constructorLeader.points} pts` : "",
+      label: "Team leader",
+      value: teamLeader?.name ?? "—",
+      sub: teamLeader ? `${teamLeader.points} pts` : "",
     },
     {
       label: "Rounds completed",
-      value: standings.round,
+      value: String(standings.round),
       sub: `${standings.season} season`,
     },
   ];
 }
 
-export function UpcomingSessionView({ context, standings }: Props) {
+export function MotoGpUpcomingView({ context, standings }: Props) {
   const { currentWeekend, nextSession } = context;
   const flag = countryCodeToFlag(currentWeekend.countryCode);
-  const isSprintWeekend = currentWeekend.sessions.some(
-    (s) => s.key === "sprint_qualifying" || s.key === "sprint"
-  );
 
   if (!nextSession) {
     return (
@@ -67,7 +64,7 @@ export function UpcomingSessionView({ context, standings }: Props) {
   }
 
   const sessions = currentWeekend.sessions.map((session) => ({
-    id: session.key,
+    id: session.sessionId,
     label: session.label,
     dateUtc: session.dateUtc,
     status: session.status,
@@ -75,37 +72,45 @@ export function UpcomingSessionView({ context, standings }: Props) {
 
   const metrics = buildStandingsMetrics(standings);
 
+  const motogpFootnote = (
+    <p className="text-xs leading-6 text-slate-500">
+      Live timing is not available from the public MotoGP API. Session results
+      and progression update here throughout the weekend.
+    </p>
+  );
+
   return (
     <div className="space-y-6">
       <WeekendHero
         flag={flag}
-        eyebrow={`Round ${currentWeekend.round} · ${currentWeekend.season}${
-          isSprintWeekend ? " · Sprint weekend" : ""
-        }`}
+        eyebrow={`Round ${currentWeekend.round} · ${currentWeekend.season} · MotoGP`}
         title={currentWeekend.name}
-        subtitle={`${currentWeekend.circuit} · ${currentWeekend.locality}, ${currentWeekend.country}`}
-        detailHref={`/races/${currentWeekend.slug}`}
+        subtitle={`${currentWeekend.circuit}${
+          currentWeekend.locality ? ` · ${currentWeekend.locality}` : ""
+        }, ${currentWeekend.country}`}
+        detailHref={`/motogp/races/${currentWeekend.slug}`}
       />
 
       <WeekendPreviewGrid
         sessions={sessions}
-        nextSessionId={nextSession.key}
+        nextSessionId={nextSession.sessionId}
         sidebar={
           <>
             <NextSessionPanel
               sessionLabel={nextSession.label}
               circuit={currentWeekend.circuit}
               dateUtc={nextSession.dateUtc}
+              footnote={motogpFootnote}
             />
             <div className="hidden lg:block">
-              <LivePreviewExplainer sport="f1" />
+              <LivePreviewExplainer sport="motogp" />
             </div>
           </>
         }
       />
 
       <div className="lg:hidden">
-        <LivePreviewExplainer sport="f1" />
+        <LivePreviewExplainer sport="motogp" />
       </div>
 
       {metrics.length > 0 && (
@@ -120,11 +125,11 @@ export function UpcomingSessionView({ context, standings }: Props) {
       <WeekendQuickLinks
         links={[
           {
-            href: `/races/${currentWeekend.slug}`,
+            href: `/motogp/races/${currentWeekend.slug}`,
             label: "Full weekend schedule",
           },
-          { href: "/standings", label: "Championship standings" },
-          { href: "/races", label: "Season calendar" },
+          { href: "/motogp/standings", label: "Championship standings" },
+          { href: "/motogp/races", label: "Season calendar" },
         ]}
       />
     </div>

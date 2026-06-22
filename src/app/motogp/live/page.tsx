@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import MotoGpLiveClient from "@/components/motogp/MotoGpLiveClient";
 import {
   fetchMotoGpSchedule,
+  fetchMotoGpStandings,
   fetchSessionResults,
   type MotoGpFinisher,
 } from "@/lib/motogp";
@@ -18,21 +19,32 @@ export const revalidate = 300;
 export default async function MotoGpLivePage() {
   let initialContext = null;
   let initialResults: MotoGpFinisher[] = [];
+  let initialStandings = null;
 
   try {
-    const schedule = await fetchMotoGpSchedule();
-    initialContext = getMotoGpWeekendContext(schedule);
+    const [scheduleResult, standingsResult] = await Promise.allSettled([
+      fetchMotoGpSchedule(),
+      fetchMotoGpStandings("MotoGP™"),
+    ]);
 
-    if (initialContext) {
-      const resultsSession =
-        initialContext.activeSession ??
-        [...initialContext.currentWeekend.sessions]
-          .reverse()
-          .find((session) => session.status === "completed");
+    if (scheduleResult.status === "fulfilled") {
+      initialContext = getMotoGpWeekendContext(scheduleResult.value);
 
-      if (resultsSession) {
-        initialResults = await fetchSessionResults(resultsSession.sessionId, 5);
+      if (initialContext) {
+        const resultsSession =
+          initialContext.activeSession ??
+          [...initialContext.currentWeekend.sessions]
+            .reverse()
+            .find((session) => session.status === "completed");
+
+        if (resultsSession) {
+          initialResults = await fetchSessionResults(resultsSession.sessionId, 5);
+        }
       }
+    }
+
+    if (standingsResult.status === "fulfilled") {
+      initialStandings = standingsResult.value;
     }
   } catch (error) {
     console.error("Failed to fetch MotoGP weekend data", error);
@@ -42,6 +54,7 @@ export default async function MotoGpLivePage() {
     <MotoGpLiveClient
       initialContext={initialContext}
       initialResults={initialResults}
+      initialStandings={initialStandings}
     />
   );
 }
