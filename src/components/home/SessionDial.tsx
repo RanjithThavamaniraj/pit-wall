@@ -1,8 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, type CSSProperties } from "react";
+import { useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { useCountdown } from "@/hooks/useCountdown";
+import {
+  dialRadiusPx,
+  resolveRingPillOverlaps,
+} from "@/lib/sessionDialOverlap";
 import { formatCompactTime } from "@/lib/utils";
 import type { HeroBoardSession } from "@/components/home/PitWallHeroBoard";
 
@@ -95,6 +99,36 @@ export function SessionDial({
   liveHref,
   countdown,
 }: SessionDialProps) {
+  const stageRef = useRef<HTMLDivElement>(null);
+  const [stageWidth, setStageWidth] = useState(480);
+  const [chipSize, setChipSize] = useState({ width: 88, height: 54 });
+
+  useLayoutEffect(() => {
+    const node = stageRef.current;
+    if (!node) return;
+
+    const measure = () => {
+      const width = node.getBoundingClientRect().width;
+      if (width > 0) setStageWidth(width);
+
+      const pill = node.querySelector<HTMLElement>(".hero-dial-pill");
+      if (pill) {
+        const rect = pill.getBoundingClientRect();
+        if (rect.width > 0 && rect.height > 0) {
+          setChipSize({
+            width: Math.ceil(rect.width),
+            height: Math.ceil(rect.height),
+          });
+        }
+      }
+    };
+
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, [sessions]);
+
   const timedSessions = sessions.filter((s) => s.dateUtc);
   const minTime = timedSessions.length
     ? Math.min(...timedSessions.map((s) => new Date(s.dateUtc!).getTime()))
@@ -116,6 +150,27 @@ export function SessionDial({
 
   const completedCount = sessions.filter((s) => s.status === "completed").length;
 
+  const ringRadius = dialRadiusPx(stageWidth);
+  const minGap = stageWidth < 420 ? 8 : 6;
+
+  const pillLayouts = useMemo(() => {
+    const angled = sessions.map((session, index) => ({
+      id: session.id,
+      angleDeg: sessionAngle(
+        session,
+        index,
+        sessions.length,
+        minTime,
+        maxTime
+      ),
+    }));
+    return resolveRingPillOverlaps(angled, ringRadius, {
+      minGap,
+      chipWidth: chipSize.width,
+      chipHeight: chipSize.height,
+    });
+  }, [sessions, ringRadius, minGap, minTime, maxTime, chipSize]);
+
   return (
     <div className="hero-dial" aria-label="Weekend session times">
       <div className="hero-dial-header">
@@ -125,7 +180,7 @@ export function SessionDial({
         </p>
       </div>
 
-      <div className="hero-dial-stage">
+      <div className="hero-dial-stage" ref={stageRef}>
         <svg
           className="hero-dial-svg"
           viewBox="0 0 240 240"
@@ -177,6 +232,7 @@ export function SessionDial({
           const timeLabel = session.dateUtc
             ? formatCompactTime(session.dateUtc)
             : "TBC";
+          const tangent = pillLayouts.get(session.id)?.tangentOffset ?? 0;
 
           return (
             <Link
@@ -194,6 +250,7 @@ export function SessionDial({
               style={
                 {
                   "--dial-angle": `${angle}deg`,
+                  "--dial-tangent-offset": `${tangent}px`,
                 } as CSSProperties
               }
               aria-label={`${session.label}, ${timeLabel}`}

@@ -309,7 +309,9 @@
   backdrop-filter: blur(10px);
   text-align: center;
   transform: translate(-50%, -50%) rotate(var(--dial-angle))
-    translateY(calc(-1 * var(--dial-radius))) rotate(calc(-1 * var(--dial-angle)));
+    translateY(calc(-1 * var(--dial-radius)))
+    translateX(var(--dial-tangent-offset, 0px))
+    rotate(calc(-1 * var(--dial-angle)));
   transition:
     border-color 0.2s ease,
     background 0.2s ease,
