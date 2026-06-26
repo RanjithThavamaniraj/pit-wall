@@ -171,6 +171,78 @@ const MOTOGP_SESSION_DURATION_MINUTES: Record<string, number> = {
   fp4: 45,
 };
 
+/** PulseLive returns circuit-local wall times with a bogus +00:00 suffix. */
+const CIRCUIT_TIMEZONES: Record<string, string> = {
+  ARG: "America/Argentina/Buenos_Aires",
+  AUS: "Australia/Phillip_Island",
+  AUT: "Europe/Vienna",
+  CAT: "Europe/Madrid",
+  FRA: "Europe/Paris",
+  GER: "Europe/Berlin",
+  GBR: "Europe/London",
+  INA: "Asia/Makassar",
+  IND: "Asia/Kolkata",
+  ITA: "Europe/Rome",
+  JPN: "Asia/Tokyo",
+  MAL: "Asia/Kuala_Lumpur",
+  NED: "Europe/Amsterdam",
+  POR: "Europe/Lisbon",
+  QAT: "Asia/Qatar",
+  RSA: "Africa/Johannesburg",
+  SPA: "Europe/Madrid",
+  THA: "Asia/Bangkok",
+  USA: "America/Los_Angeles",
+};
+
+function circuitTimeZone(countryCode: string): string {
+  return CIRCUIT_TIMEZONES[countryCode.toUpperCase()] ?? "Europe/Amsterdam";
+}
+
+/**
+ * Convert a PulseLive ISO string (track-local wall clock tagged as UTC) to a
+ * real UTC instant for countdowns and session status.
+ */
+export function pulseLiveDateToUtc(
+  iso: string,
+  countryCode: string
+): string {
+  const wall = iso.replace(/(?:\.\d{3})?(?:Z|[+-]\d{2}:\d{2})$/, "");
+  const [datePart, timePart = "00:00:00"] = wall.split("T");
+  const [y, M, d] = datePart.split("-").map(Number);
+  const [h, m, s = 0] = timePart.split(":").map(Number);
+  const targetMs = Date.UTC(y, M - 1, d, h, m, Number(s));
+  const timeZone = circuitTimeZone(countryCode);
+
+  const formatInTz = (instant: number) => {
+    const parts = new Intl.DateTimeFormat("en-GB", {
+      timeZone,
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      hour12: false,
+    }).formatToParts(new Date(instant));
+    const get = (type: string) =>
+      Number(parts.find((part) => part.type === type)?.value);
+    return Date.UTC(
+      get("year"),
+      get("month") - 1,
+      get("day"),
+      get("hour"),
+      get("minute"),
+      get("second")
+    );
+  };
+
+  let guess = targetMs;
+  for (let i = 0; i < 4; i++) {
+    guess += targetMs - formatInTz(guess);
+  }
+  return new Date(guess).toISOString();
+}
+
 // ─── Fetch helpers ────────────────────────────────────────────────────────────
 
 async function motogpFetch<T>(
@@ -250,32 +322,40 @@ function getMotoGpSessionStatus(
   dateUtc: string,
   apiStatus?: string
 ): SessionStatus {
-  if (apiStatus === "FINISHED" || apiStatus === "Official") {
-    return "completed";
-  }
-
   if (!dateUtc) return "upcoming";
+
   const now = Date.now();
   const start = new Date(dateUtc).getTime();
   const durationMs =
     (MOTOGP_SESSION_DURATION_MINUTES[key] ?? 45) * 60 * 1000;
   const end = start + durationMs;
 
+  if (apiStatus === "FINISHED" || apiStatus === "Official") {
+    if (now < start) {
+      return "upcoming";
+    }
+    return "completed";
+  }
+
   if (now < start) return "upcoming";
   if (now >= start && now <= end) return "live";
   return "completed";
 }
 
-function mapIndividualSessions(rawSessions: ApiSession[]): MotoGpSession[] {
+function mapIndividualSessions(
+  rawSessions: ApiSession[],
+  countryCode: string
+): MotoGpSession[] {
   return rawSessions
     .filter((session) => session.date && sessionKeyFromApi(session))
     .map((session) => {
       const key = sessionKeyFromApi(session)!;
+      const dateUtc = pulseLiveDateToUtc(session.date!, countryCode);
       return {
         key,
         label: sessionLabelFromApi(session),
-        dateUtc: session.date!,
-        status: getMotoGpSessionStatus(key, session.date!, session.status),
+        dateUtc,
+        status: getMotoGpSessionStatus(key, dateUtc, session.status),
         sessionId: session.id,
         apiType: session.type,
       };
@@ -469,13 +549,14 @@ export async function fetchSessionResults(
 
 async function fetchEventSessions(
   eventId: string,
-  categoryId: string
+  categoryId: string,
+  countryCode: string
 ): Promise<MotoGpSession[]> {
   const sessions = await motogpFetch<ApiSession[]>(
     `/results/sessions?eventUuid=${eventId}&categoryUuid=${categoryId}`,
     3600
   );
-  return mapIndividualSessions(sessions);
+  return mapIndividualSessions(sessions, countryCode);
 }
 
 export async function fetchMotoGpSchedule(
@@ -511,7 +592,11 @@ export async function fetchMotoGpSchedule(
       const round = index + 1;
       let sessions: MotoGpSession[] = [];
       try {
-        sessions = await fetchEventSessions(event.id, motoGpCategoryId);
+        sessions = await fetchEventSessions(
+          event.id,
+          motoGpCategoryId,
+          event.country.iso
+        );
       } catch {
         sessions = [];
       }
