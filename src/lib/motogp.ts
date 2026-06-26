@@ -450,12 +450,13 @@ export async function fetchSessionClassification(
 
 export async function fetchSessionResults(
   sessionId: string,
-  limit = 5
+  limit = 5,
+  options?: { noStore?: boolean }
 ): Promise<MotoGpFinisher[]> {
   const data = await motogpFetch<ApiStandingsResponse>(
     `/results/session/${sessionId}/classification?test=false`,
     300,
-    true
+    options?.noStore ?? false
   );
 
   return (data.classification ?? []).slice(0, limit).map((entry) => ({

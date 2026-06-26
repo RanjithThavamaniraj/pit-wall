@@ -27,7 +27,9 @@ export const GET = withApiAnalytics("/api/motogp/weekend", async function GET() 
     let results: MotoGpFinisher[] = [];
     if (resultsSession) {
       try {
-        results = await fetchSessionResults(resultsSession.sessionId, 5);
+        results = await fetchSessionResults(resultsSession.sessionId, 5, {
+          noStore: true,
+        });
       } catch {
         results = [];
       }
