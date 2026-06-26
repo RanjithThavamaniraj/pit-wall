@@ -117,7 +117,6 @@ export function PitWallHeroBoard({
               detailHref={detailHref}
               liveHref={liveHref}
               countdown={countdown}
-              markerStyle={sport === "motogp" ? "ring" : "pill"}
             />
           </div>
         </div>

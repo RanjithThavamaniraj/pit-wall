@@ -11,8 +11,6 @@ type SessionDialProps = {
   detailHref: string;
   liveHref: string;
   countdown?: { dateUtc: string; label: string; isRace?: boolean };
-  /** Pills around the ring (F1). Ring dots on the track (MotoGP — avoids overlap). */
-  markerStyle?: "pill" | "ring";
 };
 
 function countdownLabel(label: string, isRace?: boolean, live?: boolean) {
@@ -91,20 +89,11 @@ function DialCenter({
   );
 }
 
-function polarOnRing(angleDeg: number, radius = 98) {
-  const rad = (angleDeg * Math.PI) / 180;
-  return {
-    x: 120 + radius * Math.cos(rad),
-    y: 120 + radius * Math.sin(rad),
-  };
-}
-
 export function SessionDial({
   sessions,
   detailHref,
   liveHref,
   countdown,
-  markerStyle = "pill",
 }: SessionDialProps) {
   const timedSessions = sessions.filter((s) => s.dateUtc);
   const minTime = timedSessions.length
@@ -170,58 +159,6 @@ export function SessionDial({
               transform="rotate(-90 120 120)"
             />
           )}
-          {markerStyle === "ring" &&
-            sessions.map((session, index) => {
-              const angle = sessionAngle(
-                session,
-                index,
-                sessions.length,
-                minTime,
-                maxTime
-              );
-              const { x, y } = polarOnRing(angle);
-              const isLive = session.status === "live";
-              const isNext =
-                index === nextIndex && session.status === "upcoming";
-              const isDone = session.status === "completed";
-              const timeLabel = session.dateUtc
-                ? formatCompactTime(session.dateUtc)
-                : "TBC";
-              const href = sessionHref(session, detailHref, liveHref);
-
-              return (
-                <a
-                  key={session.id}
-                  href={href}
-                  className={`hero-dial-marker ${
-                    isLive
-                      ? "hero-dial-marker--live"
-                      : isNext
-                      ? "hero-dial-marker--next"
-                      : isDone
-                      ? "hero-dial-marker--done"
-                      : ""
-                  }`}
-                  aria-label={`${session.label}, ${timeLabel}`}
-                >
-                  <title>{`${session.label} · ${timeLabel}`}</title>
-                  <circle
-                    cx={x}
-                    cy={y}
-                    r={isNext || isLive ? 7 : 5}
-                    className="hero-dial-marker-dot"
-                  />
-                  {(isNext || isLive) && (
-                    <circle
-                      cx={x}
-                      cy={y}
-                      r={11}
-                      className="hero-dial-marker-halo"
-                    />
-                  )}
-                </a>
-              );
-            })}
         </svg>
 
         {countdown?.dateUtc && (
@@ -232,8 +169,7 @@ export function SessionDial({
           />
         )}
 
-        {markerStyle === "pill" &&
-          sessions.map((session, index) => {
+        {sessions.map((session, index) => {
           const angle = sessionAngle(session, index, sessions.length, minTime, maxTime);
           const isLive = session.status === "live";
           const isNext = index === nextIndex && session.status === "upcoming";
