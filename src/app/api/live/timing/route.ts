@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { withApiAnalytics } from "@/lib/analytics/api-wrapper";
 import {
   OpenF1Session,
   OpenF1Driver,
@@ -39,7 +40,7 @@ function formatLapTime(seconds: number): string {
   return mins > 0 ? `${mins}:${secs.padStart(6, "0")}` : secs;
 }
 
-export async function GET() {
+export const GET = withApiAnalytics("/api/live/timing", async function GET() {
   try {
     // 1. Get the authoritative weekend state from Jolpica
     const schedule = await fetchSeasonSchedule("current");
@@ -259,4 +260,4 @@ export async function GET() {
     console.error("Error fetching live timing:", error);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
-}
+});

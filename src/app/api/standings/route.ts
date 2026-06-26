@@ -1,10 +1,11 @@
 import { NextResponse } from "next/server";
+import { withApiAnalytics } from "@/lib/analytics/api-wrapper";
 import { fetchAllStandings } from "@/lib/standings";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 1800; // 30 minutes
 
-export async function GET() {
+export const GET = withApiAnalytics("/api/standings", async function GET() {
   try {
     const standings = await fetchAllStandings();
     return NextResponse.json(standings, {
@@ -19,4 +20,4 @@ export async function GET() {
       { status: 500 }
     );
   }
-}
+});

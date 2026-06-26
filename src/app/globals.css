@@ -1,6 +1,7 @@
 @import "tailwindcss";
 @import "./layout.css";
-@import "./hero-stage.css";
+@import "./(site)/hero-stage.css";
+@import "./(site)/weekend-hub.css";
 
 :root {
   --background: #07090f;

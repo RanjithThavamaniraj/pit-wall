@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { withApiAnalytics } from "@/lib/analytics/api-wrapper";
 import { fetchMotoGpSchedule } from "@/lib/motogp";
 import { fetchSeasonSchedule } from "@/lib/schedule";
 import { getMotoGpWeekendContext } from "@/lib/motogp-weekend";
@@ -6,7 +7,7 @@ import { getWeekendContext } from "@/lib/weekend";
 
 export const dynamic = "force-dynamic";
 
-export async function GET() {
+export const GET = withApiAnalytics("/api/sport-status", async function GET() {
   let f1Live = false;
   let motogpLive = false;
 
@@ -29,4 +30,4 @@ export async function GET() {
     { f1Live, motogpLive },
     { headers: { "Cache-Control": "public, s-maxage=30" } }
   );
-}
+});

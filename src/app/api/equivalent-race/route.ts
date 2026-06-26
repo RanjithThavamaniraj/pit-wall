@@ -1,11 +1,14 @@
 import { NextResponse } from "next/server";
+import { withApiAnalytics } from "@/lib/analytics/api-wrapper";
 import { getEquivalentRaceSlug } from "@/lib/equivalent-race";
 import { isValidSport } from "@/lib/sport";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 3600;
 
-export async function GET(request: Request) {
+export const GET = withApiAnalytics("/api/equivalent-race", async function GET(
+  request: Request
+) {
   const { searchParams } = new URL(request.url);
   const from = searchParams.get("from");
   const slug = searchParams.get("slug");
@@ -35,4 +38,4 @@ export async function GET(request: Request) {
       { status: 500 }
     );
   }
-}
+});

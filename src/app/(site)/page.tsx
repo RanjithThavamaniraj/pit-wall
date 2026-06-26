@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
-import Link from "next/link";
 import { Suspense } from "react";
 import { GlassCard, PageSection, SectionHeading } from "@/components/ui";
 import { HomePageGate } from "@/components/HomePageGate";
@@ -8,6 +7,8 @@ import { isValidSport, SPORT_COOKIE_KEY, type Sport } from "@/lib/sport";
 import { F1HeroBoard } from "@/components/home/F1HeroBoard";
 import { MotoGpHeroBoard } from "@/components/home/MotoGpHeroBoard";
 import { HeroBoardSkeleton } from "@/components/home/HeroBoardSkeleton";
+import { F1WeekendHubSection } from "@/components/home/F1WeekendHubSection";
+import { MotoGpWeekendHubSection } from "@/components/home/MotoGpWeekendHubSection";
 
 function Hero() {
   return (
@@ -17,78 +18,34 @@ function Hero() {
   );
 }
 
-// ─── Feature Grid ──────────────────────────────────────────────────────────────
+function WeekendHub() {
+  return (
+    <Suspense fallback={<WeekendHubSkeleton />}>
+      <F1WeekendHubSection />
+    </Suspense>
+  );
+}
 
-function FeatureGrid({ sport }: { sport: Sport }) {
-  const routes =
-    sport === "motogp"
-      ? {
-          briefing: "/motogp/live",
-          pulse: "/#strategy",
-          championship: "/motogp/standings",
-        }
-      : {
-          briefing: "/live",
-          pulse: "/#strategy",
-          championship: "/standings",
-        };
-
-  const companionCards = [
-    {
-      eyebrow: "RACE BRIEFING",
-      title: "Know the story before the race.",
-      description:
-        "Follow live session updates, race control messages, and weekend progression as each session runs.",
-      href: routes.briefing,
-      cta: sport === "motogp" ? "Open weekend hub" : "Open live timing",
-    },
-    {
-      eyebrow: "COMMUNITY PULSE",
-      title: "See who fans are backing.",
-      description:
-        sport === "motogp"
-          ? "Preview how community race-win favourites could look once predictions launch."
-          : "Preview how community race-win favourites could look once predictions launch.",
-      href: routes.pulse,
-      cta: "View prediction preview",
-    },
-    {
-      eyebrow: "CHAMPIONSHIP BATTLE",
-      title: "Track the title fight.",
-      description:
-        sport === "motogp"
-          ? "MotoGP, Moto2, and Moto3 standings updated after every round."
-          : "Live drivers' and constructors' standings updated after every round.",
-      href: routes.championship,
-      cta: "View standings",
-    },
-  ];
-
+function WeekendHubSkeleton() {
   return (
     <PageSection id="features" wide tightTop>
-      <SectionHeading
-        eyebrow="MOTORSPORT WEEKEND HUB"
-        title="Everything you need before lights out."
-        description="Schedules, live hubs, and championship standings — with more community features on the way."
-      />
-      <div className="mt-10 grid gap-5 sm:grid-cols-2 sm:gap-6 xl:grid-cols-3 xl:gap-8">
-        {companionCards.map((card) => (
-          <Link key={card.title} href={card.href} className="group block">
-            <GlassCard className="flex h-full flex-col transition hover:-translate-y-0.5 hover:bg-white/[0.08]">
-              <p className="text-sm font-semibold uppercase tracking-[0.24em] text-amber-200">
-                {card.eyebrow}
-              </p>
-              <h3 className="mt-4 text-xl font-semibold text-white transition group-hover:text-amber-100 sm:mt-5 sm:text-2xl">
-                {card.title}
-              </h3>
-              <p className="mt-3 flex-1 text-sm leading-7 text-slate-300 sm:mt-4 sm:text-base">
-                {card.description}
-              </p>
-              <p className="mt-5 text-sm font-semibold text-amber-300 transition group-hover:text-amber-200 sm:mt-6">
-                {card.cta} →
-              </p>
-            </GlassCard>
-          </Link>
+      <div className="hub-section-label">
+        <span className="hub-section-label-bar" aria-hidden="true" />
+        <span className="hub-section-label-text">Pit wall tools</span>
+      </div>
+      <div className="max-w-3xl animate-pulse space-y-4">
+        <div className="h-10 w-2/3 rounded bg-white/10" />
+        <div className="h-5 w-full rounded bg-white/5" />
+      </div>
+      <div className="hub-board mt-10">
+        {Array.from({ length: 3 }).map((_, i) => (
+          <div key={i} className="hub-board-row pointer-events-none opacity-40">
+            <span className="hub-board-channel">—</span>
+            <span className="hub-board-tag">—</span>
+            <div className="hub-board-body">
+              <div className="h-4 w-32 rounded bg-white/10" />
+            </div>
+          </div>
         ))}
       </div>
     </PageSection>
@@ -165,6 +122,14 @@ function CTA() {
 }
 
 // ─── MotoGP Home ──────────────────────────────────────────────────────────────
+
+function MotoGpWeekendHub() {
+  return (
+    <Suspense fallback={<WeekendHubSkeleton />}>
+      <MotoGpWeekendHubSection />
+    </Suspense>
+  );
+}
 
 function MotoGpHero() {
   return (
@@ -243,7 +208,7 @@ function F1Home() {
   return (
     <div className="page-flow">
       <Hero />
-      <FeatureGrid sport="f1" />
+      <WeekendHub />
       <StrategySection />
       <CTA />
     </div>
@@ -254,7 +219,7 @@ function MotoGpHome() {
   return (
     <div className="page-flow">
       <MotoGpHero />
-      <FeatureGrid sport="motogp" />
+      <MotoGpWeekendHub />
       <MotoGpStrategySection />
       <MotoGpCTA />
     </div>

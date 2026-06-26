@@ -1,10 +1,11 @@
 import { NextResponse } from "next/server";
+import { withApiAnalytics } from "@/lib/analytics/api-wrapper";
 import { fetchSeasonSchedule } from "@/lib/schedule";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 3600; // 1 hour
 
-export async function GET() {
+export const GET = withApiAnalytics("/api/schedule", async function GET() {
   try {
     const schedule = await fetchSeasonSchedule("current");
     return NextResponse.json(schedule, {
@@ -19,4 +20,4 @@ export async function GET() {
       { status: 500 }
     );
   }
-}
+});

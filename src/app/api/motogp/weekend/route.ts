@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { withApiAnalytics } from "@/lib/analytics/api-wrapper";
 import {
   fetchMotoGpSchedule,
   fetchSessionResults,
@@ -8,7 +9,7 @@ import { getMotoGpWeekendContext } from "@/lib/motogp-weekend";
 
 export const dynamic = "force-dynamic";
 
-export async function GET() {
+export const GET = withApiAnalytics("/api/motogp/weekend", async function GET() {
   try {
     const schedule = await fetchMotoGpSchedule();
     const context = getMotoGpWeekendContext(schedule);
@@ -47,4 +48,4 @@ export async function GET() {
       { status: 500 }
     );
   }
-}
+});

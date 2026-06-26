@@ -1,10 +1,11 @@
 import { NextResponse } from "next/server";
+import { withApiAnalytics } from "@/lib/analytics/api-wrapper";
 import { OpenF1RaceControl } from "@/lib/timing";
 import { translateRaceControlMessage, BriefingItem } from "@/lib/briefings";
 
 const OPENF1_BASE = "https://api.openf1.org/v1";
 
-export async function GET() {
+export const GET = withApiAnalytics("/api/live/briefings", async function GET() {
   try {
     // 1. Fetch race control messages for the latest session
     const res = await fetch(`${OPENF1_BASE}/race_control?session_key=latest`, {
@@ -79,4 +80,4 @@ export async function GET() {
     console.error("Error fetching briefings:", error);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
-}
+});
