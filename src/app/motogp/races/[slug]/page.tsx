@@ -150,7 +150,8 @@ export default async function MotoGpRaceDetailPage({
               {event.sessions.map((session) => (
                 <li
                   key={session.sessionId}
-                  className={`flex items-center justify-between gap-4 px-6 py-4 ${
+                  id={`session-${session.sessionId}`}
+                  className={`scroll-mt-28 flex items-center justify-between gap-4 px-6 py-4 ${
                     session.status === "live"
                       ? "bg-red-400/[0.06]"
                       : session.status === "completed"

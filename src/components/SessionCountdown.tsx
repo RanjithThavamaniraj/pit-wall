@@ -5,8 +5,8 @@ import { useCountdown } from "@/hooks/useCountdown";
 type Props = {
   targetDate: string; // ISO UTC string
   sessionLabel: string;
-  /** "full" shows days/hours/min/sec blocks. "inline" shows compact "3h 42m" */
-  variant?: "full" | "inline";
+  /** "full" shows days/hours/min/sec blocks. "inline" shows compact "3h 42m". "hero" is open typography. */
+  variant?: "full" | "inline" | "hero";
 };
 
 /**
@@ -62,6 +62,62 @@ function FullCountdown({ targetDate, sessionLabel }: Props) {
 }
 
 /**
+ * Hero countdown — open typography without tile boxes.
+ */
+function HeroCountdown({ targetDate, sessionLabel }: Props) {
+  const { days, hours, minutes, seconds, isExpired } = useCountdown(targetDate);
+
+  if (isExpired) {
+    return (
+      <div role="timer" aria-label={`${sessionLabel} is now live`}>
+        <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-red-400">
+          {sessionLabel}
+        </p>
+        <p className="mt-2 flex items-center gap-2 text-lg font-semibold text-red-300">
+          <span className="size-2 animate-pulse rounded-full bg-red-400" />
+          Session live
+        </p>
+      </div>
+    );
+  }
+
+  const units = [
+    { value: days, label: "days", show: days > 0 },
+    { value: hours, label: "hrs", show: days < 7 },
+    { value: minutes, label: "min", show: days < 1 || days < 7 },
+    { value: seconds, label: "sec", show: days === 0 && hours < 3 },
+  ].filter((u) => u.show);
+
+  return (
+    <div
+      role="timer"
+      aria-label={`${sessionLabel} starts in ${days} days ${hours} hours ${minutes} minutes`}
+    >
+      <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-slate-500">
+        {sessionLabel} starts in
+      </p>
+      <div className="mt-3 flex flex-wrap items-baseline gap-x-4 gap-y-1">
+        {units.map(({ value, label }, index) => (
+          <span key={label} className="inline-flex items-baseline gap-1">
+            {index > 0 && (
+              <span className="mr-2 text-slate-600" aria-hidden="true">
+                :
+              </span>
+            )}
+            <span className="font-mono text-3xl font-semibold tabular-nums text-white sm:text-4xl">
+              {String(value).padStart(2, "0")}
+            </span>
+            <span className="text-xs uppercase tracking-widest text-slate-500">
+              {label}
+            </span>
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/**
  * Inline countdown — compact "in 3h 42m" format for session rows.
  */
 function InlineCountdown({ targetDate, sessionLabel }: Props) {
@@ -98,5 +154,6 @@ function InlineCountdown({ targetDate, sessionLabel }: Props) {
 
 export function SessionCountdown(props: Props) {
   if (props.variant === "inline") return <InlineCountdown {...props} />;
+  if (props.variant === "hero") return <HeroCountdown {...props} />;
   return <FullCountdown {...props} />;
 }

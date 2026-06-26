@@ -1,8 +1,14 @@
 @import "tailwindcss";
+@import "./layout.css";
+@import "./hero-stage.css";
 
 :root {
   --background: #07090f;
   --foreground: #f8fafc;
+  --pit-accent: #fcd34d;
+  --pit-accent-soft: rgba(252, 211, 77, 0.14);
+  --pit-accent-glow: rgba(252, 211, 77, 0.42);
+  --pit-accent-muted: #fde68a;
 }
 
 @theme inline {

@@ -160,7 +160,8 @@ export default async function RaceDetailPage({
               {race.sessions.map((session) => (
                 <li
                   key={session.key}
-                  className={`flex items-center justify-between gap-4 px-6 py-4 ${
+                  id={`session-${session.key}`}
+                  className={`scroll-mt-28 flex items-center justify-between gap-4 px-6 py-4 ${
                     session.status === "live"
                       ? "bg-red-400/[0.06]"
                       : session.status === "completed"

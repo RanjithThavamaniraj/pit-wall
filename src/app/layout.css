@@ -1,0 +1,76 @@
+/* Shared layout rhythm — spacing scale: 8 / 16 / 24 / 32 / 48 / 64 / 80 */
+
+:root {
+  --content-max: 90rem;
+  --content-max-wide: 100rem;
+  --content-px: 1.25rem;
+  --section-y: 4rem;
+  --section-y-lg: 5rem;
+  --section-y-xl: 6rem;
+}
+
+@media (min-width: 640px) {
+  :root {
+    --content-px: 2rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  :root {
+    --content-px: 2.5rem;
+    --section-y: 5rem;
+    --section-y-lg: 6rem;
+    --section-y-xl: 7rem;
+  }
+}
+
+.layout-shell {
+  width: 100%;
+  max-width: var(--content-max);
+  margin-inline: auto;
+  padding-inline: var(--content-px);
+}
+
+.layout-shell--wide {
+  max-width: var(--content-max-wide);
+}
+
+.page-section {
+  padding-block: var(--section-y);
+}
+
+@media (min-width: 1024px) {
+  .page-section {
+    padding-block: var(--section-y-lg);
+  }
+}
+
+.page-section--tight-top {
+  padding-top: calc(var(--section-y) * 0.65);
+}
+
+@media (min-width: 1024px) {
+  .page-section--tight-top {
+    padding-top: calc(var(--section-y-lg) * 0.65);
+  }
+}
+
+.page-section--muted {
+  border-block: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.page-flow {
+  display: flex;
+  flex-direction: column;
+}
+
+.hero-stage-fade {
+  pointer-events: none;
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  z-index: 1;
+  height: 5rem;
+  background: linear-gradient(to bottom, transparent, var(--background));
+}

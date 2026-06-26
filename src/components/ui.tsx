@@ -11,12 +11,37 @@ export function Container({
 }) {
   return (
     <div
-      className={`mx-auto w-full px-5 sm:px-8 lg:px-10 ${
-        wide ? "max-w-[88rem]" : "max-w-7xl"
-      } ${className}`}
+      className={`layout-shell ${wide ? "layout-shell--wide" : ""} ${className}`}
     >
       {children}
     </div>
+  );
+}
+
+export function PageSection({
+  children,
+  id,
+  className = "",
+  variant = "default",
+  wide = false,
+  tightTop = false,
+}: {
+  children: ReactNode;
+  id?: string;
+  className?: string;
+  variant?: "default" | "muted";
+  wide?: boolean;
+  tightTop?: boolean;
+}) {
+  return (
+    <section
+      id={id}
+      className={`page-section ${variant === "muted" ? "page-section--muted" : ""} ${
+        tightTop ? "page-section--tight-top" : ""
+      } ${className}`}
+    >
+      <Container wide={wide}>{children}</Container>
+    </section>
   );
 }
 
@@ -24,20 +49,22 @@ export function SectionHeading({
   eyebrow,
   title,
   description,
+  className = "",
 }: {
   eyebrow: string;
   title: string;
   description: string;
+  className?: string;
 }) {
   return (
-    <div className="max-w-3xl">
+    <div className={`max-w-3xl lg:max-w-4xl ${className}`}>
       <p className="text-sm font-semibold uppercase tracking-[0.28em] text-amber-300">
         {eyebrow}
       </p>
-      <h2 className="mt-4 text-3xl font-semibold tracking-[-0.04em] text-white sm:text-5xl">
+      <h2 className="mt-3 text-3xl font-semibold tracking-[-0.04em] text-white sm:mt-4 sm:text-4xl lg:text-5xl">
         {title}
       </h2>
-      <p className="mt-5 text-base leading-8 text-slate-300 sm:text-lg">
+      <p className="mt-4 text-base leading-7 text-slate-300 sm:mt-5 sm:text-lg sm:leading-8">
         {description}
       </p>
     </div>
@@ -53,7 +80,7 @@ export function GlassCard({
 }) {
   return (
     <div
-      className={`rounded-[2rem] border border-white/10 bg-white/[0.06] p-6 shadow-2xl shadow-black/30 backdrop-blur-xl ${className}`}
+      className={`rounded-[2rem] border border-white/10 bg-white/[0.06] p-6 shadow-2xl shadow-black/30 backdrop-blur-xl sm:p-7 lg:p-8 ${className}`}
     >
       {children}
     </div>

@@ -89,7 +89,7 @@ export default function RootLayout({
             Skip to main content
           </a>
           <header className="sticky top-0 z-50 border-b border-white/10 bg-[#07090f]/80 backdrop-blur-xl">
-            <div className="mx-auto flex h-20 w-full max-w-7xl items-center justify-between px-5 sm:px-8 lg:px-10">
+            <div className="layout-shell flex h-16 items-center justify-between sm:h-[4.5rem]">
               <Link
                 href="/"
                 aria-label="PitWall Apex home"

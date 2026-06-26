@@ -1,0 +1,425 @@
+.hero-stage {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background: #050608;
+  min-height: clamp(28rem, 78vh, 52rem);
+}
+
+.hero-stage--f1 {
+  --hero-accent: var(--pit-accent);
+  --hero-accent-soft: var(--pit-accent-soft);
+  --hero-accent-glow: var(--pit-accent-glow);
+}
+
+.hero-stage--motogp {
+  --hero-accent: #fbbf24;
+  --hero-accent-soft: rgba(251, 191, 36, 0.14);
+  --hero-accent-glow: rgba(251, 191, 36, 0.42);
+}
+
+.hero-stage-beam {
+  pointer-events: none;
+  position: absolute;
+  top: -20%;
+  left: -10%;
+  width: 70%;
+  height: 140%;
+  background: linear-gradient(
+    118deg,
+    var(--hero-accent-soft) 0%,
+    transparent 62%
+  );
+  transform: skewX(-12deg);
+}
+
+.hero-stage-glow {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse 55% 45% at 50% 35%,
+    var(--hero-accent-soft),
+    transparent 70%
+  );
+}
+
+.hero-stage-vignette {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 80% 70% at 50% 50%, transparent 35%, #050608 100%);
+}
+
+.hero-stage-round {
+  pointer-events: none;
+  position: absolute;
+  right: -2%;
+  top: 50%;
+  transform: translateY(-50%);
+  font-family: var(--font-rajdhani), sans-serif;
+  font-size: clamp(11rem, 28vw, 22rem);
+  font-weight: 700;
+  line-height: 0.85;
+  letter-spacing: -0.04em;
+  color: rgba(255, 255, 255, 0.025);
+  user-select: none;
+}
+
+.hero-stage-checker {
+  pointer-events: none;
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 120px;
+  height: 120px;
+  opacity: 0.05;
+  background-image:
+    linear-gradient(45deg, #fff 25%, transparent 25%, transparent 75%, #fff 75%),
+    linear-gradient(45deg, #fff 25%, transparent 25%, transparent 75%, #fff 75%);
+  background-size: 14px 14px;
+  background-position: 0 0, 7px 7px;
+  mask-image: linear-gradient(45deg, black 30%, transparent 75%);
+}
+
+.hero-stage-speedline {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  opacity: 0.04;
+  background: repeating-linear-gradient(
+    -12deg,
+    transparent,
+    transparent 40px,
+    rgba(255, 255, 255, 0.5) 40px,
+    rgba(255, 255, 255, 0.5) 41px
+  );
+}
+
+/* ── Hero stack (open layout, no cards) ───────────────────────────────────── */
+
+.hero-stack {
+  margin-top: 1.5rem;
+  text-align: center;
+}
+
+@media (min-width: 1024px) {
+  .hero-stack {
+    margin-top: 2rem;
+    text-align: left;
+  }
+}
+
+.hero-body {
+  display: grid;
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+@media (min-width: 1024px) {
+  .hero-body {
+    grid-template-columns: minmax(0, 1.05fr) minmax(16rem, 22rem);
+    align-items: center;
+    gap: 3rem;
+    margin-top: 2.5rem;
+  }
+}
+
+@media (min-width: 1280px) {
+  .hero-body {
+    grid-template-columns: minmax(0, 1.1fr) minmax(18rem, 26rem);
+    gap: 4rem;
+  }
+}
+
+.hero-body__dial {
+  justify-self: center;
+  width: 100%;
+}
+
+@media (min-width: 1024px) {
+  .hero-body__dial {
+    justify-self: end;
+  }
+}
+
+.hero-footer {
+  margin-top: 2.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+@media (min-width: 1024px) {
+  .hero-footer {
+    margin-top: 3rem;
+    gap: 2.5rem;
+  }
+}
+
+/* ── Session dial (circular weekend times) ─────────────────────────────────── */
+
+.hero-dial {
+  margin-top: 0;
+  width: 100%;
+}
+
+.hero-dial-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.hero-dial-title {
+  font-family: var(--font-rajdhani), sans-serif;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.34em;
+  text-transform: uppercase;
+  color: var(--hero-accent);
+}
+
+.hero-dial-progress {
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(148, 163, 184, 0.7);
+}
+
+.hero-dial-stage {
+  --dial-radius: clamp(8.75rem, 40vw, 11.25rem);
+  position: relative;
+  width: min(100%, 30rem);
+  aspect-ratio: 1;
+  margin-inline: auto;
+}
+
+.hero-dial-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.hero-dial-svg-track {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.05);
+}
+
+.hero-dial-svg-track--outer {
+  stroke-width: 10;
+}
+
+.hero-dial-svg-track--mid {
+  stroke-width: 14;
+  stroke: color-mix(in srgb, var(--hero-accent) 12%, transparent);
+}
+
+.hero-dial-svg-track--inner {
+  stroke-width: 8;
+}
+
+.hero-dial-svg-progress {
+  fill: none;
+  stroke: var(--hero-accent);
+  stroke-width: 6;
+  stroke-linecap: round;
+  opacity: 0.75;
+  filter: drop-shadow(0 0 8px var(--hero-accent-glow));
+}
+
+.hero-dial-center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 2;
+  display: flex;
+  width: 7.5rem;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  transform: translate(-50%, -50%);
+}
+
+.hero-dial-center-eyebrow {
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.58rem;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--hero-accent);
+}
+
+.hero-dial-center-time {
+  margin-top: 0.35rem;
+  font-family: var(--font-geist-mono), monospace;
+  font-size: clamp(1.15rem, 4vw, 1.45rem);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  color: #fff;
+  text-shadow: 0 0 24px var(--hero-accent-glow);
+}
+
+.hero-dial-center-sep {
+  margin-inline: 0.1rem;
+  color: rgba(255, 255, 255, 0.25);
+}
+
+.hero-dial-center-live {
+  margin-top: 0.35rem;
+  font-family: var(--font-rajdhani), sans-serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #fecaca;
+  text-shadow: 0 0 20px rgba(239, 68, 68, 0.5);
+}
+
+.hero-dial-center-session {
+  margin-top: 0.4rem;
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.55rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(148, 163, 184, 0.85);
+  line-height: 1.35;
+}
+
+.hero-dial-pill {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 3;
+  display: flex;
+  min-width: 4.75rem;
+  flex-direction: column;
+  align-items: center;
+  padding: 0.45rem 0.65rem;
+  border-radius: 9999px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(10px);
+  text-align: center;
+  transform: translate(-50%, -50%) rotate(var(--dial-angle))
+    translateY(calc(-1 * var(--dial-radius))) rotate(calc(-1 * var(--dial-angle)));
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
+}
+
+.hero-dial-pill:hover {
+  border-color: color-mix(in srgb, var(--hero-accent) 45%, transparent);
+  background: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 0 24px color-mix(in srgb, var(--hero-accent) 22%, transparent);
+}
+
+.hero-dial-pill--next {
+  z-index: 4;
+  border-color: color-mix(in srgb, var(--hero-accent) 55%, transparent);
+  background: color-mix(in srgb, var(--hero-accent) 14%, rgba(255, 255, 255, 0.04));
+  box-shadow: 0 0 20px color-mix(in srgb, var(--hero-accent) 18%, transparent);
+}
+
+.hero-dial-pill--live {
+  border-color: rgba(239, 68, 68, 0.55);
+  background: rgba(239, 68, 68, 0.14);
+  box-shadow: 0 0 22px rgba(239, 68, 68, 0.28);
+}
+
+.hero-dial-pill--done {
+  opacity: 0.62;
+}
+
+.hero-dial-pill-time {
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: #fff;
+  white-space: nowrap;
+}
+
+.hero-dial-pill-label {
+  margin-top: 0.15rem;
+  font-family: var(--font-rajdhani), sans-serif;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(203, 213, 225, 0.75);
+}
+
+.hero-dial-pill--next .hero-dial-pill-label {
+  color: var(--hero-accent);
+}
+
+.hero-dial-pill--live .hero-dial-pill-time {
+  color: #fecaca;
+}
+
+/* ── Open championship strip ────────────────────────────────────────────────── */
+
+.hero-standings {
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+@keyframes hero-live-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.45;
+  }
+}
+
+.hero-live-dot {
+  animation: hero-live-pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes hero-lights-sequence {
+  0%,
+  78%,
+  100% {
+    opacity: 0.2;
+  }
+  8%,
+  68% {
+    opacity: 1;
+  }
+}
+
+.hero-start-light {
+  animation: hero-lights-sequence 2.2s ease-in-out infinite;
+}
+
+.hero-start-light:nth-child(2) {
+  animation-delay: 0.12s;
+}
+.hero-start-light:nth-child(3) {
+  animation-delay: 0.24s;
+}
+.hero-start-light:nth-child(4) {
+  animation-delay: 0.36s;
+}
+.hero-start-light:nth-child(5) {
+  animation-delay: 0.48s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-live-dot,
+  .hero-start-light {
+    animation: none;
+  }
+}

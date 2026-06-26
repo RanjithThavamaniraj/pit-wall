@@ -1,0 +1,205 @@
+"use client";
+
+import Link from "next/link";
+import { Container } from "@/components/ui";
+import { SessionDial } from "@/components/home/SessionDial";
+
+export type HeroBoardSession = {
+  id: string;
+  shortLabel: string;
+  label: string;
+  status: "completed" | "live" | "upcoming";
+  dateUtc?: string;
+};
+
+export type HeroChampionship = {
+  leaderCode: string;
+  leaderName: string;
+  leaderTeam: string;
+  leaderPoints: number;
+  leaderColor?: string;
+  chaserName: string;
+  gapPoints: string;
+  round: number;
+  titleLabel: string;
+  standingsHref: string;
+};
+
+export type PitWallHeroBoardProps = {
+  sport: "f1" | "motogp";
+  sportLabel: string;
+  season: number;
+  round: number;
+  raceTitle: string;
+  circuit: string;
+  locality: string;
+  flag: string;
+  weekendLabel: string;
+  isLive: boolean;
+  sessions: HeroBoardSession[];
+  countdown?: { dateUtc: string; label: string; isRace?: boolean };
+  detailHref: string;
+  scheduleHref: string;
+  liveHref: string;
+  championship: HeroChampionship | null;
+};
+
+export function PitWallHeroBoard({
+  sport,
+  sportLabel,
+  season,
+  round,
+  raceTitle,
+  circuit,
+  locality,
+  flag,
+  weekendLabel,
+  isLive,
+  sessions,
+  countdown,
+  detailHref,
+  scheduleHref,
+  liveHref,
+  championship,
+}: PitWallHeroBoardProps) {
+  const roundLabel = `R${String(round).padStart(2, "0")}`;
+
+  return (
+    <section id="top" className={`hero-stage hero-stage--${sport}`}>
+      <div className="hero-stage-beam" aria-hidden="true" />
+      <div className="hero-stage-glow" aria-hidden="true" />
+      <div className="hero-stage-speedline" aria-hidden="true" />
+      <div className="hero-stage-vignette" aria-hidden="true" />
+      <div className="hero-stage-checker" aria-hidden="true" />
+      <div className="hero-stage-round" aria-hidden="true">
+        {roundLabel}
+      </div>
+      <div className="hero-stage-fade" aria-hidden="true" />
+
+      <Container wide className="relative z-[2] flex min-h-[inherit] flex-col justify-center py-12 sm:py-16 lg:py-20">
+        <div className="flex flex-wrap items-center justify-center gap-3 font-mono text-[11px] uppercase tracking-[0.28em] text-slate-500 lg:justify-start">
+          {isLive && (
+            <span className="hero-live-dot flex items-center gap-2 text-red-400">
+              <span className="size-2 rounded-full bg-red-500" />
+              Live
+            </span>
+          )}
+          <span className="text-[color:var(--hero-accent)]">{weekendLabel}</span>
+          <span className="text-white/15">·</span>
+          <span>
+            {sportLabel} {season}
+          </span>
+          <span className="text-white/15">·</span>
+          <span>{roundLabel}</span>
+        </div>
+
+        <div className="hero-body">
+          <div className="hero-stack">
+            <h1 className="font-brand text-[clamp(2.75rem,10vw,5.5rem)] font-bold uppercase leading-[0.88] tracking-tight text-white xl:text-[clamp(3.5rem,5vw,5rem)]">
+              {raceTitle}
+            </h1>
+            <p className="mt-2 font-brand text-base font-semibold uppercase tracking-[0.42em] text-[color:var(--hero-accent)] sm:text-lg">
+              Grand Prix
+            </p>
+            <p className="mt-4 flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-base text-slate-400 sm:mt-5 lg:justify-start">
+              <span className="text-3xl" aria-hidden="true">
+                {flag}
+              </span>
+              <span className="text-lg text-slate-200">{circuit}</span>
+              {locality ? (
+                <>
+                  <span className="text-white/20">·</span>
+                  <span>{locality}</span>
+                </>
+              ) : null}
+            </p>
+          </div>
+
+          <div className="hero-body__dial">
+            <SessionDial
+              sessions={sessions}
+              detailHref={detailHref}
+              liveHref={liveHref}
+              countdown={countdown}
+            />
+          </div>
+        </div>
+
+        <div className="hero-footer">
+          {isLive && (
+            <p className="text-center lg:text-left">
+              <Link
+                href={liveHref}
+                className="hero-live-dot font-mono text-sm font-bold uppercase tracking-[0.25em] text-red-300 transition hover:text-red-200"
+              >
+                Open live timing →
+              </Link>
+            </p>
+          )}
+
+          {championship && (
+            <div className="hero-standings">
+              <div className="flex flex-col gap-6 text-center lg:flex-row lg:items-end lg:justify-between lg:text-left">
+                <div className="min-w-0">
+                  <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-slate-500">
+                    {championship.titleLabel}
+                  </p>
+                  <p className="mt-2 font-brand text-2xl font-bold text-white sm:text-3xl">
+                    <span className="text-[color:var(--hero-accent)]">
+                      {championship.leaderCode}
+                    </span>{" "}
+                    {championship.leaderName}
+                    <span className="ml-2 text-lg text-slate-500">
+                      {championship.leaderPoints} pts
+                    </span>
+                  </p>
+                  <p className="mt-1 text-sm text-slate-500">{championship.leaderTeam}</p>
+                </div>
+                <div className="flex flex-wrap items-end justify-center gap-8 font-mono text-sm lg:justify-end">
+                  <div>
+                    <p className="text-[10px] uppercase tracking-[0.2em] text-slate-600">
+                      Chasing
+                    </p>
+                    <p className="mt-1 text-white">{championship.chaserName}</p>
+                    <p className="text-amber-200/90">{championship.gapPoints}</p>
+                  </div>
+                  <div>
+                    <p className="text-[10px] uppercase tracking-[0.2em] text-slate-600">
+                      Round
+                    </p>
+                    <p className="mt-1 text-2xl font-bold text-white">
+                      {championship.round}
+                    </p>
+                  </div>
+                  <Link
+                    href={championship.standingsHref}
+                    className="text-xs uppercase tracking-[0.2em] text-[color:var(--hero-accent)] hover:brightness-110"
+                  >
+                    Standings →
+                  </Link>
+                </div>
+              </div>
+            </div>
+          )}
+
+          <nav
+            aria-label="Weekend links"
+            className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 font-mono text-[11px] uppercase tracking-[0.2em] text-slate-600 lg:justify-start"
+          >
+            <Link href={detailHref} className="transition hover:text-[color:var(--hero-accent)]">
+              Weekend hub →
+            </Link>
+            <Link href={scheduleHref} className="transition hover:text-slate-400">
+              Calendar →
+            </Link>
+            {!isLive && (
+              <Link href={liveHref} className="transition hover:text-slate-400">
+                Live timing →
+              </Link>
+            )}
+          </nav>
+        </div>
+      </Container>
+    </section>
+  );
+}

@@ -13,8 +13,8 @@ export function SportAwareFooter() {
       : "Data provided by OpenF1 & Jolpica (F1). Not affiliated with Formula 1.";
 
   return (
-    <footer className="border-t border-white/10 py-6 md:py-8">
-      <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-5 sm:flex-row sm:items-center sm:justify-between sm:px-8 lg:px-10">
+    <footer className="border-t border-white/10 py-8 lg:py-10">
+      <div className="layout-shell flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
         <div className="hidden md:block">
           <PitWallBrandLockup
             variant="footer"

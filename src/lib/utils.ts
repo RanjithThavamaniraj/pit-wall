@@ -41,6 +41,20 @@ export function formatLocalTimeOnly(isoString: string): string {
   }
 }
 
+/** Compact clock label for dial pills, e.g. "5:00 PM". */
+export function formatCompactTime(isoString: string): string {
+  if (!isoString) return "TBC";
+  try {
+    return new Intl.DateTimeFormat("en-US", {
+      hour: "numeric",
+      minute: "2-digit",
+      hour12: true,
+    }).format(new Date(isoString));
+  } catch {
+    return isoString;
+  }
+}
+
 /**
  * Format a short date: "Sat 24 May"
  */
