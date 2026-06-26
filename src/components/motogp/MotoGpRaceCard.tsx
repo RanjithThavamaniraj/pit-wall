@@ -105,69 +105,55 @@ export function MotoGpRaceCard({ event }: Props) {
   }
 
   if (event.isNext || event.isCurrent) {
-    const showLiveLink = event.isCurrent || Boolean(liveSession);
-
     return (
-      <div className="relative overflow-hidden rounded-[2rem] border border-amber-300/20 bg-white/[0.06] shadow-2xl shadow-amber-500/10 backdrop-blur-xl">
-        <Link
-          href={href}
-          className="group block p-6 transition hover:bg-white/[0.08] focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-300 focus-visible:ring-inset"
-          aria-label={`${event.name} — Round ${event.round}. ${
-            event.isCurrent ? "Race weekend is happening now." : "Next race."
-          }`}
-        >
-          <div
-            className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-amber-300/0 via-amber-300 to-amber-300/0"
-            aria-hidden="true"
-          />
-          <div className="flex items-start justify-between gap-2">
-            <div className="flex items-center gap-3">
-              <span className="text-3xl" aria-hidden="true">
-                {flag}
-              </span>
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.22em] text-amber-300">
-                  Round {event.round} ·{" "}
-                  {event.isCurrent ? "This weekend" : "Next race"}
-                </p>
-                <h3 className="mt-1 text-lg font-semibold text-white">
-                  {event.name}
-                </h3>
-                <p className="text-sm text-slate-400">
-                  {event.circuit}
-                  {event.locality ? ` · ${event.locality}` : ""}
-                </p>
-              </div>
+      <Link
+        href={href}
+        className="group relative block overflow-hidden rounded-[2rem] border border-amber-300/20 bg-white/[0.06] p-6 shadow-2xl shadow-amber-500/10 backdrop-blur-xl transition hover:bg-white/[0.08] focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-300"
+        aria-label={`${event.name} — Round ${event.round}. ${
+          event.isCurrent ? "Race weekend is happening now." : "Next race."
+        }`}
+      >
+        <div
+          className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-amber-300/0 via-amber-300 to-amber-300/0"
+          aria-hidden="true"
+        />
+        <div className="flex items-start justify-between gap-2">
+          <div className="flex items-center gap-3">
+            <span className="text-3xl" aria-hidden="true">
+              {flag}
+            </span>
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.22em] text-amber-300">
+                Round {event.round} ·{" "}
+                {event.isCurrent ? "This weekend" : "Next race"}
+              </p>
+              <h3 className="mt-1 text-lg font-semibold text-white">
+                {event.name}
+              </h3>
+              <p className="text-sm text-slate-400">
+                {event.circuit}
+                {event.locality ? ` · ${event.locality}` : ""}
+              </p>
             </div>
-            {liveSession ? (
-              <StatusPill tone="red">Live now</StatusPill>
-            ) : (
-              <StatusPill tone="green">Upcoming</StatusPill>
-            )}
           </div>
-          <p className="mt-3 text-xs text-slate-500">{dateRange}</p>
-          {countdown?.dateUtc && (
-            <div className="mt-5">
-              <SessionCountdown
-                targetDate={countdown.dateUtc}
-                sessionLabel={countdown.label}
-                variant="full"
-              />
-            </div>
+          {liveSession ? (
+            <StatusPill tone="red">Live now</StatusPill>
+          ) : (
+            <StatusPill tone="green">Upcoming</StatusPill>
           )}
-          <SessionPreview event={event} />
-        </Link>
-        {showLiveLink && (
-          <div className="border-t border-white/10 px-6 py-3">
-            <Link
-              href="/motogp/live"
-              className="text-sm font-semibold text-amber-300 transition hover:text-amber-200"
-            >
-              Open weekend hub →
-            </Link>
+        </div>
+        <p className="mt-3 text-xs text-slate-500">{dateRange}</p>
+        {countdown?.dateUtc && (
+          <div className="mt-5">
+            <SessionCountdown
+              targetDate={countdown.dateUtc}
+              sessionLabel={countdown.label}
+              variant="full"
+            />
           </div>
         )}
-      </div>
+        <SessionPreview event={event} />
+      </Link>
     );
   }
 

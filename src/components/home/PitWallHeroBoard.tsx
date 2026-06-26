@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { Container } from "@/components/ui";
 import { SessionDial } from "@/components/home/SessionDial";
 
@@ -22,7 +21,6 @@ export type HeroChampionship = {
   gapPoints: string;
   round: number;
   titleLabel: string;
-  standingsHref: string;
 };
 
 export type PitWallHeroBoardProps = {
@@ -39,7 +37,6 @@ export type PitWallHeroBoardProps = {
   sessions: HeroBoardSession[];
   countdown?: { dateUtc: string; label: string; isRace?: boolean };
   detailHref: string;
-  scheduleHref: string;
   liveHref: string;
   championship: HeroChampionship | null;
 };
@@ -58,7 +55,6 @@ export function PitWallHeroBoard({
   sessions,
   countdown,
   detailHref,
-  scheduleHref,
   liveHref,
   championship,
 }: PitWallHeroBoardProps) {
@@ -126,17 +122,6 @@ export function PitWallHeroBoard({
         </div>
 
         <div className="hero-footer">
-          {isLive && (
-            <p className="text-center lg:text-left">
-              <Link
-                href={liveHref}
-                className="hero-live-dot font-mono text-sm font-bold uppercase tracking-[0.25em] text-red-300 transition hover:text-red-200"
-              >
-                Open live timing →
-              </Link>
-            </p>
-          )}
-
           {championship && (
             <div className="hero-standings">
               <div className="flex flex-col gap-6 text-center lg:flex-row lg:items-end lg:justify-between lg:text-left">
@@ -171,33 +156,10 @@ export function PitWallHeroBoard({
                       {championship.round}
                     </p>
                   </div>
-                  <Link
-                    href={championship.standingsHref}
-                    className="text-xs uppercase tracking-[0.2em] text-[color:var(--hero-accent)] hover:brightness-110"
-                  >
-                    Standings →
-                  </Link>
                 </div>
               </div>
             </div>
           )}
-
-          <nav
-            aria-label="Weekend links"
-            className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 font-mono text-[11px] uppercase tracking-[0.2em] text-slate-600 lg:justify-start"
-          >
-            <Link href={detailHref} className="transition hover:text-[color:var(--hero-accent)]">
-              Weekend hub →
-            </Link>
-            <Link href={scheduleHref} className="transition hover:text-slate-400">
-              Calendar →
-            </Link>
-            {!isLive && (
-              <Link href={liveHref} className="transition hover:text-slate-400">
-                Live timing →
-              </Link>
-            )}
-          </nav>
         </div>
       </Container>
     </section>

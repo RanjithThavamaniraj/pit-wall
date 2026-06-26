@@ -269,26 +269,6 @@ export function LivePreviewExplainer({ sport }: { sport: "f1" | "motogp" }) {
   );
 }
 
-export function WeekendQuickLinks({
-  links,
-}: {
-  links: Array<{ href: string; label: string }>;
-}) {
-  return (
-    <div className="flex flex-wrap gap-x-6 gap-y-3 border-t border-white/10 pt-6">
-      {links.map((link) => (
-        <Link
-          key={link.href}
-          href={link.href}
-          className="text-sm font-semibold text-amber-300 transition hover:text-amber-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-300"
-        >
-          {link.label} →
-        </Link>
-      ))}
-    </div>
-  );
-}
-
 export type PodiumFinisher = {
   position: number;
   name: string;
@@ -359,7 +339,6 @@ export function EmptyWeekendState({
   const isMotogp = sport === "motogp";
   const racesHref = isMotogp ? "/motogp/races" : "/races";
   const standingsHref = isMotogp ? "/motogp/standings" : "/standings";
-  const liveHref = isMotogp ? "/motogp/live" : "/live";
 
   return (
     <div className="mx-auto max-w-lg text-center">
@@ -388,12 +367,6 @@ export function EmptyWeekendState({
             Championship standings
           </Link>
         </div>
-        <p className="mt-6 text-xs text-slate-600">
-          Live hub:{" "}
-          <Link href={liveHref} className="text-amber-300 hover:text-amber-200">
-            {liveHref}
-          </Link>
-        </p>
       </GlassCard>
     </div>
   );

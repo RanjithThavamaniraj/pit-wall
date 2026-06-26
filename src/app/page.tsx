@@ -147,26 +147,18 @@ function StrategySection() {
 function CTA() {
   return (
     <PageSection className="!pb-16 lg:!pb-20">
-      <div className="overflow-hidden rounded-[2.5rem] border border-amber-200/20 bg-amber-300 p-8 text-slate-950 shadow-2xl shadow-amber-500/20 sm:p-10 lg:grid lg:grid-cols-[1fr_auto] lg:items-center lg:gap-12 lg:p-14 xl:p-16">
-        <div>
-          <p className="text-sm font-black uppercase tracking-[0.3em]">
-            Season {new Date().getFullYear()}
-          </p>
-          <h2 className="mt-3 max-w-3xl text-3xl font-black tracking-[-0.05em] sm:mt-4 sm:text-4xl lg:text-5xl xl:text-6xl">
-            Bring PitWall Apex to your sofa.
-          </h2>
-          <p className="mt-4 max-w-2xl text-base leading-7 text-slate-800 sm:mt-5 sm:text-lg sm:leading-8">
-            Session schedules in your timezone. Live championship standings.
-            Race control intelligence. Strategy explainers. Everything an
-            F1 fan needs for every race weekend.
-          </p>
-        </div>
-        <Link
-          href="/races"
-          className="mt-8 inline-flex shrink-0 items-center justify-center rounded-full bg-slate-950 px-8 py-4 text-center text-base font-bold text-white transition hover:bg-slate-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-4 focus-visible:ring-offset-amber-300 lg:mt-0"
-        >
-          View race schedule
-        </Link>
+      <div className="overflow-hidden rounded-[2.5rem] border border-amber-200/20 bg-amber-300 p-8 text-slate-950 shadow-2xl shadow-amber-500/20 sm:p-10 lg:p-14 xl:p-16">
+        <p className="text-sm font-black uppercase tracking-[0.3em]">
+          Season {new Date().getFullYear()}
+        </p>
+        <h2 className="mt-3 max-w-3xl text-3xl font-black tracking-[-0.05em] sm:mt-4 sm:text-4xl lg:text-5xl xl:text-6xl">
+          Bring PitWall Apex to your sofa.
+        </h2>
+        <p className="mt-4 max-w-2xl text-base leading-7 text-slate-800 sm:mt-5 sm:text-lg sm:leading-8">
+          Session schedules in your timezone. Live championship standings.
+          Race control intelligence. Strategy explainers. Everything an
+          F1 fan needs for every race weekend.
+        </p>
       </div>
     </PageSection>
   );
@@ -230,26 +222,18 @@ function MotoGpStrategySection() {
 function MotoGpCTA() {
   return (
     <PageSection className="!pb-16 lg:!pb-20">
-      <div className="overflow-hidden rounded-[2.5rem] border border-amber-200/20 bg-amber-300 p-8 text-slate-950 shadow-2xl shadow-amber-500/20 sm:p-10 lg:grid lg:grid-cols-[1fr_auto] lg:items-center lg:gap-12 lg:p-14 xl:p-16">
-        <div>
-          <p className="text-sm font-black uppercase tracking-[0.3em]">
-            Season {new Date().getFullYear()}
-          </p>
-          <h2 className="mt-3 max-w-3xl text-3xl font-black tracking-[-0.05em] sm:mt-4 sm:text-4xl lg:text-5xl xl:text-6xl">
-            Bring PitWall Apex to race day.
-          </h2>
-          <p className="mt-4 max-w-2xl text-base leading-7 text-slate-800 sm:mt-5 sm:text-lg sm:leading-8">
-            Session schedules in your timezone. Championship standings across
-            all classes. Weekend progression and results. Everything a
-            MotoGP fan needs for every Grand Prix.
-          </p>
-        </div>
-        <Link
-          href="/motogp/races"
-          className="mt-8 inline-flex shrink-0 items-center justify-center rounded-full bg-slate-950 px-8 py-4 text-center text-base font-bold text-white transition hover:bg-slate-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-4 focus-visible:ring-offset-amber-300 lg:mt-0"
-        >
-          View race calendar
-        </Link>
+      <div className="overflow-hidden rounded-[2.5rem] border border-amber-200/20 bg-amber-300 p-8 text-slate-950 shadow-2xl shadow-amber-500/20 sm:p-10 lg:p-14 xl:p-16">
+        <p className="text-sm font-black uppercase tracking-[0.3em]">
+          Season {new Date().getFullYear()}
+        </p>
+        <h2 className="mt-3 max-w-3xl text-3xl font-black tracking-[-0.05em] sm:mt-4 sm:text-4xl lg:text-5xl xl:text-6xl">
+          Bring PitWall Apex to race day.
+        </h2>
+        <p className="mt-4 max-w-2xl text-base leading-7 text-slate-800 sm:mt-5 sm:text-lg sm:leading-8">
+          Session schedules in your timezone. Championship standings across
+          all classes. Weekend progression and results. Everything a
+          MotoGP fan needs for every Grand Prix.
+        </p>
       </div>
     </PageSection>
   );

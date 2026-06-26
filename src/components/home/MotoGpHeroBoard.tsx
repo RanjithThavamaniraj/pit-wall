@@ -91,7 +91,6 @@ export async function MotoGpHeroBoard() {
             : undefined
         }
         detailHref={`/motogp/races/${event.slug}`}
-        scheduleHref="/motogp/races"
         liveHref="/motogp/live"
         championship={
           leader
@@ -104,7 +103,6 @@ export async function MotoGpHeroBoard() {
                 chaserName: p2?.riderName ?? "—",
                 gapPoints: p2 ? `−${p2.gapToLeader} pts` : "—",
                 round: standings.round,
-                standingsHref: "/motogp/standings",
               }
             : null
         }

@@ -11,7 +11,6 @@ import {
   WeekendPreviewGrid,
   NextSessionPanel,
   PreviousRoundCard,
-  WeekendQuickLinks,
   type SnapshotMetric,
 } from "./WeekendPreviewShared";
 import { countryCodeToFlag } from "@/lib/utils";
@@ -152,18 +151,6 @@ export function UpcomingSessionView({
           <ChampionshipSnapshot metrics={metrics} />
         </section>
       )}
-
-      <WeekendQuickLinks
-        links={[
-          {
-            href: `/races/${currentWeekend.slug}`,
-            label: "Full weekend schedule",
-          },
-          { href: "/live", label: "Live timing hub" },
-          { href: "/standings", label: "Championship standings" },
-          { href: "/races", label: "Season calendar" },
-        ]}
-      />
     </div>
   );
 }

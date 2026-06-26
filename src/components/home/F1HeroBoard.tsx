@@ -81,7 +81,6 @@ export async function F1HeroBoard() {
             : undefined
         }
         detailHref={`/races/${race.slug}`}
-        scheduleHref="/races"
         liveHref="/live"
         championship={
           leader
@@ -95,7 +94,6 @@ export async function F1HeroBoard() {
                 chaserName: p2?.lastName ?? "—",
                 gapPoints: p2 ? `−${p2.gapToLeader} pts` : "—",
                 round: Number(standings.round),
-                standingsHref: "/standings",
               }
             : null
         }

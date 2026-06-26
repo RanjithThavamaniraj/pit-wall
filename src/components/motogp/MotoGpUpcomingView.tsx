@@ -8,7 +8,6 @@ import {
   WeekendPreviewGrid,
   NextSessionPanel,
   PreviousRoundCard,
-  WeekendQuickLinks,
   type SnapshotMetric,
 } from "@/components/live/WeekendPreviewShared";
 import { countryCodeToFlag } from "@/lib/utils";
@@ -142,18 +141,6 @@ export function MotoGpUpcomingView({
           <ChampionshipSnapshot metrics={metrics} />
         </section>
       )}
-
-      <WeekendQuickLinks
-        links={[
-          {
-            href: `/motogp/races/${currentWeekend.slug}`,
-            label: "Full weekend schedule",
-          },
-          { href: "/motogp/live", label: "Weekend hub" },
-          { href: "/motogp/standings", label: "Championship standings" },
-          { href: "/motogp/races", label: "Season calendar" },
-        ]}
-      />
     </div>
   );
 }
