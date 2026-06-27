@@ -5,7 +5,6 @@ import {
   MAIN_CATEGORIES,
   type MotoGpCategoryName,
 } from "@/lib/motogp";
-import { CACHE } from "@/lib/motogp/cache";
 import { MotoGpStandingsTabs } from "@/components/motogp/MotoGpStandingsTabs";
 import { Container } from "@/components/ui";
 
@@ -15,7 +14,7 @@ export const metadata: Metadata = {
     "Live MotoGP, Moto2, and Moto3 championship standings. Updated after every race.",
 };
 
-export const revalidate = CACHE.MOTOGP_STANDINGS;
+export const revalidate = 300;
 
 export default async function MotoGpStandingsPage() {
   let standingsByCategory;

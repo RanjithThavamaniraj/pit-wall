@@ -246,7 +246,7 @@ export function pulseLiveDateToUtc(
 
 async function motogpFetch<T>(
   path: string,
-  revalidate = CACHE.MOTOGP_SCHEDULE,
+  revalidate: number = CACHE.MOTOGP_SCHEDULE,
   noStore = false
 ): Promise<T> {
   const res = await fetch(`${MOTOGP_BASE}${path}`, noStore
