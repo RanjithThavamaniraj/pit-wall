@@ -1,4 +1,5 @@
 import { generateRaceSlug, type SessionStatus } from "./utils";
+import { CACHE, MOTOGP_SCHEDULE_MEMORY_MS } from "./motogp/cache";
 
 const MOTOGP_BASE = "https://api.motogp.pulselive.com/motogp/v1";
 
@@ -156,8 +157,6 @@ let cachedSeasonYear: number | null = null;
 let cachedCategories: MotoGpCategory[] | null = null;
 let cachedSchedule: { data: MotoGpSchedule; fetchedAt: number } | null = null;
 
-const SCHEDULE_CACHE_MS = 5 * 60 * 1000;
-
 const MOTOGP_SESSION_DURATION_MINUTES: Record<string, number> = {
   race: 45,
   sprint: 30,
@@ -247,7 +246,7 @@ export function pulseLiveDateToUtc(
 
 async function motogpFetch<T>(
   path: string,
-  revalidate = 3600,
+  revalidate = CACHE.MOTOGP_SCHEDULE,
   noStore = false
 ): Promise<T> {
   const res = await fetch(`${MOTOGP_BASE}${path}`, noStore
@@ -457,7 +456,10 @@ export async function getCurrentSeasonId(): Promise<{
     return { seasonId: cachedSeasonId, seasonYear: cachedSeasonYear };
   }
 
-  const seasons = await motogpFetch<ApiSeason[]>("/results/seasons", 86400);
+  const seasons = await motogpFetch<ApiSeason[]>(
+    "/results/seasons",
+    CACHE.MOTOGP_PROFILES
+  );
   const current =
     seasons.find((season) => season.current) ??
     [...seasons].sort((a, b) => b.year - a.year)[0];
@@ -482,7 +484,7 @@ export async function getSeasonCategories(
   const resolvedSeasonId = seasonId ?? (await getCurrentSeasonId()).seasonId;
   const categories = await motogpFetch<ApiCategory[]>(
     `/results/categories?seasonUuid=${resolvedSeasonId}`,
-    86400
+    CACHE.MOTOGP_PROFILES
   );
 
   const mapped = categories
@@ -517,7 +519,7 @@ export async function fetchSessionClassification(
 ): Promise<MotoGpFinisher[]> {
   const data = await motogpFetch<ApiStandingsResponse>(
     `/results/session/${sessionId}/classification?test=false`,
-    3600
+    CACHE.MOTOGP_HISTORY
   );
 
   return (data.classification ?? []).slice(0, 3).map((entry) => ({
@@ -535,7 +537,7 @@ export async function fetchSessionResults(
 ): Promise<MotoGpFinisher[]> {
   const data = await motogpFetch<ApiStandingsResponse>(
     `/results/session/${sessionId}/classification?test=false`,
-    300,
+    CACHE.MOTOGP_SESSION_RESULTS,
     options?.noStore ?? false
   );
 
@@ -554,7 +556,7 @@ async function fetchEventSessions(
 ): Promise<MotoGpSession[]> {
   const sessions = await motogpFetch<ApiSession[]>(
     `/results/sessions?eventUuid=${eventId}&categoryUuid=${categoryId}`,
-    3600
+    CACHE.MOTOGP_SCHEDULE
   );
   return mapIndividualSessions(sessions, countryCode);
 }
@@ -565,7 +567,7 @@ export async function fetchMotoGpSchedule(
   if (
     cachedSchedule &&
     !options?.force &&
-    Date.now() - cachedSchedule.fetchedAt < SCHEDULE_CACHE_MS
+    Date.now() - cachedSchedule.fetchedAt < MOTOGP_SCHEDULE_MEMORY_MS
   ) {
     return cachedSchedule.data;
   }
@@ -575,7 +577,7 @@ export async function fetchMotoGpSchedule(
 
   const apiEvents = await motogpFetch<ApiEvent[]>(
     `/results/events?seasonUuid=${seasonId}`,
-    3600
+    CACHE.MOTOGP_SCHEDULE
   );
 
   const raceEvents = apiEvents
@@ -675,7 +677,7 @@ export async function fetchMotoGpStandings(
 
   const data = await motogpFetch<ApiStandingsResponse>(
     `/results/standings?seasonUuid=${seasonId}&categoryUuid=${categoryId}`,
-    1800
+    CACHE.MOTOGP_STANDINGS
   );
 
   const riders = mapRiderStandings(data.classification ?? []);
