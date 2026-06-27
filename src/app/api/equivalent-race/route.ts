@@ -2,9 +2,10 @@ import { NextResponse } from "next/server";
 import { withApiAnalytics } from "@/lib/analytics/api-wrapper";
 import { getEquivalentRaceSlug } from "@/lib/equivalent-race";
 import { isValidSport } from "@/lib/sport";
+import { F1_CACHE } from "@/lib/cache/f1";
 
 export const dynamic = "force-dynamic";
-export const revalidate = 3600;
+export const revalidate = 3600; // Keep in sync with F1_CACHE.EQUIVALENT_RACE
 
 export const GET = withApiAnalytics("/api/equivalent-race", async function GET(
   request: Request
@@ -27,7 +28,7 @@ export const GET = withApiAnalytics("/api/equivalent-race", async function GET(
       { slug: equivalentSlug },
       {
         headers: {
-          "Cache-Control": "public, s-maxage=3600, stale-while-revalidate=7200",
+          "Cache-Control": `public, s-maxage=${F1_CACHE.EQUIVALENT_RACE_S_MAXAGE}, stale-while-revalidate=${F1_CACHE.EQUIVALENT_RACE_STALE_WHILE_REVALIDATE}`,
         },
       }
     );

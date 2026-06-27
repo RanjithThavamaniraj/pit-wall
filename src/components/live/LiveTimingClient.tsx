@@ -12,6 +12,7 @@ import { TimingBoard } from "@/components/live/TimingBoard";
 import { BriefingFeed } from "@/components/live/BriefingFeed";
 import { UpcomingSessionView } from "@/components/live/UpcomingSessionView";
 import { CompletedSessionView } from "@/components/live/CompletedSessionView";
+import { LIVE_CACHE } from "@/lib/cache/live";
 
 export default function LiveTimingClient({
   initialContext,
@@ -46,7 +47,7 @@ export default function LiveTimingClient({
         if (res.status === 404) {
           if (cancelled || requestId !== requestIdRef.current) return;
           setError(null);
-          timeoutId = setTimeout(fetchTiming, 15000);
+          timeoutId = setTimeout(fetchTiming, LIVE_CACHE.F1_TIMING_IDLE_POLL_MS);
           return;
         }
         if (!res.ok) {
@@ -60,12 +61,17 @@ export default function LiveTimingClient({
         setError(null);
 
         const isCurrentlyLive = payload.weekendContext?.state === "LIVE";
-        timeoutId = setTimeout(fetchTiming, isCurrentlyLive ? 3000 : 15000);
+        timeoutId = setTimeout(
+          fetchTiming,
+          isCurrentlyLive
+            ? LIVE_CACHE.F1_TIMING_LIVE_POLL_MS
+            : LIVE_CACHE.F1_TIMING_IDLE_POLL_MS
+        );
       } catch (err) {
         console.error("Live timing error:", err);
         if (!cancelled) {
           setError("Unable to connect to live timing.");
-          timeoutId = setTimeout(fetchTiming, 15000);
+          timeoutId = setTimeout(fetchTiming, LIVE_CACHE.F1_TIMING_IDLE_POLL_MS);
         }
       }
     };

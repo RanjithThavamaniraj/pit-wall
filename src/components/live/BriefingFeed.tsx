@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useRef } from "react";
 import type { BriefingItem } from "@/lib/briefings";
+import { LIVE_CACHE } from "@/lib/cache/live";
 import { BriefingCard } from "./BriefingCard";
 import { SessionCountdown } from "@/components/SessionCountdown";
 import { GlassCard } from "@/components/ui";
@@ -46,7 +47,7 @@ export function BriefingFeed({ nextSessionData, isActiveSession }: Props) {
       } finally {
         if (!cancelled) {
           setIsInitialLoad(false);
-          timeoutId = setTimeout(fetchBriefings, 10000);
+          timeoutId = setTimeout(fetchBriefings, LIVE_CACHE.F1_BRIEFINGS_POLL_MS);
         }
       }
     };

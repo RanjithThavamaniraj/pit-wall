@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { withApiAnalytics } from "@/lib/analytics/api-wrapper";
 import { OpenF1RaceControl } from "@/lib/timing";
 import { translateRaceControlMessage, BriefingItem } from "@/lib/briefings";
+import { LIVE_CACHE } from "@/lib/cache/live";
 
 const OPENF1_BASE = "https://api.openf1.org/v1";
 
@@ -9,7 +10,7 @@ export const GET = withApiAnalytics("/api/live/briefings", async function GET() 
   try {
     // 1. Fetch race control messages for the latest session
     const res = await fetch(`${OPENF1_BASE}/race_control?session_key=latest`, {
-      next: { revalidate: 5 }, // Revalidate every 5 seconds
+      next: { revalidate: LIVE_CACHE.OPENF1_BRIEFINGS },
     });
 
     if (!res.ok) {
@@ -72,7 +73,7 @@ export const GET = withApiAnalytics("/api/live/briefings", async function GET() 
       { briefings },
       {
         headers: {
-          "Cache-Control": "public, s-maxage=5, stale-while-revalidate=10",
+          "Cache-Control": `public, s-maxage=${LIVE_CACHE.BRIEFINGS_S_MAXAGE}, stale-while-revalidate=${LIVE_CACHE.BRIEFINGS_STALE_WHILE_REVALIDATE}`,
         },
       }
     );

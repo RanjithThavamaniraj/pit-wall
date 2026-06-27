@@ -1,4 +1,5 @@
 import { getTeamColor } from "./teamColors";
+import { F1_CACHE } from "@/lib/cache/f1";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -70,7 +71,7 @@ export async function fetchDriverStandings(): Promise<{
 }> {
   const url = `${JOLPICA_BASE}/current/driverStandings.json`;
   const res = await fetch(url, {
-    next: { revalidate: 1800 }, // 30 minutes — only changes after races
+    next: { revalidate: F1_CACHE.STANDINGS },
   });
 
   if (!res.ok) {
@@ -114,7 +115,7 @@ export async function fetchConstructorStandings(): Promise<{
 }> {
   const url = `${JOLPICA_BASE}/current/constructorStandings.json`;
   const res = await fetch(url, {
-    next: { revalidate: 1800 },
+    next: { revalidate: F1_CACHE.STANDINGS },
   });
 
   if (!res.ok) {

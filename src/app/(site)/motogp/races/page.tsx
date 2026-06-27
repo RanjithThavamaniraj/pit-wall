@@ -10,7 +10,7 @@ export const metadata: Metadata = {
     "Full MotoGP season calendar with session times, countdowns, and race weekend details. All times shown in your local timezone.",
 };
 
-export const revalidate = 3600;
+export const revalidate = 3600; // Keep in sync with MOTOGP_CACHE.SCHEDULE
 
 export default async function MotoGpRacesPage() {
   let schedule;

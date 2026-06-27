@@ -1,3 +1,5 @@
+import { ADMIN_CACHE } from "@/lib/cache/admin";
+
 export type Sport = "f1" | "motogp";
 
 export const SPORT_STORAGE_KEY = "pitwall-sport";
@@ -77,7 +79,7 @@ export function getEquivalentRoute(pathname: string, targetSport: Sport): string
 
 export function setSportCookie(sport: Sport) {
   if (typeof document === "undefined") return;
-  document.cookie = `${SPORT_COOKIE_KEY}=${sport};path=/;max-age=31536000;SameSite=Lax`;
+  document.cookie = `${SPORT_COOKIE_KEY}=${sport};path=/;max-age=${ADMIN_CACHE.SPORT_PREFERENCE_MAX_AGE_SECONDS};SameSite=Lax`;
 }
 
 export function isValidSport(value: string | null): value is Sport {

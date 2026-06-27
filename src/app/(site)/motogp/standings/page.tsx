@@ -14,7 +14,7 @@ export const metadata: Metadata = {
     "Live MotoGP, Moto2, and Moto3 championship standings. Updated after every race.",
 };
 
-export const revalidate = 300;
+export const revalidate = 300; // Keep in sync with MOTOGP_CACHE.STANDINGS
 
 export default async function MotoGpStandingsPage() {
   let standingsByCategory;

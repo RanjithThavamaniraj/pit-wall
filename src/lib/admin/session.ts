@@ -1,5 +1,5 @@
 import { createHmac, timingSafeEqual } from "crypto";
-import { ADMIN_SESSION_MAX_AGE_SECONDS } from "./constants";
+import { ADMIN_CACHE } from "@/lib/cache/admin";
 
 function getSecret(): string {
   const secret = process.env.ADMIN_SESSION_SECRET;
@@ -14,7 +14,7 @@ function signPayload(payload: string): string {
 }
 
 export function createAdminSessionToken(username: string): string {
-  const expiresAt = Date.now() + ADMIN_SESSION_MAX_AGE_SECONDS * 1000;
+  const expiresAt = Date.now() + ADMIN_CACHE.ADMIN_SESSION_MAX_AGE_SECONDS * 1000;
   const payload = `${username}:${expiresAt}`;
   return `${payload}.${signPayload(payload)}`;
 }

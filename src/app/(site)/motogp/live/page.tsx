@@ -16,7 +16,7 @@ export const metadata: Metadata = {
     "MotoGP race weekend tracker with session progression, countdowns, and latest results. Live timing is not available from the public API.",
 };
 
-export const revalidate = 300;
+export const revalidate = 300; // Keep in sync with MOTOGP_CACHE.SESSION_RESULTS
 
 export default async function MotoGpLivePage() {
   let initialContext = null;

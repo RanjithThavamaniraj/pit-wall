@@ -15,7 +15,7 @@ export async function generateStaticParams() {
   }
 }
 
-export const revalidate = 3600;
+export const revalidate = 3600; // Keep in sync with MOTOGP_CACHE.SCHEDULE
 
 export async function generateMetadata({
   params,

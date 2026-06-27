@@ -2,8 +2,7 @@
 
 import { usePathname } from "next/navigation";
 import { useEffect, useRef } from "react";
-
-const HEARTBEAT_MS = 30_000;
+import { ANALYTICS_CACHE } from "@/lib/cache/analytics";
 
 export function AnalyticsBeacon() {
   const pathname = usePathname();
@@ -50,8 +49,13 @@ export function AnalyticsBeacon() {
     const interval = window.setInterval(() => {
       if (document.visibilityState !== "visible") return;
       const sinceLast = Date.now() - lastSentRef.current;
-      if (sinceLast >= HEARTBEAT_MS - 500) flushHeartbeat();
-    }, HEARTBEAT_MS);
+      if (
+        sinceLast >=
+        ANALYTICS_CACHE.HEARTBEAT_MS -
+          ANALYTICS_CACHE.HEARTBEAT_FLUSH_TOLERANCE_MS
+      )
+        flushHeartbeat();
+    }, ANALYTICS_CACHE.HEARTBEAT_MS);
 
     function onVisibilityChange() {
       if (document.visibilityState === "hidden") flushHeartbeat();

@@ -10,7 +10,7 @@ export const metadata: Metadata = {
     "Full Formula 1 season calendar with session times, countdowns, and race weekend details. All times shown in your local timezone.",
 };
 
-export const revalidate = 3600; // ISR — revalidate every hour
+export const revalidate = 3600; // Keep in sync with F1_CACHE.SCHEDULE
 
 export default async function RacesPage() {
   let schedule;

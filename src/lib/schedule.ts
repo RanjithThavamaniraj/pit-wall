@@ -1,4 +1,5 @@
 import { generateRaceSlug, getSessionStatus, type SessionStatus } from "./utils";
+import { F1_CACHE } from "@/lib/cache/f1";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -185,7 +186,7 @@ export async function fetchSeasonSchedule(
   const url = `${JOLPICA_BASE}/${season}/races.json?limit=30`;
 
   const res = await fetch(url, {
-    next: { revalidate: 3600 }, // cache for 1 hour
+    next: { revalidate: F1_CACHE.SCHEDULE },
   });
 
   if (!res.ok) {

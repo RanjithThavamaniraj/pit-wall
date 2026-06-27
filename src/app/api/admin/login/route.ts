@@ -1,8 +1,6 @@
 import { NextResponse } from "next/server";
-import {
-  ADMIN_SESSION_COOKIE,
-  ADMIN_SESSION_MAX_AGE_SECONDS,
-} from "@/lib/admin/constants";
+import { ADMIN_SESSION_COOKIE } from "@/lib/admin/constants";
+import { ADMIN_CACHE } from "@/lib/cache/admin";
 import {
   adminCredentialsConfigured,
   verifyAdminCredentials,
@@ -45,7 +43,7 @@ export async function POST(request: Request) {
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
     path: "/",
-    maxAge: ADMIN_SESSION_MAX_AGE_SECONDS,
+    maxAge: ADMIN_CACHE.ADMIN_SESSION_MAX_AGE_SECONDS,
   });
   return response;
 }

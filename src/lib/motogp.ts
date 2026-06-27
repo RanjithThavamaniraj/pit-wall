@@ -1,5 +1,5 @@
 import { generateRaceSlug, type SessionStatus } from "./utils";
-import { CACHE, MOTOGP_SCHEDULE_MEMORY_MS } from "./motogp/cache";
+import { MOTOGP_CACHE, MOTOGP_SCHEDULE_MEMORY_MS } from "./cache/motogp";
 
 const MOTOGP_BASE = "https://api.motogp.pulselive.com/motogp/v1";
 
@@ -246,7 +246,7 @@ export function pulseLiveDateToUtc(
 
 async function motogpFetch<T>(
   path: string,
-  revalidate: number = CACHE.MOTOGP_SCHEDULE,
+  revalidate: number = MOTOGP_CACHE.SCHEDULE,
   noStore = false
 ): Promise<T> {
   const res = await fetch(`${MOTOGP_BASE}${path}`, noStore
@@ -458,7 +458,7 @@ export async function getCurrentSeasonId(): Promise<{
 
   const seasons = await motogpFetch<ApiSeason[]>(
     "/results/seasons",
-    CACHE.MOTOGP_PROFILES
+    MOTOGP_CACHE.PROFILES
   );
   const current =
     seasons.find((season) => season.current) ??
@@ -484,7 +484,7 @@ export async function getSeasonCategories(
   const resolvedSeasonId = seasonId ?? (await getCurrentSeasonId()).seasonId;
   const categories = await motogpFetch<ApiCategory[]>(
     `/results/categories?seasonUuid=${resolvedSeasonId}`,
-    CACHE.MOTOGP_PROFILES
+    MOTOGP_CACHE.PROFILES
   );
 
   const mapped = categories
@@ -519,7 +519,7 @@ export async function fetchSessionClassification(
 ): Promise<MotoGpFinisher[]> {
   const data = await motogpFetch<ApiStandingsResponse>(
     `/results/session/${sessionId}/classification?test=false`,
-    CACHE.MOTOGP_HISTORY
+    MOTOGP_CACHE.HISTORY
   );
 
   return (data.classification ?? []).slice(0, 3).map((entry) => ({
@@ -537,7 +537,7 @@ export async function fetchSessionResults(
 ): Promise<MotoGpFinisher[]> {
   const data = await motogpFetch<ApiStandingsResponse>(
     `/results/session/${sessionId}/classification?test=false`,
-    CACHE.MOTOGP_SESSION_RESULTS,
+    MOTOGP_CACHE.SESSION_RESULTS,
     options?.noStore ?? false
   );
 
@@ -556,7 +556,7 @@ async function fetchEventSessions(
 ): Promise<MotoGpSession[]> {
   const sessions = await motogpFetch<ApiSession[]>(
     `/results/sessions?eventUuid=${eventId}&categoryUuid=${categoryId}`,
-    CACHE.MOTOGP_SCHEDULE
+    MOTOGP_CACHE.SCHEDULE
   );
   return mapIndividualSessions(sessions, countryCode);
 }
@@ -577,7 +577,7 @@ export async function fetchMotoGpSchedule(
 
   const apiEvents = await motogpFetch<ApiEvent[]>(
     `/results/events?seasonUuid=${seasonId}`,
-    CACHE.MOTOGP_SCHEDULE
+    MOTOGP_CACHE.SCHEDULE
   );
 
   const raceEvents = apiEvents
@@ -677,7 +677,7 @@ export async function fetchMotoGpStandings(
 
   const data = await motogpFetch<ApiStandingsResponse>(
     `/results/standings?seasonUuid=${seasonId}&categoryUuid=${categoryId}`,
-    CACHE.MOTOGP_STANDINGS
+    MOTOGP_CACHE.STANDINGS
   );
 
   const riders = mapRiderStandings(data.classification ?? []);

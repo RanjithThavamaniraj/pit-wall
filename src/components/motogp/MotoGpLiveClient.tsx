@@ -8,6 +8,7 @@ import { EmptyWeekendState } from "@/components/live/WeekendPreviewShared";
 import { SessionCountdown } from "@/components/SessionCountdown";
 import { Container, GlassCard, StatusPill } from "@/components/ui";
 import { countryCodeToFlag } from "@/lib/utils";
+import { LIVE_CACHE } from "@/lib/cache/live";
 
 type Props = {
   initialContext: MotoGpWeekendContext | null;
@@ -32,7 +33,7 @@ export default function MotoGpLiveClient({
 
     const refresh = async () => {
       const requestId = ++requestIdRef.current;
-      let pollIntervalMs = 60000;
+      let pollIntervalMs: number = LIVE_CACHE.MOTOGP_IDLE_POLL_MS;
 
       try {
         const res = await fetch("/api/motogp/weekend");
@@ -41,7 +42,10 @@ export default function MotoGpLiveClient({
         if (cancelled || requestId !== requestIdRef.current) return;
         setContext(payload.context);
         setResults(payload.results ?? []);
-        pollIntervalMs = payload.context?.state === "LIVE" ? 30000 : 60000;
+        pollIntervalMs =
+          payload.context?.state === "LIVE"
+            ? LIVE_CACHE.MOTOGP_LIVE_POLL_MS
+            : LIVE_CACHE.MOTOGP_IDLE_POLL_MS;
       } catch {
         // Keep existing state on failure.
       } finally {

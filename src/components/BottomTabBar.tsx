@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useSportPreference } from "@/hooks/useSportPreference";
 import { getSportRoutes, isNavRouteActive } from "@/lib/sport";
+import { LIVE_CACHE } from "@/lib/cache/live";
 
 const tabs = [
   { key: "home" as const, label: "Home", icon: HomeIcon },
@@ -35,7 +36,7 @@ export function BottomTabBar() {
         // Ignore polling errors.
       } finally {
         if (!cancelled) {
-          timeoutId = setTimeout(checkLive, 60000);
+          timeoutId = setTimeout(checkLive, LIVE_CACHE.SPORT_STATUS_POLL_MS);
         }
       }
     };

@@ -4,6 +4,7 @@ import { fetchMotoGpSchedule } from "@/lib/motogp";
 import { fetchSeasonSchedule } from "@/lib/schedule";
 import { getMotoGpWeekendContext } from "@/lib/motogp-weekend";
 import { getWeekendContext } from "@/lib/weekend";
+import { LIVE_CACHE } from "@/lib/cache/live";
 
 export const dynamic = "force-dynamic";
 
@@ -28,6 +29,6 @@ export const GET = withApiAnalytics("/api/sport-status", async function GET() {
 
   return NextResponse.json(
     { f1Live, motogpLive },
-    { headers: { "Cache-Control": "public, s-maxage=30" } }
+    { headers: { "Cache-Control": `public, s-maxage=${LIVE_CACHE.SPORT_STATUS_S_MAXAGE}` } }
   );
 });

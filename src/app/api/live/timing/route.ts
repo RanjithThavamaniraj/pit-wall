@@ -13,6 +13,7 @@ import {
 } from "@/lib/timing";
 import { fetchSeasonSchedule } from "@/lib/schedule";
 import { getWeekendContext } from "@/lib/weekend";
+import { LIVE_CACHE } from "@/lib/cache/live";
 
 export type OpenF1Lap = {
   meeting_key: number;
@@ -52,7 +53,7 @@ export const GET = withApiAnalytics("/api/live/timing", async function GET() {
 
     // 2. Fetch the OpenF1 session mapping
     const sessionRes = await fetch(`${OPENF1_BASE}/sessions?session_key=latest`, {
-      next: { revalidate: 10 },
+      next: { revalidate: LIVE_CACHE.OPENF1_SESSION },
     });
     let currentSession: OpenF1Session | null = null;
     if (sessionRes.ok) {
@@ -72,15 +73,15 @@ export const GET = withApiAnalytics("/api/live/timing", async function GET() {
           session: null,
           timing: [],
         },
-        { headers: { "Cache-Control": "public, s-maxage=10" } }
+        { headers: { "Cache-Control": `public, s-maxage=${LIVE_CACHE.TIMING_UPCOMING_S_MAXAGE}` } }
       );
     }
 
     // 3. Fetch base data (Drivers, Weather, RaceControl)
     const [driversRes, weatherRes, raceControlRes] = await Promise.all([
-      fetch(`${OPENF1_BASE}/drivers?session_key=latest`, { next: { revalidate: 3600 } }),
-      fetch(`${OPENF1_BASE}/weather?session_key=latest`, { next: { revalidate: 30 } }),
-      fetch(`${OPENF1_BASE}/race_control?session_key=latest`, { next: { revalidate: 10 } }),
+      fetch(`${OPENF1_BASE}/drivers?session_key=latest`, { next: { revalidate: LIVE_CACHE.OPENF1_DRIVERS } }),
+      fetch(`${OPENF1_BASE}/weather?session_key=latest`, { next: { revalidate: LIVE_CACHE.OPENF1_WEATHER } }),
+      fetch(`${OPENF1_BASE}/race_control?session_key=latest`, { next: { revalidate: LIVE_CACHE.OPENF1_RACE_CONTROL } }),
     ]);
 
     const drivers: OpenF1Driver[] = driversRes.ok
@@ -154,7 +155,7 @@ export const GET = withApiAnalytics("/api/live/timing", async function GET() {
     let timingRows: TimingRowData[] = [];
 
     if (isSessionResults && isPracticeOrQuali) {
-      const lapsRes = await fetch(`${OPENF1_BASE}/laps?session_key=latest`, { next: { revalidate: 3600 } });
+      const lapsRes = await fetch(`${OPENF1_BASE}/laps?session_key=latest`, { next: { revalidate: LIVE_CACHE.OPENF1_LAPS } });
       const laps: OpenF1Lap[] = lapsRes.ok ? await lapsRes.json() : [];
 
       const bestLaps = new Map<number, number>(); // driver_number -> best lap duration
@@ -193,8 +194,8 @@ export const GET = withApiAnalytics("/api/live/timing", async function GET() {
     } else {
       // Normal race or live behavior using /position and /intervals
       const [positionsRes, intervalsRes] = await Promise.all([
-        fetch(`${OPENF1_BASE}/position?session_key=latest`, { next: { revalidate: 2 } }),
-        fetch(`${OPENF1_BASE}/intervals?session_key=latest`, { next: { revalidate: 2 } }),
+        fetch(`${OPENF1_BASE}/position?session_key=latest`, { next: { revalidate: LIVE_CACHE.OPENF1_POSITION } }),
+        fetch(`${OPENF1_BASE}/intervals?session_key=latest`, { next: { revalidate: LIVE_CACHE.OPENF1_INTERVALS } }),
       ]);
       const positions: OpenF1Position[] = positionsRes.ok
         ? await positionsRes.json()
@@ -249,11 +250,15 @@ export const GET = withApiAnalytics("/api/live/timing", async function GET() {
 
     // Cache long if completed, short if live
     const maxAge =
-      weekendContext.state === "LIVE" ? 2 : isSessionResults ? 60 : 10;
+      weekendContext.state === "LIVE"
+        ? LIVE_CACHE.TIMING_LIVE_S_MAXAGE
+        : isSessionResults
+          ? LIVE_CACHE.TIMING_COMPLETED_S_MAXAGE
+          : LIVE_CACHE.TIMING_DEFAULT_S_MAXAGE;
 
     return NextResponse.json(payload, {
       headers: {
-        "Cache-Control": `public, s-maxage=${maxAge}, stale-while-revalidate=10`,
+        "Cache-Control": `public, s-maxage=${maxAge}, stale-while-revalidate=${LIVE_CACHE.TIMING_STALE_WHILE_REVALIDATE}`,
       },
     });
   } catch (error) {

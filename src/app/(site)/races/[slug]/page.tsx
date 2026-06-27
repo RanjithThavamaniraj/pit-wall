@@ -17,7 +17,7 @@ export async function generateStaticParams() {
   }
 }
 
-export const revalidate = 3600;
+export const revalidate = 3600; // Keep in sync with F1_CACHE.SCHEDULE
 
 // ─── Dynamic metadata ─────────────────────────────────────────────────────────
 

@@ -2,10 +2,9 @@ import { NextResponse, type NextRequest } from "next/server";
 import {
   ADMIN_SESSION_COOKIE,
   SESSION_COOKIE,
-  SESSION_MAX_AGE_SECONDS,
   VISITOR_COOKIE,
-  VISITOR_MAX_AGE_SECONDS,
 } from "@/lib/admin/constants";
+import { ADMIN_CACHE } from "@/lib/cache/admin";
 import { verifyAdminSessionTokenEdge } from "@/lib/admin/session-edge";
 
 const ADMIN_PUBLIC_PATHS = ["/admin/login"];
@@ -44,7 +43,7 @@ function ensureAnalyticsCookies(
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
       path: "/",
-      maxAge: VISITOR_MAX_AGE_SECONDS,
+      maxAge: ADMIN_CACHE.VISITOR_MAX_AGE_SECONDS,
     });
   }
 
@@ -57,7 +56,7 @@ function ensureAnalyticsCookies(
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
     path: "/",
-    maxAge: SESSION_MAX_AGE_SECONDS,
+    maxAge: ADMIN_CACHE.SESSION_MAX_AGE_SECONDS,
   });
 
   return { visitorId, sessionId };
