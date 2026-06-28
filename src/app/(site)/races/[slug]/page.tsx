@@ -17,7 +17,7 @@ export async function generateStaticParams() {
   }
 }
 
-export const revalidate = 3600; // Keep in sync with F1_CACHE.SCHEDULE
+export const revalidate = 300; // Keep in sync with F1_CACHE.STANDINGS (live race flags; schedule fetch stays 3600s)
 
 // ─── Dynamic metadata ─────────────────────────────────────────────────────────
 

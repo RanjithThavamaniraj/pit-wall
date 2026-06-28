@@ -163,10 +163,10 @@ const SESSION_DURATION_MINUTES: Record<string, number> = {
 
 export function getSessionStatus(
   sessionKey: string,
-  dateUtc: string
+  dateUtc: string,
+  now: number = Date.now()
 ): SessionStatus {
   if (!dateUtc) return "upcoming";
-  const now = Date.now();
   const start = new Date(dateUtc).getTime();
   const durationMs =
     (SESSION_DURATION_MINUTES[sessionKey.toLowerCase()] ?? 60) * 60 * 1000;

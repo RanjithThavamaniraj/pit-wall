@@ -11,7 +11,7 @@ export const metadata: Metadata = {
     "Real-time Formula 1 session timing, positions, gaps, and race control messages.",
 };
 
-export const revalidate = 3600; // Keep in sync with F1_CACHE.SCHEDULE
+export const revalidate = 300; // Keep in sync with F1_CACHE.STANDINGS (standings + live race flags)
 
 export default async function LivePage() {
   let initialContext = null;

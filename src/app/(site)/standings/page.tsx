@@ -10,7 +10,7 @@ export const metadata: Metadata = {
     "Live Formula 1 World Drivers' and Constructors' Championship standings. Updated after every race.",
 };
 
-export const revalidate = 1800; // Keep in sync with F1_CACHE.STANDINGS
+export const revalidate = 300; // Keep in sync with F1_CACHE.STANDINGS
 
 export default async function StandingsPage() {
   let standings;

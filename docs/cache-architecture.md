@@ -46,12 +46,12 @@ src/lib/cache/
 | Constant | TTL | Controls | Used by |
 |----------|-----|----------|---------|
 | `SCHEDULE` | 3600s (1 h) | Jolpica season schedule fetch | `fetchSeasonSchedule()` in `src/lib/schedule.ts` |
-| `STANDINGS` | 1800s (30 min) | Driver and constructor standings fetch | `fetchDriverStandings()`, `fetchConstructorStandings()` in `src/lib/standings.ts` |
+| `STANDINGS` | 300s (5 min) | Driver and constructor standings fetch | `fetchDriverStandings()`, `fetchConstructorStandings()` in `src/lib/standings.ts` |
 | `EQUIVALENT_RACE` | 3600s (1 h) | Cross-sport slug resolution upstream data | `/api/equivalent-race` route segment config |
 | `SCHEDULE_S_MAXAGE` | 3600s | CDN cache for `/api/schedule` JSON | `Cache-Control` on `/api/schedule` |
 | `SCHEDULE_STALE_WHILE_REVALIDATE` | 7200s | SWR window for schedule API | `/api/schedule` |
-| `STANDINGS_S_MAXAGE` | 1800s | CDN cache for `/api/standings` JSON | `/api/standings` |
-| `STANDINGS_STALE_WHILE_REVALIDATE` | 3600s | SWR window for standings API | `/api/standings` |
+| `STANDINGS_S_MAXAGE` | 300s | CDN cache for `/api/standings` JSON | `/api/standings` |
+| `STANDINGS_STALE_WHILE_REVALIDATE` | 600s | SWR window for standings API | `/api/standings` |
 | `EQUIVALENT_RACE_S_MAXAGE` | 3600s | CDN cache for equivalent-race API | `/api/equivalent-race` |
 | `EQUIVALENT_RACE_STALE_WHILE_REVALIDATE` | 7200s | SWR window for equivalent-race API | `/api/equivalent-race` |
 
@@ -59,12 +59,12 @@ src/lib/cache/
 
 | Page | Literal | Sync constant |
 |------|---------|---------------|
-| `/standings` | `1800` | `F1_CACHE.STANDINGS` |
-| `/races`, `/races/[slug]`, `/live` | `3600` | `F1_CACHE.SCHEDULE` |
+| `/standings` | `300` | `F1_CACHE.STANDINGS` |
+| `/live`, `/races`, `/races/[slug]` | `300` | `F1_CACHE.STANDINGS` (time-sensitive race flags + standings; Jolpica schedule fetch remains `3600`) |
 
-**API route segment `revalidate` (literals):** `/api/standings` → `1800`, `/api/schedule` → `3600`, `/api/equivalent-race` → `3600`.
+**API route segment `revalidate` (literals):** `/api/standings` → `300`, `/api/schedule` → `3600`, `/api/equivalent-race` → `3600`.
 
-**Why:** F1 standings only change after race weekends; 30 minutes is sufficient. Schedule and race pages are hour-cached because session times are fixed once published. CDN `s-maxage` mirrors upstream fetch TTL; `stale-while-revalidate` allows edge to serve stale JSON while refreshing in the background.
+**Why:** F1 standings change after each session and race weekend; 5 minutes matches MotoGP and keeps championship data fresh without hammering Jolpica. The Jolpica schedule HTTP response stays hour-cached (`SCHEDULE` = 3600) because session start times are fixed once published. `isPast`, `isCurrent`, `isNext`, and session status are recomputed in `applyScheduleLiveState()` on every page render so ISR pages are not stuck with stale weekend flags. Pages that show standings or live race state use a 5-minute ISR window; schedule-only API routes keep the longer TTL.
 
 ---
 

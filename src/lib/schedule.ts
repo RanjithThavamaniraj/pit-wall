@@ -132,32 +132,18 @@ function buildSessions(race: JolpicaRace): RaceSession[] {
         key,
         label: SESSION_LABELS[key],
         dateUtc,
-        status: dateUtc ? getSessionStatus(key, dateUtc) : "upcoming",
+        status: "upcoming" as SessionStatus,
       };
     });
 }
 
-function jolpicaToRaceWeekend(
-  race: JolpicaRace,
-  nextRaceRound: number
-): RaceWeekend {
+function jolpicaToRaceWeekend(race: JolpicaRace): RaceWeekend {
   const round = parseInt(race.round);
   const season = parseInt(race.season);
   const country = race.Circuit.Location.country;
   const locality = race.Circuit.Location.locality;
   const slug = generateRaceSlug(race.raceName, round);
   const sessions = buildSessions(race);
-  const raceSession = sessions.find((s) => s.key === "race");
-  const raceDate = raceSession?.dateUtc ?? "";
-  const raceEndMs = raceDate
-    ? new Date(raceDate).getTime() + 120 * 60 * 1000
-    : 0;
-  const isPast = raceDate ? raceEndMs < Date.now() : false;
-  const fp1Date = sessions.find((s) => s.key === "fp1")?.dateUtc ?? "";
-  const isCurrent =
-    fp1Date && raceDate
-      ? new Date(fp1Date).getTime() <= Date.now() && raceEndMs > Date.now()
-      : false;
 
   return {
     slug,
@@ -170,9 +156,52 @@ function jolpicaToRaceWeekend(
     country,
     countryCode: getCountryCode(country, locality),
     sessions,
-    isPast,
-    isCurrent,
-    isNext: round === nextRaceRound,
+    isPast: false,
+    isCurrent: false,
+    isNext: false,
+  };
+}
+
+/** Recompute time-sensitive flags on every schedule read (not cached with Jolpica fetch). */
+export function applyScheduleLiveState(
+  schedule: SeasonSchedule,
+  now: number = Date.now()
+): SeasonSchedule {
+  let nextRaceRound = 0;
+  for (const race of schedule.races) {
+    const raceSession = race.sessions.find((s) => s.key === "race");
+    if (raceSession?.dateUtc && new Date(raceSession.dateUtc).getTime() > now) {
+      nextRaceRound = race.round;
+      break;
+    }
+  }
+
+  return {
+    ...schedule,
+    races: schedule.races.map((race) => {
+      const raceSession = race.sessions.find((s) => s.key === "race");
+      const raceDate = raceSession?.dateUtc ?? "";
+      const raceEndMs = raceDate
+        ? new Date(raceDate).getTime() + 120 * 60 * 1000
+        : 0;
+      const fp1Date = race.sessions.find((s) => s.key === "fp1")?.dateUtc ?? "";
+
+      return {
+        ...race,
+        isPast: raceDate ? raceEndMs < now : false,
+        isCurrent:
+          fp1Date && raceDate
+            ? new Date(fp1Date).getTime() <= now && raceEndMs > now
+            : false,
+        isNext: race.round === nextRaceRound,
+        sessions: race.sessions.map((session) => ({
+          ...session,
+          status: session.dateUtc
+            ? getSessionStatus(session.key, session.dateUtc, now)
+            : "upcoming",
+        })),
+      };
+    }),
   };
 }
 
@@ -197,27 +226,13 @@ export async function fetchSeasonSchedule(
   const races: JolpicaRace[] =
     json?.MRData?.RaceTable?.Races ?? [];
 
-  const now = Date.now();
+  const raceWeekends = races.map((r) => jolpicaToRaceWeekend(r));
 
-  // Find the next upcoming race (first race whose race date is in the future)
-  let nextRaceRound = 0;
-  for (const race of races) {
-    const raceUtc = race.date
-      ? new Date(`${race.date}T${race.time ?? "00:00:00Z"}`).getTime()
-      : 0;
-    if (raceUtc > now) {
-      nextRaceRound = parseInt(race.round);
-      break;
-    }
-  }
-
-  const raceWeekends = races.map((r) => jolpicaToRaceWeekend(r, nextRaceRound));
-
-  return {
+  return applyScheduleLiveState({
     season: parseInt(races[0]?.season ?? String(season)),
     totalRaces: raceWeekends.length,
     races: raceWeekends,
-  };
+  });
 }
 
 export async function fetchRaceBySlug(
