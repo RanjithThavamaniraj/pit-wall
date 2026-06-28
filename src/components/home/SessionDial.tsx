@@ -7,7 +7,7 @@ import {
   dialRadiusPx,
   resolveRingPillOverlaps,
 } from "@/lib/sessionDialOverlap";
-import { formatCompactTime } from "@/lib/utils";
+import { formatCompactTime, formatCountdownCompact } from "@/lib/utils";
 import type { HeroBoardSession } from "@/components/home/PitWallHeroBoard";
 
 type SessionDialProps = {
@@ -63,13 +63,7 @@ function DialCenter({
 }) {
   const { days, hours, minutes, seconds, isExpired } = useCountdown(targetDate);
   const live = isExpired;
-
-  const parts = [
-    { value: days, show: days > 0 },
-    { value: hours, show: days < 7 },
-    { value: minutes, show: true },
-    { value: seconds, show: days === 0 && hours < 8 },
-  ].filter((p) => p.show);
+  const parts = formatCountdownCompact(days, hours, minutes, seconds);
 
   return (
     <div className="hero-dial-center" role="timer">
@@ -79,11 +73,15 @@ function DialCenter({
       {live ? (
         <p className="hero-dial-center-live">Live</p>
       ) : (
-        <p className="hero-dial-center-time" suppressHydrationWarning>
+        <p
+          className="hero-dial-center-time"
+          suppressHydrationWarning
+          aria-label={`${sessionLabel} starts in ${days} days ${hours} hours ${minutes} minutes`}
+        >
           {parts.map((part, i) => (
-            <span key={i}>
+            <span key={part}>
               {i > 0 && <span className="hero-dial-center-sep">:</span>}
-              {String(part.value).padStart(2, "0")}
+              {part}
             </span>
           ))}
         </p>

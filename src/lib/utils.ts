@@ -41,6 +41,23 @@ export function formatLocalTimeOnly(isoString: string): string {
   }
 }
 
+/** Compact countdown segments for dial / inline timers, e.g. ["11d", "14h", "12m"]. */
+export function formatCountdownCompact(
+  days: number,
+  hours: number,
+  minutes: number,
+  seconds: number
+): string[] {
+  const parts: string[] = [];
+  if (days > 0) parts.push(`${days}d`);
+  if (hours > 0 || days > 0) parts.push(`${hours}h`);
+  parts.push(`${String(minutes).padStart(2, "0")}m`);
+  if (days === 0 && hours < 8) {
+    parts.push(`${String(seconds).padStart(2, "0")}s`);
+  }
+  return parts;
+}
+
 /** Compact clock label for dial pills, e.g. "5:00 PM". */
 export function formatCompactTime(isoString: string): string {
   if (!isoString) return "TBC";

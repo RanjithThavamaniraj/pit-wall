@@ -1,6 +1,7 @@
 "use client";
 
 import { useCountdown } from "@/hooks/useCountdown";
+import { formatCountdownCompact } from "@/lib/utils";
 
 type Props = {
   targetDate: string; // ISO UTC string
@@ -136,10 +137,7 @@ function InlineCountdown({ targetDate, sessionLabel }: Props) {
     );
   }
 
-  const parts: string[] = [];
-  if (days > 0) parts.push(`${days}d`);
-  if (hours > 0 || days > 0) parts.push(`${hours}h`);
-  parts.push(`${String(minutes).padStart(2, "0")}m`);
+  const parts = formatCountdownCompact(days, hours, minutes, 0);
 
   return (
     <span
