@@ -6,10 +6,10 @@ Self-hosted analytics for the Founder Dashboard. No third-party analytics SDKs.
 
 ```mermaid
 flowchart LR
-  A[Browser document GET] --> B[middleware.ts]
-  B --> C[Cookies pitwall-vid / pitwall-sid]
-  B --> D["waitUntil → POST /api/analytics/collect"]
-  E[AnalyticsBeacon] --> F[POST /api/analytics/heartbeat]
+  A[Browser] --> B[middleware.ts — analytics cookies]
+  B --> C[AnalyticsBeacon — pageview]
+  C --> D["POST /api/analytics/collect"]
+  C --> F[POST /api/analytics/heartbeat]
   G[API routes] --> H[withApiAnalytics → ingestApiMetric]
   D --> I[ingest.ts]
   F --> I
@@ -128,9 +128,11 @@ ANALYTICS_STORE=supabase
 
 Never expose `SUPABASE_SERVICE_ROLE_KEY` to the browser or `NEXT_PUBLIC_*` bundles beyond what Supabase documents for the anon key.
 
-## Middleware reliability
+## Client pageview delivery
 
-Pageviews are queued with `event.waitUntil(fetch(...))` so Vercel Edge Middleware does not terminate the collect request before it completes.
+Pageviews are sent from `AnalyticsBeacon` when the component mounts and whenever the App Router pathname changes (deduped per pathname). Middleware only issues `pitwall-vid` / `pitwall-sid` cookies; the collect route reads those cookies server-side.
+
+**Update:** Pageviews are sent from `AnalyticsBeacon` on mount and App Router route changes. Middleware only sets analytics cookies.
 
 ## Module map
 

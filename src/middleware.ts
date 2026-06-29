@@ -1,4 +1,4 @@
-import { NextResponse, type NextFetchEvent, type NextRequest } from "next/server";
+import { NextResponse, type NextRequest } from "next/server";
 import {
   ADMIN_SESSION_COOKIE,
   SESSION_COOKIE,
@@ -13,15 +13,6 @@ function isAdminPath(pathname: string): boolean {
   return pathname === "/admin" || pathname.startsWith("/admin/");
 }
 
-function isDocumentRequest(request: NextRequest): boolean {
-  const accept = request.headers.get("accept") ?? "";
-  return (
-    request.method === "GET" &&
-    accept.includes("text/html") &&
-    !request.headers.get("next-router-prefetch")
-  );
-}
-
 function shouldSkipAnalytics(pathname: string): boolean {
   return (
     pathname.startsWith("/admin") ||
@@ -34,7 +25,7 @@ function shouldSkipAnalytics(pathname: string): boolean {
 function ensureAnalyticsCookies(
   request: NextRequest,
   response: NextResponse
-): { visitorId: string; sessionId: string } {
+): void {
   let visitorId = request.cookies.get(VISITOR_COOKIE)?.value;
   if (!visitorId) {
     visitorId = crypto.randomUUID();
@@ -58,42 +49,9 @@ function ensureAnalyticsCookies(
     path: "/",
     maxAge: ADMIN_CACHE.SESSION_MAX_AGE_SECONDS,
   });
-
-  return { visitorId, sessionId };
 }
 
-function queuePageview(
-  request: NextRequest,
-  event: NextFetchEvent,
-  visitorId: string,
-  sessionId: string
-) {
-  const collectUrl = new URL("/api/analytics/collect", request.url);
-  const payload = JSON.stringify({
-    type: "pageview",
-    pathname: request.nextUrl.pathname,
-    referrer: request.headers.get("referer"),
-    userAgent: request.headers.get("user-agent"),
-    visitorId,
-    sessionId,
-    timestamp: Date.now(),
-  });
-
-  event.waitUntil(
-    fetch(collectUrl, {
-      method: "POST",
-      headers: {
-        "content-type": "application/json",
-        "x-analytics-internal": "1",
-      },
-      body: payload,
-    }).catch(() => {
-      /* best-effort */
-    })
-  );
-}
-
-export async function middleware(request: NextRequest, event: NextFetchEvent) {
+export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   if (isAdminPath(pathname)) {
@@ -128,11 +86,7 @@ export async function middleware(request: NextRequest, event: NextFetchEvent) {
   const response = NextResponse.next();
 
   if (!shouldSkipAnalytics(pathname)) {
-    const { visitorId, sessionId } = ensureAnalyticsCookies(request, response);
-
-    if (isDocumentRequest(request)) {
-      queuePageview(request, event, visitorId, sessionId);
-    }
+    ensureAnalyticsCookies(request, response);
   }
 
   return response;

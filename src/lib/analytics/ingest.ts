@@ -17,6 +17,21 @@ export async function ingestApiMetric(
   const store = getAnalyticsStore();
   await store.recordApiMetric(metric);
 }
+export function enrichCollectBody(
+  body: unknown,
+  ids: { visitorId?: string; sessionId?: string }
+): unknown {
+  if (!body || typeof body !== "object") return body;
+  const record = { ...(body as Record<string, unknown>) };
+  if (typeof record.visitorId !== "string" && ids.visitorId) {
+    record.visitorId = ids.visitorId;
+  }
+  if (typeof record.sessionId !== "string" && ids.sessionId) {
+    record.sessionId = ids.sessionId;
+  }
+  return record;
+}
+
 export function parseCollectBody(
   body: unknown
 ): PageviewInput | HeartbeatInput | null {

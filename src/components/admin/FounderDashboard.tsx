@@ -37,7 +37,7 @@ export function FounderDashboard({ data }: { data: DashboardSummary }) {
       {!hasData ? (
         <GlassCard className="p-6 text-sm text-slate-400">
           No traffic recorded yet. Browse the public site in another tab, then
-          refresh this page. Pageviews are captured via middleware; engagement
+          refresh this page. Pageviews are captured on route changes; engagement
           time is sent by the client heartbeat.
         </GlassCard>
       ) : null}
