@@ -1,12 +1,20 @@
 import type { AnalyticsStore } from "./store";
 import { getFileAnalyticsStore } from "./file-store";
+import { getSupabaseAnalyticsStore } from "./supabase-store";
+
+export type AnalyticsStoreBackend = "file" | "supabase";
+
+export function resolveAnalyticsStoreBackend(): AnalyticsStoreBackend {
+  const override = process.env.ANALYTICS_STORE?.trim().toLowerCase();
+  if (override === "file") return "file";
+  if (override === "supabase") return "supabase";
+  return process.env.NODE_ENV === "production" ? "supabase" : "file";
+}
 
 export function getAnalyticsStore(): AnalyticsStore {
-  const mode = process.env.ANALYTICS_STORE ?? "file";
-  if (mode === "file") {
+  const backend = resolveAnalyticsStoreBackend();
+  if (backend === "file") {
     return getFileAnalyticsStore();
   }
-  throw new Error(
-    `Unsupported ANALYTICS_STORE="${mode}". Only "file" is implemented.`
-  );
+  return getSupabaseAnalyticsStore();
 }

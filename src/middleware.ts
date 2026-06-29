@@ -1,4 +1,4 @@
-import { NextResponse, type NextRequest } from "next/server";
+import { NextResponse, type NextFetchEvent, type NextRequest } from "next/server";
 import {
   ADMIN_SESSION_COOKIE,
   SESSION_COOKIE,
@@ -64,6 +64,7 @@ function ensureAnalyticsCookies(
 
 function queuePageview(
   request: NextRequest,
+  event: NextFetchEvent,
   visitorId: string,
   sessionId: string
 ) {
@@ -78,19 +79,21 @@ function queuePageview(
     timestamp: Date.now(),
   });
 
-  void fetch(collectUrl, {
-    method: "POST",
-    headers: {
-      "content-type": "application/json",
-      "x-analytics-internal": "1",
-    },
-    body: payload,
-  }).catch(() => {
-    /* best-effort */
-  });
+  event.waitUntil(
+    fetch(collectUrl, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        "x-analytics-internal": "1",
+      },
+      body: payload,
+    }).catch(() => {
+      /* best-effort */
+    })
+  );
 }
 
-export async function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest, event: NextFetchEvent) {
   const { pathname } = request.nextUrl;
 
   if (isAdminPath(pathname)) {
@@ -128,7 +131,7 @@ export async function middleware(request: NextRequest) {
     const { visitorId, sessionId } = ensureAnalyticsCookies(request, response);
 
     if (isDocumentRequest(request)) {
-      queuePageview(request, visitorId, sessionId);
+      queuePageview(request, event, visitorId, sessionId);
     }
   }
 

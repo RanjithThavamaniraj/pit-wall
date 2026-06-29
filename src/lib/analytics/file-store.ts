@@ -1,12 +1,10 @@
 import { mkdir, appendFile, readFile } from "fs/promises";
 import path from "path";
-import { randomUUID } from "crypto";
 import {
-  classifyDevice,
-  classifyReferrer,
-  classifyRouteBucket,
-  classifySport,
-} from "./classify";
+  buildApiMetricEvent,
+  buildHeartbeatEvent,
+  buildPageviewEvent,
+} from "./build-events";
 import type { AnalyticsStore } from "./store";
 import type {
   AnalyticsEvent,
@@ -26,52 +24,6 @@ async function ensureDir() {
 async function appendJsonLine(filePath: string, value: unknown) {
   await ensureDir();
   await appendFile(filePath, `${JSON.stringify(value)}\n`, "utf8");
-}
-
-function siteHost(): string | undefined {
-  const raw = process.env.NEXT_PUBLIC_SITE_URL;
-  if (!raw) return undefined;
-  try {
-    return new URL(raw).host;
-  } catch {
-    return undefined;
-  }
-}
-
-function buildPageviewEvent(input: PageviewInput): AnalyticsEvent {
-  const timestamp = input.timestamp ?? Date.now();
-  return {
-    id: randomUUID(),
-    type: "pageview",
-    timestamp,
-    visitorId: input.visitorId,
-    sessionId: input.sessionId,
-    pathname: input.pathname,
-    sport: classifySport(input.pathname),
-    routeBucket: classifyRouteBucket(input.pathname),
-    referrerBucket: classifyReferrer(input.referrer, siteHost()),
-    device: classifyDevice(input.userAgent),
-    referrer: input.referrer ?? undefined,
-    userAgent: input.userAgent ?? undefined,
-  };
-}
-
-function buildHeartbeatEvent(input: HeartbeatInput): AnalyticsEvent {
-  const timestamp = input.timestamp ?? Date.now();
-  return {
-    id: randomUUID(),
-    type: "heartbeat",
-    timestamp,
-    visitorId: input.visitorId,
-    sessionId: input.sessionId,
-    pathname: input.pathname,
-    sport: classifySport(input.pathname),
-    routeBucket: classifyRouteBucket(input.pathname),
-    referrerBucket: "direct",
-    device: classifyDevice(input.userAgent),
-    durationMs: input.durationMs,
-    userAgent: input.userAgent ?? undefined,
-  };
 }
 
 async function readJsonLines<T>(filePath: string): Promise<T[]> {
@@ -97,7 +49,7 @@ export class FileAnalyticsStore implements AnalyticsStore {
   }
 
   async recordApiMetric(metric: Omit<ApiMetricEvent, "id">): Promise<void> {
-    await appendJsonLine(API_FILE, { id: randomUUID(), ...metric });
+    await appendJsonLine(API_FILE, buildApiMetricEvent(metric));
   }
 
   async readEvents(sinceMs: number): Promise<AnalyticsEvent[]> {
