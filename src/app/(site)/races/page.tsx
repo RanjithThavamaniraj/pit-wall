@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { fetchSeasonSchedule } from "@/lib/schedule";
 import { RaceCard } from "@/components/RaceCard";
+import { CompletedWeekendGrid } from "@/components/weekend-summary";
+import { f1WeekendToCardData } from "@/lib/race-summary/mappers";
 import { Container } from "@/components/ui";
 
 export const metadata: Metadata = {
@@ -96,11 +98,10 @@ export default async function RacesPage() {
             >
               Completed — {pastRaces.length} round{pastRaces.length !== 1 ? "s" : ""}
             </h2>
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-              {[...pastRaces].reverse().map((race) => (
-                <RaceCard key={race.slug} race={race} />
-              ))}
-            </div>
+            <CompletedWeekendGrid
+              sport="f1"
+              races={[...pastRaces].reverse().map(f1WeekendToCardData)}
+            />
           </Container>
         </section>
       )}

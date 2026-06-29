@@ -1,0 +1,69 @@
+{
+  "sport": "f1",
+  "slug": "chinese-gp-r2",
+  "round": 2,
+  "season": 2026,
+  "name": "Chinese Grand Prix",
+  "shortName": "Chinese GP",
+  "weekendReport": "Verstappen controlled the race from pole position while Ferrari struggled with tyre degradation. Norris closed the championship gap with another podium finish as McLaren continued their strong start to the season.",
+  "raceResults": [
+    { "position": 1, "name": "Max Verstappen", "team": "Red Bull Racing", "number": 1, "nationality": "Netherlands", "countryCode": "NL", "imageSlug": "max-verstappen" },
+    { "position": 2, "name": "Lando Norris", "team": "McLaren", "number": 4, "nationality": "United Kingdom", "countryCode": "GB", "imageSlug": "lando-norris" },
+    { "position": 3, "name": "Charles Leclerc", "team": "Ferrari", "number": 16, "nationality": "Monaco", "countryCode": "MC", "imageSlug": "charles-leclerc" }
+  ],
+  "polePosition": "Max Verstappen",
+  "fastestLap": "Lando Norris",
+  "sprintWinner": "Oscar Piastri",
+  "timeline": [
+    { "day": "Friday", "label": "FP1", "completed": true },
+    { "day": "Friday", "label": "FP2", "completed": true },
+    { "day": "Saturday", "label": "FP3", "completed": true },
+    { "day": "Saturday", "label": "Qualifying", "completed": true },
+    { "day": "Saturday", "label": "Sprint", "completed": true },
+    { "day": "Sunday", "label": "Race", "completed": true }
+  ],
+  "weather": {
+    "airTemp": "19°C",
+    "trackTemp": "28°C",
+    "conditions": "Overcast"
+  },
+  "driversChampionship": [
+    { "position": 1, "name": "Lando Norris", "team": "McLaren", "points": 43, "movement": "unchanged", "imageSlug": "lando-norris" },
+    { "position": 2, "name": "Max Verstappen", "team": "Red Bull Racing", "points": 40, "movement": "up", "imageSlug": "max-verstappen" },
+    { "position": 3, "name": "Oscar Piastri", "team": "McLaren", "points": 33, "movement": "down", "imageSlug": "oscar-piastri" },
+    { "position": 4, "name": "Charles Leclerc", "team": "Ferrari", "points": 27, "movement": "up", "imageSlug": "charles-leclerc" },
+    { "position": 5, "name": "George Russell", "team": "Mercedes", "points": 18, "movement": "unchanged", "imageSlug": "george-russell" }
+  ],
+  "constructorsChampionship": [
+    { "position": 1, "name": "McLaren", "points": 76, "movement": "unchanged" },
+    { "position": 2, "name": "Red Bull Racing", "points": 40, "movement": "up" },
+    { "position": 3, "name": "Ferrari", "points": 27, "movement": "up" },
+    { "position": 4, "name": "Mercedes", "points": 18, "movement": "unchanged" },
+    { "position": 5, "name": "Aston Martin", "points": 8, "movement": "unchanged" }
+  ],
+  "communityPrediction": {
+    "predictedWinner": "Lando Norris",
+    "actualWinner": "Max Verstappen",
+    "accuracy": 28,
+    "totalVotes": 387,
+    "topPicks": [
+      { "name": "Lando Norris", "percentage": 44 },
+      { "name": "Max Verstappen", "percentage": 35 },
+      { "name": "Oscar Piastri", "percentage": 12 }
+    ]
+  },
+  "statistics": [
+    { "label": "Race duration", "value": "1:35:42.103", "highlight": true },
+    { "label": "Laps", "value": "56" },
+    { "label": "Safety cars", "value": "0" },
+    { "label": "DNFs", "value": "2" },
+    { "label": "Fastest lap", "value": "1:32.118" },
+    { "label": "Pole time", "value": "1:30.441" },
+    { "label": "Winning margin", "value": "+2.156s" }
+  ],
+  "highlights": [
+    { "title": "Greatest Overtake", "description": "Norris re-pass on Leclerc into the final sector on lap 48.", "type": "overtake" },
+    { "title": "Driver of the Day", "description": "Max Verstappen — flawless race management from lights to flag.", "type": "driver" },
+    { "title": "Key Moment", "description": "Ferrari's second stint drop-off opened the door for McLaren.", "type": "moment" }
+  ]
+}

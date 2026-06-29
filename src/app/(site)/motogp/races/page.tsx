@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { fetchMotoGpSchedule } from "@/lib/motogp";
 import { MotoGpRaceCard } from "@/components/motogp/MotoGpRaceCard";
+import { CompletedWeekendGrid } from "@/components/weekend-summary";
+import { motoGpEventToCardData } from "@/lib/race-summary/mappers";
 import { Container } from "@/components/ui";
 
 export const metadata: Metadata = {
@@ -94,11 +96,10 @@ export default async function MotoGpRacesPage() {
               Completed — {pastRaces.length} round
               {pastRaces.length !== 1 ? "s" : ""}
             </h2>
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-              {[...pastRaces].reverse().map((event) => (
-                <MotoGpRaceCard key={event.id} event={event} />
-              ))}
-            </div>
+            <CompletedWeekendGrid
+              sport="motogp"
+              races={[...pastRaces].reverse().map(motoGpEventToCardData)}
+            />
           </Container>
         </section>
       )}
