@@ -64,7 +64,7 @@ export function SectionHeading({
         </p>
       ) : null}
       <h2
-        className={`${eyebrow ? "mt-3 sm:mt-4" : ""} text-3xl font-semibold tracking-[-0.04em] text-white sm:text-4xl lg:text-5xl`}
+        className={`${eyebrow ? "mt-3 sm:mt-4" : ""} text-2xl font-semibold tracking-[-0.04em] text-white sm:text-3xl lg:text-5xl`}
       >
         {title}
       </h2>
@@ -84,7 +84,7 @@ export function GlassCard({
 }) {
   return (
     <div
-      className={`rounded-[2rem] border border-white/10 bg-white/[0.06] p-6 shadow-2xl shadow-black/30 backdrop-blur-xl sm:p-7 lg:p-8 ${className}`}
+      className={`rounded-[2rem] border border-white/10 bg-white/[0.06] p-5 shadow-2xl shadow-black/30 backdrop-blur-xl sm:p-7 lg:p-8 ${className}`}
     >
       {children}
     </div>

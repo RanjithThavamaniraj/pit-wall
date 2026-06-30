@@ -1,0 +1,83 @@
+/* Mobile-first enhancements — preserves desktop layout at md+ */
+
+:root {
+  --touch-target-min: 2.75rem; /* 44px */
+  --section-y-mobile: 3rem;
+}
+
+@media (max-width: 767px) {
+  .page-section {
+    padding-block: var(--section-y-mobile);
+  }
+
+  .page-section--tight-top {
+    padding-top: calc(var(--section-y-mobile) * 0.65);
+  }
+}
+
+/* Minimum comfortable tap target for interactive controls */
+.touch-target {
+  min-height: var(--touch-target-min);
+  min-width: var(--touch-target-min);
+}
+
+.touch-target-inline {
+  min-height: var(--touch-target-min);
+}
+
+/* Mobile standings / timing card stacks (no horizontal scroll) */
+.mobile-card-stack {
+  display: flex;
+  flex-direction: column;
+}
+
+.mobile-standing-card,
+.mobile-timing-card {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.875rem 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  transition: background-color 0.15s ease;
+}
+
+.mobile-standing-card:last-child,
+.mobile-timing-card:last-child {
+  border-bottom: none;
+}
+
+.mobile-standing-card:active,
+.mobile-timing-card:active {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.mobile-standing-card__meta,
+.mobile-timing-card__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 0.75rem;
+  margin-top: 0.25rem;
+  font-size: 0.75rem;
+  color: rgb(100 116 139);
+}
+
+.mobile-standing-card__points,
+.mobile-timing-card__interval {
+  margin-left: auto;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+/* Tab controls — thumb-friendly on phones */
+.mobile-tab {
+  min-height: var(--touch-target-min);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Prediction / chart bars — readable on narrow screens */
+.mobile-bar-label {
+  font-size: 0.8125rem;
+  line-height: 1.25rem;
+}

@@ -144,8 +144,8 @@ export default async function RaceDetailPage({
       <section className="pb-12" aria-labelledby="sessions-heading">
         <Container wide className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(280px,360px)] lg:items-start">
           {/* Session list */}
-          <GlassCard className="p-0 overflow-hidden">
-            <div className="border-b border-white/10 px-6 py-4">
+          <GlassCard className="order-2 overflow-hidden p-0 lg:order-1">
+            <div className="border-b border-white/10 px-5 py-4 sm:px-6">
               <h2
                 id="sessions-heading"
                 className="text-sm font-semibold uppercase tracking-[0.24em] text-slate-400"
@@ -161,7 +161,7 @@ export default async function RaceDetailPage({
                 <li
                   key={session.key}
                   id={`session-${session.key}`}
-                  className={`scroll-mt-28 flex items-center justify-between gap-4 px-6 py-4 ${
+                  className={`scroll-mt-28 flex min-h-[4.75rem] items-center justify-between gap-4 px-5 py-4 sm:px-6 ${
                     session.status === "live"
                       ? "bg-red-400/[0.06]"
                       : session.status === "completed"
@@ -170,7 +170,7 @@ export default async function RaceDetailPage({
                   }`}
                 >
                   <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-2.5">
+                    <div className="flex flex-wrap items-center gap-2.5">
                       <StatusPill tone={sessionTone(session.status)}>
                         {sessionStatusLabel(session.status)}
                       </StatusPill>
@@ -203,9 +203,9 @@ export default async function RaceDetailPage({
             </ul>
           </GlassCard>
 
-          {/* Countdown widget */}
+          {/* Countdown widget — first on mobile */}
           {countdownSession && countdownSession.dateUtc && !race.isPast && (
-            <div className="lg:sticky lg:top-28">
+            <div className="order-1 lg:order-2 lg:sticky lg:top-28">
               <GlassCard>
                 <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">
                   Next session
@@ -231,7 +231,7 @@ export default async function RaceDetailPage({
           )}
 
           {race.isPast && (
-            <GlassCard>
+            <GlassCard className="order-1 lg:order-2">
               <p className="text-sm text-slate-400">
                 This race has concluded. Points from this round are reflected in
                 the championship standings.

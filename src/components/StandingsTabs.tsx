@@ -4,6 +4,7 @@ import { useState } from "react";
 import type { DriverStanding, ConstructorStanding } from "@/lib/standings";
 import { DriverRow } from "./DriverRow";
 import { ConstructorRow } from "./ConstructorRow";
+import { MobileStandingCard } from "./mobile/MobileStandingCard";
 
 type Tab = "drivers" | "constructors";
 
@@ -38,7 +39,7 @@ export function StandingsTabs({ drivers, constructors, season, round }: Props) {
             aria-controls={`${tab}-panel`}
             id={`${tab}-tab`}
             onClick={() => setActiveTab(tab)}
-            className={`flex-1 rounded-xl px-4 py-2.5 text-sm font-semibold transition focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-300 ${
+            className={`mobile-tab flex-1 rounded-xl px-4 py-3 text-sm font-semibold transition focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-300 ${
               activeTab === tab
                 ? "bg-amber-300 text-slate-950 shadow-sm"
                 : "text-slate-400 hover:text-white"
@@ -61,7 +62,52 @@ export function StandingsTabs({ drivers, constructors, season, round }: Props) {
         aria-labelledby={`${activeTab}-tab`}
         className="mt-5 overflow-hidden rounded-[2rem] border border-white/10 bg-white/[0.04]"
       >
-        <div className="overflow-x-auto">
+        {/* Mobile card layout */}
+        <div className="mobile-card-stack md:hidden" aria-hidden={false}>
+          {activeTab === "drivers"
+            ? drivers.map((driver) => (
+                <MobileStandingCard
+                  key={driver.driverCode}
+                  position={driver.position}
+                  primary={
+                    <>
+                      <span className="font-mono text-amber-200">
+                        {driver.driverCode}
+                      </span>{" "}
+                      {driver.firstName} {driver.lastName}
+                    </>
+                  }
+                  secondary={driver.constructorName}
+                  colorBar={driver.constructorColor}
+                  points={driver.points}
+                  gapLabel={
+                    driver.gapToLeader === 0
+                      ? "Leader"
+                      : `−${driver.gapToLeader} to leader`
+                  }
+                  wins={driver.wins}
+                />
+              ))
+            : constructors.map((c) => (
+                <MobileStandingCard
+                  key={c.name}
+                  position={c.position}
+                  primary={c.name}
+                  secondary={c.nationality}
+                  colorBar={c.color}
+                  points={c.points}
+                  gapLabel={
+                    c.gapToLeader === 0
+                      ? "Leader"
+                      : `−${c.gapToLeader} to leader`
+                  }
+                  wins={c.wins}
+                />
+              ))}
+        </div>
+
+        {/* Desktop table */}
+        <div className="hidden overflow-x-auto md:block">
           <table className="w-full border-collapse">
             <caption className="sr-only">
               {activeTab === "drivers"

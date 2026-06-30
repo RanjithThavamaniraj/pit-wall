@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "./layout.css";
+@import "./mobile.css";
 @import "./(site)/hero-stage.css";
 @import "./(site)/weekend-hub.css";
 

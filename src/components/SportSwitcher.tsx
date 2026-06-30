@@ -33,7 +33,7 @@ export function SportSwitcher() {
             type="button"
             aria-pressed={isActive}
             onClick={() => switchSport(sport)}
-            className={`rounded-full px-3.5 py-1.5 text-xs font-semibold tracking-wide transition focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-300 ${
+            className={`touch-target-inline rounded-full px-4 py-2.5 text-xs font-semibold tracking-wide transition focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-300 ${
               isActive
                 ? "bg-amber-300 text-slate-950 shadow-sm"
                 : "text-slate-400 hover:text-white"

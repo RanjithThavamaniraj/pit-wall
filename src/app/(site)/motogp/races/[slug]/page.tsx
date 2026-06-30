@@ -134,8 +134,8 @@ export default async function MotoGpRaceDetailPage({
           wide
           className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(280px,360px)] lg:items-start"
         >
-          <GlassCard className="overflow-hidden p-0">
-            <div className="border-b border-white/10 px-6 py-4">
+          <GlassCard className="order-2 overflow-hidden p-0 lg:order-1">
+            <div className="border-b border-white/10 px-5 py-4 sm:px-6">
               <h2
                 id="motogp-sessions-heading"
                 className="text-sm font-semibold uppercase tracking-[0.24em] text-slate-400"
@@ -151,7 +151,7 @@ export default async function MotoGpRaceDetailPage({
                 <li
                   key={session.sessionId}
                   id={`session-${session.sessionId}`}
-                  className={`scroll-mt-28 flex items-center justify-between gap-4 px-6 py-4 ${
+                  className={`scroll-mt-28 flex min-h-[4.75rem] items-center justify-between gap-4 px-5 py-4 sm:px-6 ${
                     session.status === "live"
                       ? "bg-red-400/[0.06]"
                       : session.status === "completed"
@@ -192,7 +192,7 @@ export default async function MotoGpRaceDetailPage({
           </GlassCard>
 
           {countdownSession && countdownSession.dateUtc && !event.isPast && (
-            <div className="lg:sticky lg:top-28">
+            <div className="order-1 lg:order-2 lg:sticky lg:top-28">
               <GlassCard>
                 <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">
                   Next session
@@ -218,7 +218,7 @@ export default async function MotoGpRaceDetailPage({
           )}
 
           {event.isPast && (
-            <GlassCard>
+            <GlassCard className="order-1 lg:order-2">
               {event.podium.length > 0 ? (
                 <>
                   <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">

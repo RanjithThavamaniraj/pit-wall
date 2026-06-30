@@ -77,6 +77,15 @@ function WeekendSummaryComponent({ summary }: Props) {
         </div>
       </SummarySection>
 
+      {summary.communityPrediction ? (
+        <SummarySection>
+          <PredictionSummary
+            sport={summary.sport}
+            prediction={summary.communityPrediction}
+          />
+        </SummarySection>
+      ) : null}
+
       {summary.timeline?.length ? (
         <SummarySection>
           <WeekendTimeline entries={summary.timeline} />
@@ -148,13 +157,6 @@ function WeekendSummaryComponent({ summary }: Props) {
           />
         </SummarySection>
       ) : null}
-
-      <SummarySection>
-        <PredictionSummary
-          sport={summary.sport}
-          prediction={summary.communityPrediction}
-        />
-      </SummarySection>
 
       <SummarySection>
         <WeekendStats statistics={summary.statistics} />

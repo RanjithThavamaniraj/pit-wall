@@ -21,7 +21,7 @@ function ExpandableRaceCardComponent({ race, isExpanded, onToggle }: Props) {
       onClick={onToggle}
       aria-expanded={isExpanded}
       aria-controls={`weekend-summary-${race.slug}`}
-      className={`group w-full rounded-[2rem] border p-5 text-left transition focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-300 ${
+      className={`group w-full min-h-[4.75rem] rounded-[2rem] border p-5 text-left transition active:scale-[0.99] focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-300 ${
         isExpanded
           ? "border-amber-300/25 bg-white/[0.06] shadow-lg shadow-amber-500/5"
           : "border-white/[0.06] bg-white/[0.03] hover:bg-white/[0.06]"

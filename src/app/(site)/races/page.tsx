@@ -63,7 +63,7 @@ export default async function RacesPage() {
           <p className="text-sm font-semibold uppercase tracking-[0.28em] text-amber-300">
             {schedule.season} season
           </p>
-          <h1 className="mt-3 text-4xl font-semibold tracking-[-0.04em] text-white sm:text-6xl">
+          <h1 className="mt-3 text-3xl font-semibold tracking-[-0.04em] text-white sm:text-4xl lg:text-6xl">
             Race schedule
           </h1>
           <p className="mt-4 max-w-xl text-base leading-7 text-slate-400">

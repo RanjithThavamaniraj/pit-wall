@@ -44,14 +44,14 @@ function PredictionSummaryComponent({ sport, prediction }: Props) {
       </div>
 
       <div className="mt-5 grid gap-5 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,0.8fr)]">
-        <div className="space-y-4">
+        <div className="space-y-4 order-2 lg:order-1">
           <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500">
             Top community picks
           </p>
           {topPicks.map((pick) => (
             <div key={pick.name}>
               <div className="mb-1.5 flex items-center justify-between gap-3">
-                <span className="text-sm font-medium text-slate-200">
+                <span className="mobile-bar-label font-medium text-slate-200">
                   {pick.name}
                 </span>
                 <span className="font-mono text-xs text-amber-200/80">
@@ -70,7 +70,7 @@ function PredictionSummaryComponent({ sport, prediction }: Props) {
           ))}
         </div>
 
-        <div className="space-y-3">
+        <div className="space-y-3 order-1 lg:order-2">
           <div className="rounded-xl border border-white/[0.06] bg-slate-950/40 p-4">
             <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500">
               Predicted winner

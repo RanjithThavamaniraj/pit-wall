@@ -1,4 +1,5 @@
 import type { TimingRowData } from "@/lib/timing";
+import { MobileTimingCard } from "@/components/mobile/MobileTimingCard";
 
 export function TimingRow({ row }: { row: TimingRowData }) {
   return (
@@ -60,7 +61,13 @@ export function TimingBoard({ timing }: { timing: TimingRowData[] }) {
 
   return (
     <div className="overflow-hidden rounded-[2rem] border border-white/10 bg-white/[0.04]">
-      <div className="overflow-x-auto">
+      <div className="mobile-card-stack md:hidden">
+        {timing.map((row) => (
+          <MobileTimingCard key={row.driverNumber} row={row} />
+        ))}
+      </div>
+
+      <div className="hidden overflow-x-auto md:block">
         <table className="w-full border-collapse">
           <caption className="sr-only">Live Timing Board</caption>
           <thead>

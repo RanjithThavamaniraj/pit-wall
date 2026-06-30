@@ -73,7 +73,7 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} ${rajdhani.variable} scroll-smooth antialiased`}
     >
-      <body className="pb-16 md:pb-0">{children}</body>
+      <body className="pb-[4.75rem] md:pb-0">{children}</body>
     </html>
   );
 }

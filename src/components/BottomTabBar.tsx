@@ -55,7 +55,7 @@ export function BottomTabBar() {
       className="fixed bottom-0 left-0 right-0 z-50 border-t border-white/10 bg-[#07090f]/95 backdrop-blur-xl md:hidden"
     >
       <ul
-        className="flex h-16 items-stretch justify-around px-1"
+        className="flex h-[4.25rem] items-stretch justify-around px-1"
         style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}
         role="list"
       >
@@ -69,7 +69,7 @@ export function BottomTabBar() {
               <Link
                 href={href}
                 aria-current={isActive ? "page" : undefined}
-                className={`relative flex flex-col items-center justify-center gap-0.5 rounded-2xl px-2 py-1.5 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-300 ${
+                className={`touch-target relative flex min-w-[4.5rem] flex-col items-center justify-center gap-1 rounded-2xl px-3 py-2 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-300 ${
                   isActive ? "text-amber-300" : "text-slate-500 hover:text-slate-300"
                 }`}
               >

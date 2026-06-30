@@ -7,8 +7,10 @@ import type {
   MotoGpTeamStanding,
 } from "@/lib/motogp";
 import { MAIN_CATEGORIES } from "@/lib/motogp";
+import { countryCodeToFlag } from "@/lib/utils";
 import { MotoGpRiderRow } from "./MotoGpRiderRow";
 import { MotoGpTeamRow } from "./MotoGpTeamRow";
+import { MobileStandingCard } from "../mobile/MobileStandingCard";
 
 type TableTab = "riders" | "teams";
 
@@ -61,7 +63,7 @@ export function MotoGpStandingsTabs({
             aria-selected={activeCategory === category}
             aria-controls={panelId}
             onClick={() => setActiveCategory(category)}
-            className={`flex-1 rounded-xl px-4 py-2.5 text-sm font-semibold transition focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-300 ${
+            className={`mobile-tab flex-1 rounded-xl px-4 py-3 text-sm font-semibold transition focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-300 ${
               activeCategory === category
                 ? "bg-amber-300 text-slate-950 shadow-sm"
                 : "text-slate-400 hover:text-white"
@@ -85,7 +87,7 @@ export function MotoGpStandingsTabs({
             aria-selected={activeTable === tab}
             aria-controls={panelId}
             onClick={() => setActiveTable(tab)}
-            className={`flex-1 rounded-xl px-4 py-2.5 text-sm font-semibold transition focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-300 ${
+            className={`mobile-tab flex-1 rounded-xl px-4 py-3 text-sm font-semibold transition focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-300 ${
               activeTable === tab
                 ? "bg-white/[0.08] text-white"
                 : "text-slate-400 hover:text-white"
@@ -106,7 +108,52 @@ export function MotoGpStandingsTabs({
         aria-labelledby={`category-tab-${activeCategory}`}
         className="mt-5 overflow-hidden rounded-[2rem] border border-white/10 bg-white/[0.04]"
       >
-        <div className="overflow-x-auto">
+        <div className="mobile-card-stack md:hidden">
+          {activeTable === "riders"
+            ? current.riders.map((rider) => (
+                <MobileStandingCard
+                  key={`${rider.riderNumber}-${rider.riderName}`}
+                  position={rider.position}
+                  accent={
+                    <span className="text-lg" aria-hidden="true">
+                      {countryCodeToFlag(rider.countryCode)}
+                    </span>
+                  }
+                  primary={
+                    <>
+                      <span className="font-mono text-amber-200">
+                        #{rider.riderNumber}
+                      </span>{" "}
+                      {rider.riderName}
+                    </>
+                  }
+                  secondary={rider.teamName}
+                  points={rider.points}
+                  gapLabel={
+                    rider.gapToLeader === 0
+                      ? "Leader"
+                      : `−${rider.gapToLeader} to leader`
+                  }
+                  wins={rider.wins}
+                />
+              ))
+            : current.teams.map((team) => (
+                <MobileStandingCard
+                  key={team.name}
+                  position={team.position}
+                  primary={team.name}
+                  points={team.points}
+                  gapLabel={
+                    team.gapToLeader === 0
+                      ? "Leader"
+                      : `−${team.gapToLeader} to leader`
+                  }
+                  wins={team.wins}
+                />
+              ))}
+        </div>
+
+        <div className="hidden overflow-x-auto md:block">
           <table className="w-full border-collapse">
             <caption className="sr-only">
               {season} {CATEGORY_LABELS[activeCategory]}{" "}
