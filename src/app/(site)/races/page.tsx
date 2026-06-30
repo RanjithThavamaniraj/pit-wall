@@ -4,6 +4,7 @@ import { fetchSeasonSchedule } from "@/lib/schedule";
 import { RaceCard } from "@/components/RaceCard";
 import { CompletedWeekendGrid } from "@/components/weekend-summary";
 import { f1WeekendToCardData } from "@/lib/race-summary/mappers";
+import { loadRaceWeekendSummary } from "@/lib/race-summary/loader";
 import { Container } from "@/components/ui";
 
 export const metadata: Metadata = {
@@ -38,6 +39,17 @@ export default async function RacesPage() {
   const pastRaces = schedule.races.filter((r) => r.isPast);
   const upcomingRaces = schedule.races.filter((r) => !r.isPast);
   const nextRace = upcomingRaces.find((r) => r.isNext);
+
+  const completedRaceCards = await Promise.all(
+    [...pastRaces].reverse().map(async (race) => {
+      const card = f1WeekendToCardData(race);
+      const summary = await loadRaceWeekendSummary("f1", race.slug);
+      if (summary?.raceResults?.length) {
+        card.podium = summary.raceResults;
+      }
+      return card;
+    })
+  );
 
   return (
     <>
@@ -98,10 +110,7 @@ export default async function RacesPage() {
             >
               Completed — {pastRaces.length} round{pastRaces.length !== 1 ? "s" : ""}
             </h2>
-            <CompletedWeekendGrid
-              sport="f1"
-              races={[...pastRaces].reverse().map(f1WeekendToCardData)}
-            />
+            <CompletedWeekendGrid sport="f1" races={completedRaceCards} />
           </Container>
         </section>
       )}
