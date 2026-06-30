@@ -3,14 +3,12 @@
 import { memo, useState } from "react";
 import Image from "next/image";
 import type { RaceSummarySport } from "@/lib/race-summary/types";
+import { getDriverImage } from "@/lib/assets/driver-images";
 import {
   getInitials,
   getTeamBranding,
-  personImageBasePath,
   slugifyPerson,
 } from "@/lib/race-summary/branding";
-
-const IMAGE_EXTENSIONS = [".webp", ".png", ".jpg"] as const;
 
 const SIZE_CLASSES = {
   sm: "h-9 w-9 text-[10px]",
@@ -39,10 +37,9 @@ function PersonAvatarComponent({
   const [extensionIndex, setExtensionIndex] = useState(0);
   const branding = getTeamBranding(team, sport);
   const slug = imageSlug ?? slugifyPerson(name);
-  const basePath = personImageBasePath(sport, slug);
-  const extension = IMAGE_EXTENSIONS[extensionIndex];
-  const src = extension ? `${basePath}${extension}` : null;
-  const showFallback = !src || extensionIndex >= IMAGE_EXTENSIONS.length;
+  const candidates = getDriverImage(slug, sport);
+  const src = candidates[extensionIndex];
+  const showFallback = !src || extensionIndex >= candidates.length;
 
   return (
     <div
@@ -67,9 +64,7 @@ function PersonAvatarComponent({
           }
           className="rounded-full object-cover object-top"
           loading="lazy"
-          onError={() =>
-            setExtensionIndex((current) => current + 1)
-          }
+          onError={() => setExtensionIndex((current) => current + 1)}
         />
       ) : (
         <div

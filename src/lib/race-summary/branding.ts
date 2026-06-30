@@ -158,16 +158,11 @@ export function getTeamBranding(
   return {
     color: "#64748b",
     shortName: team.split(" ").slice(0, 2).join(" "),
-    logoPath: `/images/${sport}/teams/${slugifyTeam(team)}.svg`,
+    logoPath:
+      sport === "f1"
+        ? `/images/f1/teams/${slugifyTeam(team)}.svg`
+        : `/images/motogp/manufacturers/${slugifyTeam(team)}.svg`,
   };
-}
-
-export function personImageBasePath(
-  sport: RaceSummarySport,
-  imageSlug: string
-): string {
-  const folder = sport === "f1" ? "drivers" : "riders";
-  return `/images/${sport}/${folder}/${imageSlug}`;
 }
 
 export function getInitials(name: string): string {
