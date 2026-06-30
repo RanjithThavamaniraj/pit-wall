@@ -2,9 +2,11 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { fetchSeasonSchedule, fetchRaceBySlug } from "@/lib/schedule";
-import { countryCodeToFlag, formatLocalTime, formatLocalTimeOnly } from "@/lib/utils";
-import { SessionCountdown } from "@/components/SessionCountdown";
-import { Container, GlassCard, StatusPill } from "@/components/ui";
+import { loadRaceWeekendSummary } from "@/lib/race-summary/loader";
+import { countryCodeToFlag } from "@/lib/utils";
+import { weekendHubFromF1 } from "@/lib/weekend-hub";
+import { WeekendHub } from "@/components/weekend-hub";
+import { Container, StatusPill } from "@/components/ui";
 
 // ─── Static params — pre-generate all 24 race pages at build time ─────────────
 
@@ -41,20 +43,6 @@ export async function generateMetadata({
   };
 }
 
-// ─── Session status tone mapping ──────────────────────────────────────────────
-
-function sessionTone(status: "upcoming" | "live" | "completed") {
-  if (status === "live") return "red" as const;
-  if (status === "completed") return "neutral" as const;
-  return "green" as const;
-}
-
-function sessionStatusLabel(status: "upcoming" | "live" | "completed") {
-  if (status === "live") return "Live";
-  if (status === "completed") return "Done";
-  return "Upcoming";
-}
-
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default async function RaceDetailPage({
@@ -67,10 +55,13 @@ export default async function RaceDetailPage({
 
   if (!race) notFound();
 
+  const hubData = weekendHubFromF1(race);
+  const summary = race.isPast
+    ? await loadRaceWeekendSummary("f1", slug)
+    : null;
+
   const flag = countryCodeToFlag(race.countryCode);
-  const nextSession = race.sessions.find((s) => s.status === "upcoming");
   const liveSession = race.sessions.find((s) => s.status === "live");
-  const countdownSession = liveSession ?? nextSession;
   const isSprintWeekend = race.sessions.some(
     (s) => s.key === "sprint_qualifying" || s.key === "sprint"
   );
@@ -140,112 +131,11 @@ export default async function RaceDetailPage({
         </Container>
       </section>
 
-      {/* ─── Countdown + sessions ──────────────────────────────────────── */}
-      <section className="pb-12" aria-labelledby="sessions-heading">
-        <Container wide className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(280px,360px)] lg:items-start">
-          {/* Session list */}
-          <GlassCard className="order-2 overflow-hidden p-0 lg:order-1">
-            <div className="border-b border-white/10 px-5 py-4 sm:px-6">
-              <h2
-                id="sessions-heading"
-                className="text-sm font-semibold uppercase tracking-[0.24em] text-slate-400"
-              >
-                Session schedule
-              </h2>
-              <p className="mt-0.5 text-xs text-slate-600">
-                Times shown in your local timezone
-              </p>
-            </div>
-            <ul role="list" className="divide-y divide-white/[0.06]">
-              {race.sessions.map((session) => (
-                <li
-                  key={session.key}
-                  id={`session-${session.key}`}
-                  className={`scroll-mt-28 flex min-h-[4.75rem] items-center justify-between gap-4 px-5 py-4 sm:px-6 ${
-                    session.status === "live"
-                      ? "bg-red-400/[0.06]"
-                      : session.status === "completed"
-                      ? "opacity-50"
-                      : ""
-                  }`}
-                >
-                  <div className="min-w-0 flex-1">
-                    <div className="flex flex-wrap items-center gap-2.5">
-                      <StatusPill tone={sessionTone(session.status)}>
-                        {sessionStatusLabel(session.status)}
-                      </StatusPill>
-                      <p className="text-sm font-semibold text-white">
-                        {session.label}
-                      </p>
-                    </div>
-                    {session.dateUtc ? (
-                      <p
-                        className="mt-1.5 text-xs text-slate-500"
-                        suppressHydrationWarning
-                      >
-                        {formatLocalTime(session.dateUtc)}
-                      </p>
-                    ) : (
-                      <p className="mt-1.5 text-xs text-slate-600">
-                        Date TBC
-                      </p>
-                    )}
-                  </div>
-                  {session.status === "upcoming" && session.dateUtc && (
-                    <SessionCountdown
-                      targetDate={session.dateUtc}
-                      sessionLabel={session.label}
-                      variant="inline"
-                    />
-                  )}
-                </li>
-              ))}
-            </ul>
-          </GlassCard>
-
-          {/* Countdown widget — first on mobile */}
-          {countdownSession && countdownSession.dateUtc && !race.isPast && (
-            <div className="order-1 lg:order-2 lg:sticky lg:top-28">
-              <GlassCard>
-                <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">
-                  Next session
-                </p>
-                <p className="mt-1 text-lg font-semibold text-white">
-                  {countdownSession.label}
-                </p>
-                <p
-                  className="mt-0.5 text-xs text-slate-500"
-                  suppressHydrationWarning
-                >
-                  {formatLocalTimeOnly(countdownSession.dateUtc)}
-                </p>
-                <div className="mt-6">
-                  <SessionCountdown
-                    targetDate={countdownSession.dateUtc}
-                    sessionLabel={countdownSession.label}
-                    variant="full"
-                  />
-                </div>
-              </GlassCard>
-            </div>
-          )}
-
-          {race.isPast && (
-            <GlassCard className="order-1 lg:order-2">
-              <p className="text-sm text-slate-400">
-                This race has concluded. Points from this round are reflected in
-                the championship standings.
-              </p>
-              <Link
-                href="/standings"
-                className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-amber-300 hover:text-amber-200 transition"
-              >
-                View championship standings →
-              </Link>
-            </GlassCard>
-          )}
-        </Container>
-      </section>
+      <WeekendHub
+        data={hubData}
+        summary={summary}
+        scheduleHeadingId="sessions-heading"
+      />
     </>
   );
 }

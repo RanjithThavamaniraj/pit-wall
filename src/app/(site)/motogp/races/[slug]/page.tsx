@@ -2,9 +2,11 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { fetchMotoGpEventBySlug, fetchMotoGpSchedule } from "@/lib/motogp";
-import { countryCodeToFlag, formatLocalTime, formatLocalTimeOnly } from "@/lib/utils";
-import { SessionCountdown } from "@/components/SessionCountdown";
-import { Container, GlassCard, StatusPill } from "@/components/ui";
+import { loadRaceWeekendSummary } from "@/lib/race-summary/loader";
+import { countryCodeToFlag } from "@/lib/utils";
+import { weekendHubFromMotoGp } from "@/lib/weekend-hub";
+import { WeekendHub } from "@/components/weekend-hub";
+import { Container, StatusPill } from "@/components/ui";
 
 export async function generateStaticParams() {
   try {
@@ -37,18 +39,6 @@ export async function generateMetadata({
   };
 }
 
-function sessionTone(status: "upcoming" | "live" | "completed") {
-  if (status === "live") return "red" as const;
-  if (status === "completed") return "neutral" as const;
-  return "green" as const;
-}
-
-function sessionStatusLabel(status: "upcoming" | "live" | "completed") {
-  if (status === "live") return "Live";
-  if (status === "completed") return "Done";
-  return "Upcoming";
-}
-
 export default async function MotoGpRaceDetailPage({
   params,
 }: {
@@ -59,10 +49,13 @@ export default async function MotoGpRaceDetailPage({
 
   if (!event) notFound();
 
+  const hubData = weekendHubFromMotoGp(event);
+  const summary = event.isPast
+    ? await loadRaceWeekendSummary("motogp", slug)
+    : null;
+
   const flag = countryCodeToFlag(event.countryCode);
-  const nextSession = event.sessions.find((s) => s.status === "upcoming");
   const liveSession = event.sessions.find((s) => s.status === "live");
-  const countdownSession = liveSession ?? nextSession;
   const showLiveLink = event.isCurrent || Boolean(liveSession);
 
   return (
@@ -129,140 +122,12 @@ export default async function MotoGpRaceDetailPage({
         </Container>
       </section>
 
-      <section className="pb-12" aria-labelledby="motogp-sessions-heading">
-        <Container
-          wide
-          className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(280px,360px)] lg:items-start"
-        >
-          <GlassCard className="order-2 overflow-hidden p-0 lg:order-1">
-            <div className="border-b border-white/10 px-5 py-4 sm:px-6">
-              <h2
-                id="motogp-sessions-heading"
-                className="text-sm font-semibold uppercase tracking-[0.24em] text-slate-400"
-              >
-                Session schedule
-              </h2>
-              <p className="mt-0.5 text-xs text-slate-600">
-                Times shown in your local timezone
-              </p>
-            </div>
-            <ul role="list" className="divide-y divide-white/[0.06]">
-              {event.sessions.map((session) => (
-                <li
-                  key={session.sessionId}
-                  id={`session-${session.sessionId}`}
-                  className={`scroll-mt-28 flex min-h-[4.75rem] items-center justify-between gap-4 px-5 py-4 sm:px-6 ${
-                    session.status === "live"
-                      ? "bg-red-400/[0.06]"
-                      : session.status === "completed"
-                      ? "opacity-50"
-                      : ""
-                  }`}
-                >
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-2.5">
-                      <StatusPill tone={sessionTone(session.status)}>
-                        {sessionStatusLabel(session.status)}
-                      </StatusPill>
-                      <p className="text-sm font-semibold text-white">
-                        {session.label}
-                      </p>
-                    </div>
-                    {session.dateUtc ? (
-                      <p
-                        className="mt-1.5 text-xs text-slate-500"
-                        suppressHydrationWarning
-                      >
-                        {formatLocalTime(session.dateUtc)}
-                      </p>
-                    ) : (
-                      <p className="mt-1.5 text-xs text-slate-600">Date TBC</p>
-                    )}
-                  </div>
-                  {session.status === "upcoming" && session.dateUtc && (
-                    <SessionCountdown
-                      targetDate={session.dateUtc}
-                      sessionLabel={session.label}
-                      variant="inline"
-                    />
-                  )}
-                </li>
-              ))}
-            </ul>
-          </GlassCard>
-
-          {countdownSession && countdownSession.dateUtc && !event.isPast && (
-            <div className="order-1 lg:order-2 lg:sticky lg:top-28">
-              <GlassCard>
-                <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">
-                  Next session
-                </p>
-                <p className="mt-1 text-lg font-semibold text-white">
-                  {countdownSession.label}
-                </p>
-                <p
-                  className="mt-0.5 text-xs text-slate-500"
-                  suppressHydrationWarning
-                >
-                  {formatLocalTimeOnly(countdownSession.dateUtc)}
-                </p>
-                <div className="mt-6">
-                  <SessionCountdown
-                    targetDate={countdownSession.dateUtc}
-                    sessionLabel={countdownSession.label}
-                    variant="full"
-                  />
-                </div>
-              </GlassCard>
-            </div>
-          )}
-
-          {event.isPast && (
-            <GlassCard className="order-1 lg:order-2">
-              {event.podium.length > 0 ? (
-                <>
-                  <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">
-                    Race podium
-                  </p>
-                  <ol className="mt-4 space-y-3">
-                    {event.podium.map((finisher) => (
-                      <li
-                        key={finisher.position}
-                        className="flex items-center justify-between rounded-xl border border-white/[0.06] bg-slate-950/40 px-4 py-3"
-                      >
-                        <div className="flex items-center gap-4">
-                          <span className="font-mono text-sm text-amber-200">
-                            P{finisher.position}
-                          </span>
-                          <div>
-                            <p className="text-sm font-semibold text-white">
-                              {finisher.riderName}
-                            </p>
-                            <p className="text-xs text-slate-500">
-                              #{finisher.riderNumber} · {finisher.teamName}
-                            </p>
-                          </div>
-                        </div>
-                      </li>
-                    ))}
-                  </ol>
-                </>
-              ) : (
-                <p className="text-sm text-slate-400">
-                  This Grand Prix has concluded. Points from this round are
-                  reflected in the championship standings.
-                </p>
-              )}
-              <Link
-                href="/motogp/standings"
-                className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-amber-300 hover:text-amber-200 transition"
-              >
-                View championship standings →
-              </Link>
-            </GlassCard>
-          )}
-        </Container>
-      </section>
+      <WeekendHub
+        data={hubData}
+        summary={summary}
+        motogpPodium={event.podium}
+        scheduleHeadingId="motogp-sessions-heading"
+      />
     </>
   );
 }

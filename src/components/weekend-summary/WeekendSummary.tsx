@@ -16,6 +16,8 @@ import { summaryContainerVariants } from "./motion";
 
 type Props = {
   summary: RaceWeekendSummary;
+  /** Hide sections already rendered elsewhere on the weekend hub. */
+  omit?: ("predictions" | "podium")[];
 };
 
 function HighlightRow({
@@ -40,8 +42,10 @@ function HighlightRow({
   );
 }
 
-function WeekendSummaryComponent({ summary }: Props) {
+function WeekendSummaryComponent({ summary, omit }: Props) {
   const isF1 = summary.sport === "f1";
+  const hidePredictions = omit?.includes("predictions");
+  const hidePodium = omit?.includes("podium");
 
   return (
     <motion.div
@@ -56,28 +60,30 @@ function WeekendSummaryComponent({ summary }: Props) {
         </SummarySection>
       ) : null}
 
-      <SummarySection>
-        <div className="grid gap-4 lg:grid-cols-2">
-          <PodiumCard
-            sport={summary.sport}
-            title={isF1 ? "Race Results" : "Grand Prix Results"}
-            icon="🏆"
-            finishers={summary.raceResults}
-          />
-          {!isF1 &&
-          summary.sprintResults &&
-          summary.sprintResults.length > 0 ? (
+      {!hidePodium ? (
+        <SummarySection>
+          <div className="grid gap-4 lg:grid-cols-2">
             <PodiumCard
               sport={summary.sport}
-              title="Sprint Results"
-              icon="🏁"
-              finishers={summary.sprintResults}
+              title={isF1 ? "Race Results" : "Grand Prix Results"}
+              icon="🏆"
+              finishers={summary.raceResults}
             />
-          ) : null}
-        </div>
-      </SummarySection>
+            {!isF1 &&
+            summary.sprintResults &&
+            summary.sprintResults.length > 0 ? (
+              <PodiumCard
+                sport={summary.sport}
+                title="Sprint Results"
+                icon="🏁"
+                finishers={summary.sprintResults}
+              />
+            ) : null}
+          </div>
+        </SummarySection>
+      ) : null}
 
-      {summary.communityPrediction ? (
+      {!hidePredictions && summary.communityPrediction ? (
         <SummarySection>
           <PredictionSummary
             sport={summary.sport}
