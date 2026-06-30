@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
+import { IMAGE_EXTENSIONS } from "../src/lib/assets/constants";
 import {
   ASSET_MANIFEST,
   getCircuitImage,
@@ -29,11 +30,46 @@ function resolveCandidates(entry: ManifestEntry): readonly string[] {
   }
 }
 
+function findCaseMismatch(
+  candidates: readonly string[]
+): { expected: string; actual: string } | null {
+  if (candidates.length === 0) return null;
+
+  const relative = candidates[0].replace(/^\//, "");
+  const directory = path.dirname(path.join(PUBLIC_ROOT, relative));
+  const expectedBase = path.basename(relative, IMAGE_EXTENSIONS[0]);
+
+  if (!fs.existsSync(directory)) {
+    return null;
+  }
+
+  for (const fileName of fs.readdirSync(directory)) {
+    if (fileName.startsWith(".")) continue;
+    const base = fileName.replace(/\.(webp|png|jpg)$/i, "");
+    if (base.toLowerCase() === expectedBase.toLowerCase() && base !== expectedBase) {
+      return {
+        expected: `${expectedBase}{.webp|.png|.jpg}`,
+        actual: fileName,
+      };
+    }
+  }
+
+  return null;
+}
+
 function findExistingAsset(candidates: readonly string[]): string | null {
   for (const candidate of candidates) {
     const filePath = path.join(PUBLIC_ROOT, candidate.replace(/^\//, ""));
     if (fs.existsSync(filePath)) {
-      return candidate;
+      try {
+        fs.accessSync(filePath, fs.constants.R_OK);
+        const stat = fs.statSync(filePath);
+        if (stat.isFile()) {
+          return candidate;
+        }
+      } catch {
+        continue;
+      }
     }
   }
   return null;
@@ -42,6 +78,7 @@ function findExistingAsset(candidates: readonly string[]): string | null {
 function main() {
   const existing: string[] = [];
   const missing: string[] = [];
+  const caseMismatches: string[] = [];
 
   for (const entry of ASSET_MANIFEST) {
     const candidates = resolveCandidates(entry);
@@ -50,9 +87,17 @@ function main() {
 
     if (found) {
       existing.push(`✓ ${line} → ${found}`);
-    } else {
-      missing.push(`✗ ${line}`);
+      continue;
     }
+
+    const mismatch = findCaseMismatch(candidates);
+    if (mismatch) {
+      caseMismatches.push(
+        `⚠ ${entry.label}: found "${mismatch.actual}" but expected lowercase slug filename "${mismatch.expected}"`
+      );
+    }
+
+    missing.push(`✗ ${line}`);
   }
 
   console.log("Pit Wall asset check\n");
@@ -61,6 +106,13 @@ function main() {
     console.log("  (none)");
   } else {
     for (const line of existing) {
+      console.log(`  ${line}`);
+    }
+  }
+
+  if (caseMismatches.length > 0) {
+    console.log(`\nCase mismatches (${caseMismatches.length}):`);
+    for (const line of caseMismatches) {
       console.log(`  ${line}`);
     }
   }

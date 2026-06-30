@@ -1,6 +1,6 @@
 "use client";
 
-import { memo, useState } from "react";
+import { memo, useEffect, useState } from "react";
 import Image from "next/image";
 import type { RaceSummarySport } from "@/lib/race-summary/types";
 import { getDriverImage } from "@/lib/assets/driver-images";
@@ -40,6 +40,23 @@ function PersonAvatarComponent({
   const candidates = getDriverImage(slug, sport);
   const src = candidates[extensionIndex];
   const showFallback = !src || extensionIndex >= candidates.length;
+
+  useEffect(() => {
+    if (process.env.NODE_ENV !== "development") {
+      return;
+    }
+
+    console.info(
+      [
+        "PersonAvatar Debug",
+        `slug: ${slug}`,
+        `sport: ${sport}`,
+        `generated candidate paths: ${candidates.join(", ")}`,
+        `selected path: ${src ?? "(none)"}`,
+        `fallback triggered: ${showFallback}`,
+      ].join("\n")
+    );
+  }, [slug, sport, candidates, src, showFallback]);
 
   return (
     <div
