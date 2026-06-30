@@ -8,6 +8,7 @@ import type {
 } from "@/lib/motogp";
 import { MAIN_CATEGORIES } from "@/lib/motogp";
 import { countryCodeToFlag } from "@/lib/utils";
+import { PersonAvatar } from "@/components/weekend-summary/PersonAvatar";
 import { MotoGpRiderRow } from "./MotoGpRiderRow";
 import { MotoGpTeamRow } from "./MotoGpTeamRow";
 import { MobileStandingCard } from "../mobile/MobileStandingCard";
@@ -31,6 +32,25 @@ const CATEGORY_LABELS: Record<MotoGpCategoryName, string> = {
   "Moto3™": "Moto3",
 };
 
+const RIDER_TABLE_HEADERS = [
+  { label: "Pos", className: "w-12 py-3 pl-5 pr-2 text-left" },
+  { label: "Portrait", className: "sr-only w-12 py-3 pr-2" },
+  { label: "Nation", className: "sr-only w-10 py-3 pr-3" },
+  { label: "Rider", className: "py-3 pr-4 text-left" },
+  { label: "Team", className: "hidden py-3 pr-4 text-left md:table-cell" },
+  { label: "Gap", className: "hidden py-3 pr-5 text-right sm:table-cell" },
+  { label: "Wins", className: "hidden py-3 pr-5 text-right md:table-cell" },
+  { label: "Pts", className: "py-3 pr-5 text-right" },
+] as const;
+
+const TEAM_TABLE_HEADERS = [
+  { label: "Pos", className: "py-3 pl-5 pr-3 text-left" },
+  { label: "Team", className: "py-3 pr-4 text-left" },
+  { label: "Pts", className: "py-3 pr-4 text-right" },
+  { label: "Gap", className: "hidden py-3 pr-5 text-right sm:table-cell" },
+  { label: "Wins", className: "hidden py-3 pr-5 text-right md:table-cell" },
+] as const;
+
 export function MotoGpStandingsTabs({
   standingsByCategory,
   season,
@@ -42,9 +62,7 @@ export function MotoGpStandingsTabs({
 
   const current = standingsByCategory[activeCategory];
   const tableHeaders =
-    activeTable === "riders"
-      ? ["Pos", "Rider", "Points", "Gap", "Wins"]
-      : ["Pos", "Team", "Points", "Gap", "Wins"];
+    activeTable === "riders" ? RIDER_TABLE_HEADERS : TEAM_TABLE_HEADERS;
 
   const panelId = `motogp-standings-${activeCategory}-${activeTable}`;
 
@@ -114,8 +132,16 @@ export function MotoGpStandingsTabs({
                 <MobileStandingCard
                   key={`${rider.riderNumber}-${rider.riderName}`}
                   position={rider.position}
+                  portrait={
+                    <PersonAvatar
+                      sport="motogp"
+                      name={rider.riderName}
+                      team={rider.teamName}
+                      size="sm"
+                    />
+                  }
                   accent={
-                    <span className="text-lg" aria-hidden="true">
+                    <span aria-hidden="true">
                       {countryCodeToFlag(rider.countryCode)}
                     </span>
                   }
@@ -164,21 +190,11 @@ export function MotoGpStandingsTabs({
               <tr className="border-b border-white/10">
                 {tableHeaders.map((header, index) => (
                   <th
-                    key={header}
+                    key={`${header.label}-${index}`}
                     scope="col"
-                    className={`py-3 text-xs font-semibold uppercase tracking-[0.22em] text-slate-600 ${
-                      index === 0
-                        ? "pl-5 pr-3 text-left"
-                        : index === 1
-                        ? "pr-4 text-left"
-                        : index === 2
-                        ? "pr-4 text-right"
-                        : index === 3
-                        ? "hidden pr-5 text-right sm:table-cell"
-                        : "hidden pr-5 text-right md:table-cell"
-                    }`}
+                    className={`text-xs font-semibold uppercase tracking-[0.22em] text-slate-600 ${header.className}`}
                   >
-                    {header}
+                    {header.label}
                   </th>
                 ))}
               </tr>

@@ -201,6 +201,42 @@ export function countryCodeToFlag(code: string): string {
     .join("");
 }
 
+const NATIONALITY_TO_ISO: Record<string, string> = {
+  American: "US",
+  Argentine: "AR",
+  Australian: "AU",
+  Austrian: "AT",
+  Belgian: "BE",
+  Brazilian: "BR",
+  British: "GB",
+  Canadian: "CA",
+  Chinese: "CN",
+  Danish: "DK",
+  Dutch: "NL",
+  Finnish: "FI",
+  French: "FR",
+  German: "DE",
+  Italian: "IT",
+  Japanese: "JP",
+  Mexican: "MX",
+  Monegasque: "MC",
+  "New Zealander": "NZ",
+  Spanish: "ES",
+  Swiss: "CH",
+  Thai: "TH",
+};
+
+export function nationalityToCountryCode(
+  nationality: string
+): string | undefined {
+  return NATIONALITY_TO_ISO[nationality];
+}
+
+export function nationalityToFlag(nationality: string): string {
+  const code = nationalityToCountryCode(nationality);
+  return code ? countryCodeToFlag(code) : "🏁";
+}
+
 // ─── Numbers ──────────────────────────────────────────────────────────────────
 
 /**

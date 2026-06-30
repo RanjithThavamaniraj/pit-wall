@@ -11,6 +11,7 @@ import {
 } from "@/lib/race-summary/branding";
 
 const SIZE_CLASSES = {
+  xs: "h-10 w-10 text-[10px]",
   sm: "h-9 w-9 text-[10px]",
   md: "h-14 w-14 text-sm",
   lg: "h-20 w-20 text-base",
@@ -40,6 +41,7 @@ function PersonAvatarComponent({
   const candidates = getDriverImage(slug, sport);
   const src = candidates[extensionIndex];
   const showFallback = !src || extensionIndex >= candidates.length;
+  const compactRing = size === "xs" || size === "sm";
 
   useEffect(() => {
     if (process.env.NODE_ENV !== "development") {
@@ -62,7 +64,9 @@ function PersonAvatarComponent({
     <div
       className={`relative shrink-0 rounded-full ${SIZE_CLASSES[size]} ${className}`}
       style={{
-        boxShadow: `0 0 0 2px ${branding.color}55, 0 0 24px ${branding.color}22`,
+        boxShadow: compactRing
+          ? `0 0 0 2px ${branding.color}55`
+          : `0 0 0 2px ${branding.color}55, 0 0 24px ${branding.color}22`,
       }}
     >
       {!showFallback && src ? (
@@ -77,7 +81,9 @@ function PersonAvatarComponent({
                 ? "80px"
                 : size === "md"
                   ? "56px"
-                  : "36px"
+                  : size === "xs"
+                    ? "40px"
+                    : "36px"
           }
           className="rounded-full object-cover object-top"
           loading="lazy"

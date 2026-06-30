@@ -10,6 +10,7 @@ type Props = {
   position: number;
   primary: ReactNode;
   secondary?: string;
+  portrait?: ReactNode;
   accent?: ReactNode;
   colorBar?: string;
   points: number;
@@ -21,6 +22,7 @@ export function MobileStandingCard({
   position,
   primary,
   secondary,
+  portrait,
   accent,
   colorBar,
   points,
@@ -37,7 +39,9 @@ export function MobileStandingCard({
         {String(position).padStart(2, "0")}
       </span>
 
-      {colorBar ? (
+      {portrait ? <div className="shrink-0">{portrait}</div> : null}
+
+      {!portrait && colorBar ? (
         <span
           className="h-9 w-1 shrink-0 rounded-full"
           style={{ backgroundColor: colorBar }}
@@ -45,7 +49,7 @@ export function MobileStandingCard({
         />
       ) : null}
 
-      {accent ? <span className="shrink-0">{accent}</span> : null}
+      {accent ? <span className="shrink-0 text-lg">{accent}</span> : null}
 
       <div className="min-w-0 flex-1">
         <p className="truncate text-sm font-semibold text-white">{primary}</p>

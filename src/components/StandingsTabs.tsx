@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import type { DriverStanding, ConstructorStanding } from "@/lib/standings";
+import { nationalityToFlag } from "@/lib/utils";
+import { PersonAvatar } from "@/components/weekend-summary/PersonAvatar";
 import { DriverRow } from "./DriverRow";
 import { ConstructorRow } from "./ConstructorRow";
 import { MobileStandingCard } from "./mobile/MobileStandingCard";
@@ -15,13 +17,32 @@ type Props = {
   round: string;
 };
 
+const DRIVER_TABLE_HEADERS = [
+  { label: "Pos", className: "w-12 py-3 pl-5 pr-2 text-left" },
+  { label: "Portrait", className: "sr-only w-12 py-3 pr-2" },
+  { label: "Nation", className: "sr-only w-10 py-3 pr-3" },
+  { label: "Driver", className: "py-3 pr-4 text-left" },
+  { label: "Team", className: "hidden py-3 pr-4 text-left md:table-cell" },
+  { label: "Gap", className: "hidden py-3 pr-5 text-right sm:table-cell" },
+  { label: "Wins", className: "hidden py-3 pr-5 text-right md:table-cell" },
+  { label: "Pts", className: "py-3 pr-5 text-right" },
+] as const;
+
+const CONSTRUCTOR_TABLE_HEADERS = [
+  { label: "Pos", className: "py-3 pl-5 pr-3 text-left" },
+  { label: "Constructor", className: "py-3 pr-4 text-left" },
+  { label: "Pts", className: "py-3 pr-4 text-right" },
+  { label: "Gap", className: "hidden py-3 pr-5 text-right sm:table-cell" },
+  { label: "Wins", className: "hidden py-3 pr-5 text-right md:table-cell" },
+] as const;
+
 export function StandingsTabs({ drivers, constructors, season, round }: Props) {
   const [activeTab, setActiveTab] = useState<Tab>("drivers");
 
   const tableHeaders =
     activeTab === "drivers"
-      ? ["Pos", "Driver", "Points", "Gap", "Wins"]
-      : ["Pos", "Constructor", "Points", "Gap", "Wins"];
+      ? DRIVER_TABLE_HEADERS
+      : CONSTRUCTOR_TABLE_HEADERS;
 
   return (
     <div>
@@ -65,29 +86,44 @@ export function StandingsTabs({ drivers, constructors, season, round }: Props) {
         {/* Mobile card layout */}
         <div className="mobile-card-stack md:hidden" aria-hidden={false}>
           {activeTab === "drivers"
-            ? drivers.map((driver) => (
-                <MobileStandingCard
-                  key={driver.driverCode}
-                  position={driver.position}
-                  primary={
-                    <>
-                      <span className="font-mono text-amber-200">
-                        {driver.driverCode}
-                      </span>{" "}
-                      {driver.firstName} {driver.lastName}
-                    </>
-                  }
-                  secondary={driver.constructorName}
-                  colorBar={driver.constructorColor}
-                  points={driver.points}
-                  gapLabel={
-                    driver.gapToLeader === 0
-                      ? "Leader"
-                      : `−${driver.gapToLeader} to leader`
-                  }
-                  wins={driver.wins}
-                />
-              ))
+            ? drivers.map((driver) => {
+                const fullName = `${driver.firstName} ${driver.lastName}`;
+                return (
+                  <MobileStandingCard
+                    key={driver.driverCode}
+                    position={driver.position}
+                    portrait={
+                      <PersonAvatar
+                        sport="f1"
+                        name={fullName}
+                        team={driver.constructorName}
+                        size="sm"
+                      />
+                    }
+                    accent={
+                      <span aria-hidden="true">
+                        {nationalityToFlag(driver.nationality)}
+                      </span>
+                    }
+                    primary={
+                      <>
+                        <span className="font-mono text-amber-200">
+                          {driver.driverCode}
+                        </span>{" "}
+                        {fullName}
+                      </>
+                    }
+                    secondary={driver.constructorName}
+                    points={driver.points}
+                    gapLabel={
+                      driver.gapToLeader === 0
+                        ? "Leader"
+                        : `−${driver.gapToLeader} to leader`
+                    }
+                    wins={driver.wins}
+                  />
+                );
+              })
             : constructors.map((c) => (
                 <MobileStandingCard
                   key={c.name}
@@ -116,23 +152,13 @@ export function StandingsTabs({ drivers, constructors, season, round }: Props) {
             </caption>
             <thead>
               <tr className="border-b border-white/10">
-                {tableHeaders.map((header, i) => (
+                {tableHeaders.map((header, index) => (
                   <th
-                    key={header}
+                    key={`${header.label}-${index}`}
                     scope="col"
-                    className={`py-3 text-xs font-semibold uppercase tracking-[0.22em] text-slate-600 ${
-                      i === 0
-                        ? "pl-5 pr-3 text-left"
-                        : i === 1
-                        ? "pr-4 text-left"
-                        : i === 2
-                        ? "pr-4 text-right"
-                        : i === 3
-                        ? "hidden pr-5 text-right sm:table-cell"
-                        : "hidden pr-5 text-right md:table-cell"
-                    }`}
+                    className={`text-xs font-semibold uppercase tracking-[0.22em] text-slate-600 ${header.className}`}
                   >
-                    {header}
+                    {header.label}
                   </th>
                 ))}
               </tr>
