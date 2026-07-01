@@ -11,6 +11,7 @@ import { WeekendScheduleSection } from "./WeekendScheduleSection";
 import { WeekendStageTimeline } from "./WeekendStageTimeline";
 import { WeekendStatus } from "./WeekendStatus";
 import { WeekendStoryEngine } from "./WeekendStoryEngine";
+import { WeekendStrategyCenter } from "./WeekendStrategyCenter";
 
 type MotoGpPodiumFinisher = {
   position: number;
@@ -61,6 +62,14 @@ export function WeekendHub({
           weekendName={data.name}
           sessions={data.sessions}
           summary={summary}
+          isSprintWeekend={data.isSprintWeekend}
+        />
+
+        <WeekendStrategyCenter
+          sport={data.sport}
+          weekendSlug={data.slug}
+          weekendName={data.name}
+          sessions={data.sessions}
           isSprintWeekend={data.isSprintWeekend}
         />
 
