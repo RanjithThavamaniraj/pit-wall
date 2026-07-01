@@ -5,10 +5,12 @@ import {
   type WeekendHubData,
 } from "@/lib/weekend-hub";
 import { CurrentSessionCard } from "./CurrentSessionCard";
+import { LiveEventFeed } from "./LiveEventFeed";
 import { WeekendHubArchiveSections } from "./WeekendHubArchiveSections";
 import { WeekendScheduleSection } from "./WeekendScheduleSection";
 import { WeekendStageTimeline } from "./WeekendStageTimeline";
 import { WeekendStatus } from "./WeekendStatus";
+import { WeekendStoryEngine } from "./WeekendStoryEngine";
 
 type MotoGpPodiumFinisher = {
   position: number;
@@ -44,6 +46,22 @@ export function WeekendHub({
         <WeekendScheduleSection
           sessions={data.sessions}
           headingId={scheduleHeadingId}
+        />
+
+        <LiveEventFeed
+          sport={data.sport}
+          weekendSlug={data.slug}
+          data={data}
+          sessions={data.sessions}
+        />
+
+        <WeekendStoryEngine
+          sport={data.sport}
+          weekendSlug={data.slug}
+          weekendName={data.name}
+          sessions={data.sessions}
+          summary={summary}
+          isSprintWeekend={data.isSprintWeekend}
         />
 
         <WeekendHubArchiveSections
