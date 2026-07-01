@@ -129,24 +129,30 @@ export async function getWeekendIntelligence(
   sport: IntelligenceSport,
   completedWeekendSlugs: string[]
 ): Promise<WeekendIntelligence> {
-  // Most recent first.
-  const recent = [...completedWeekendSlugs].reverse().slice(
-    0,
-    DEFAULT_SCORING_CONFIG.lookbackWeekends
-  );
-  const sourceSlugs = [...recent];
+  // Walk backwards through completed weekends, skipping any whose
+  // summary JSON does not exist locally, until we collect the
+  // configured lookback count of valid summaries (or run out of
+  // completed weekends). The public API, weights, normalisation,
+  // SSR behaviour and memoisation are all unchanged — only summary
+  // selection is more resilient to partial local data coverage.
+  const target = DEFAULT_SCORING_CONFIG.lookbackWeekends;
+  const orderedSlugs = [...completedWeekendSlugs].reverse();
+  const sourceSlugs: string[] = [];
+  const summaries: RaceWeekendSummary[] = [];
+
+  for (const slug of orderedSlugs) {
+    if (summaries.length >= target) break;
+    const summary = await loadRaceWeekendSummary(sport, slug);
+    if (!summary) continue;
+    summaries.push(summary);
+    sourceSlugs.push(slug);
+  }
 
   if (cacheKey(sport, sourceSlugs).match && cachedResult) {
     return cachedResult;
   }
 
-  const summaries: RaceWeekendSummary[] = [];
-  for (const slug of recent) {
-    const summary = await loadRaceWeekendSummary(sport, slug);
-    if (summary) summaries.push(summary);
-  }
-
-  // Not enough finished weekends yet → deterministic fallback.
+  // No valid completed summaries at all → deterministic fallback.
   if (summaries.length === 0) {
     const fallback = fallbackEntriesFromLatest(null);
     const fallbackResult: WeekendIntelligence = {
