@@ -9,6 +9,11 @@ import { MotoGpHeroBoard } from "@/components/home/MotoGpHeroBoard";
 import { HeroBoardSkeleton } from "@/components/home/HeroBoardSkeleton";
 import { F1WeekendHubSection } from "@/components/home/F1WeekendHubSection";
 import { MotoGpWeekendHubSection } from "@/components/home/MotoGpWeekendHubSection";
+import { fetchSeasonSchedule } from "@/lib/schedule";
+import type { RaceWeekend } from "@/lib/schedule";
+import { fetchMotoGpSchedule } from "@/lib/motogp";
+import { getWeekendIntelligence } from "@/lib/intelligence";
+import type { IntelligenceEntry } from "@/lib/intelligence";
 
 function Hero() {
   return (
@@ -54,17 +59,35 @@ function WeekendHubSkeleton() {
 
 // ─── Strategy Section (preserved, honest) ─────────────────────────────────────
 
-function StrategySection() {
-  const predictions = [
-    { name: "Hamilton", percentage: 32 },
-    { name: "Verstappen", percentage: 24 },
-    { name: "Antonelli", percentage: 18 },
-    { name: "Piastri", percentage: 12 },
-    { name: "Norris", percentage: 8 },
-    { name: "Russell", percentage: 4 },
-    { name: "Others", percentage: 2 },
-  ];
+async function buildF1Intelligence(): Promise<IntelligenceEntry[]> {
+  try {
+    const schedule = await fetchSeasonSchedule("current");
+    const past = schedule.races
+      .filter((r: RaceWeekend) => r.isPast)
+      .map((r: RaceWeekend) => r.slug);
+    const intelligence = await getWeekendIntelligence("f1", past);
+    return intelligence.entries;
+  } catch {
+    return [];
+  }
+}
 
+async function buildMotoGpIntelligence(): Promise<IntelligenceEntry[]> {
+  try {
+    const schedule = await fetchMotoGpSchedule();
+    const past = schedule.races.filter((r) => r.isPast).map((r) => r.slug);
+    const intelligence = await getWeekendIntelligence("motogp", past);
+    return intelligence.entries;
+  } catch {
+    return [];
+  }
+}
+
+function StrategySection({
+  predictions,
+}: {
+  predictions: IntelligenceEntry[];
+}) {
   return (
     <PageSection id="strategy" variant="muted" wide>
       <div className="grid gap-10 lg:grid-cols-2 lg:items-center lg:gap-16 xl:gap-20">
@@ -142,17 +165,11 @@ function MotoGpHero() {
   );
 }
 
-function MotoGpStrategySection() {
-  const predictions = [
-    { name: "Bagnaia", percentage: 34 },
-    { name: "Márquez", percentage: 26 },
-    { name: "Bezzecchi", percentage: 18 },
-    { name: "Martin", percentage: 12 },
-    { name: "Acosta", percentage: 6 },
-    { name: "Di Giannantonio", percentage: 3 },
-    { name: "Others", percentage: 1 },
-  ];
-
+function MotoGpStrategySection({
+  predictions,
+}: {
+  predictions: IntelligenceEntry[];
+}) {
   return (
     <PageSection id="strategy" variant="muted" wide>
       <div className="grid gap-10 lg:grid-cols-2 lg:items-center lg:gap-16 xl:gap-20">
@@ -210,23 +227,25 @@ function MotoGpCTA() {
   );
 }
 
-function F1Home() {
+async function F1Home() {
+  const predictions = await buildF1Intelligence();
   return (
     <div className="page-flow">
       <Hero />
       <WeekendHub />
-      <StrategySection />
+      <StrategySection predictions={predictions} />
       <CTA />
     </div>
   );
 }
 
-function MotoGpHome() {
+async function MotoGpHome() {
+  const predictions = await buildMotoGpIntelligence();
   return (
     <div className="page-flow">
       <MotoGpHero />
       <MotoGpWeekendHub />
-      <MotoGpStrategySection />
+      <MotoGpStrategySection predictions={predictions} />
       <MotoGpCTA />
     </div>
   );
