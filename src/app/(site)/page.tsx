@@ -69,13 +69,13 @@ function StrategySection() {
     <PageSection id="strategy" variant="muted" wide>
       <div className="grid gap-10 lg:grid-cols-2 lg:items-center lg:gap-16 xl:gap-20">
         <SectionHeading
-          eyebrow="COMMUNITY PREDICTIONS"
-          title="Community predictions are coming soon."
-          description="Preview of how race-win favourites could look once the community feature launches."
+          eyebrow="WEEKEND INTELLIGENCE"
+          title="Who has the edge before lights out?"
+          description="Every race begins before the lights go out. Weekend Intelligence combines recent form, circuit history and season momentum to highlight the leading contenders before the race weekend unfolds."
         />
         <GlassCard>
           <p className="mb-5 text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">
-            Preview · not live data
+            WEEKEND FAVOURITES
           </p>
           <div className="space-y-4">
             {predictions.map((pred) => (
@@ -93,6 +93,9 @@ function StrategySection() {
               </div>
             ))}
           </div>
+          <p className="mt-6 text-xs text-slate-500">
+            Based on recent form, circuit history and season momentum.
+          </p>
         </GlassCard>
       </div>
     </PageSection>
@@ -154,13 +157,13 @@ function MotoGpStrategySection() {
     <PageSection id="strategy" variant="muted" wide>
       <div className="grid gap-10 lg:grid-cols-2 lg:items-center lg:gap-16 xl:gap-20">
         <SectionHeading
-          eyebrow="COMMUNITY PREDICTIONS"
-          title="Community predictions are coming soon."
-          description="Preview of how race-win favourites could look once the community feature launches."
+          eyebrow="WEEKEND INTELLIGENCE"
+          title="Who has the edge before lights out?"
+          description="Every race begins before the lights go out. Weekend Intelligence combines recent form, circuit history and season momentum to highlight the leading contenders before the race weekend unfolds."
         />
         <GlassCard>
           <p className="mb-5 text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">
-            Preview · not live data
+            WEEKEND FAVOURITES
           </p>
           <div className="space-y-4">
             {predictions.map((pred) => (
@@ -178,6 +181,9 @@ function MotoGpStrategySection() {
               </div>
             ))}
           </div>
+          <p className="mt-6 text-xs text-slate-500">
+            Based on recent form, circuit history and season momentum.
+          </p>
         </GlassCard>
       </div>
     </PageSection>
