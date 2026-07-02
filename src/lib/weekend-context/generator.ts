@@ -43,6 +43,7 @@ const TOP_CONTENDERS_COUNT = 5;
 const MAX_WATCH_FOR = 5;
 const MIN_WATCH_FOR = 3;
 const OTHERS_LABEL = "Others";
+const FIELD_LABEL = "Field";
 
 function defaultPhase(): WeekendPhase {
   return "upcoming";
@@ -61,8 +62,10 @@ function buildTopContenders(
   intelligence: WeekendIntelligence | null
 ): TopContender[] {
   if (!intelligence) return [];
+  // Filter out both the "Others" bucket and the "Field" fallback sentinel
+  // — neither represents a real contender derived from race data.
   const favourites = intelligence.entries.filter(
-    (e) => e.name !== OTHERS_LABEL
+    (e) => e.name !== OTHERS_LABEL && e.name !== FIELD_LABEL
   );
   return favourites.slice(0, TOP_CONTENDERS_COUNT).map(toTopContender);
 }
@@ -75,8 +78,16 @@ function deriveConfidence(
     story: WeekendStory | null;
   }
 ): WeekendConfidence {
+  // Intelligence only counts as a signal when it produced real
+  // contender entries — not just the "Field" fallback sentinel.
+  const intelligenceHasRealEntries =
+    bundles.intelligence !== null &&
+    bundles.intelligence.entries.some(
+      (e) => e.name !== OTHERS_LABEL && e.name !== FIELD_LABEL
+    );
+
   const signals = [
-    bundles.intelligence !== null,
+    intelligenceHasRealEntries,
     bundles.drivers !== null && bundles.drivers.profiles.length > 0,
     bundles.strategy !== null,
     bundles.story !== null,
@@ -111,15 +122,14 @@ function pickStrategyFavourite(
 ): StrategyFavourite | undefined {
   if (!strategy) return undefined;
 
-  // Confidence is the strategy engine's own read; the competitor chosen
-  // is the Weekend Intelligence leader if we have one, otherwise we name
-  // only the strategy shape itself.
   const predicted = strategy.raceStrategy.predictedStrategy;
   const confidence = strategy.confidence;
 
+  // Only name a competitor when Weekend Intelligence produced a real
+  // entry — not just the "Field" or "Others" fallback sentinel.
   if (intelligence && intelligence.entries.length > 0) {
     const leader = intelligence.entries.find(
-      (e) => e.name !== OTHERS_LABEL
+      (e) => e.name !== OTHERS_LABEL && e.name !== FIELD_LABEL
     );
     if (leader) {
       return {
@@ -131,12 +141,8 @@ function pickStrategyFavourite(
     }
   }
 
-  return {
-    name: "Field",
-    confidence,
-    predictedStrategy: predicted,
-    reason: `The ${predicted.toLowerCase()} is the most likely race shape.`,
-  };
+  // No real contender data — suppress rather than fabricate.
+  return undefined;
 }
 
 function pickStorySummary(
@@ -250,10 +256,14 @@ function deriveFavourite(
   story: WeekendStory | null
 ): WeekendFavourite {
   // Prefer Weekend Intelligence's top entry; fall back to the momentum
-  // leader if no recent-form percentage was produced; fall back to the
-  // strategy favourite; finally to the story primary section heading.
+  // leader if no recent-form percentage was produced; fall back to a
+  // strategy-confidence hint; finally to a story-derived hint. Only
+  // name a competitor when the source engine has real data — never
+  // promote the "Field" or "Others" fallback sentinel as a real pick.
   if (intelligence) {
-    const lead = intelligence.entries.find((e) => e.name !== OTHERS_LABEL);
+    const lead = intelligence.entries.find(
+      (e) => e.name !== OTHERS_LABEL && e.name !== FIELD_LABEL
+    );
     if (lead) {
       return {
         name: lead.name,
@@ -284,7 +294,7 @@ function deriveFavourite(
       name: "Field",
       basis: "strategy-confidence",
       reason: `High-confidence ${shape.toLowerCase()} shape predicted.`,
-      confidence: 70,
+      confidence: 0,
     };
   }
 
@@ -295,7 +305,7 @@ function deriveFavourite(
         name: "Field",
         basis: "story",
         reason: primary.heading,
-        confidence: 50,
+        confidence: 0,
       };
     }
   }

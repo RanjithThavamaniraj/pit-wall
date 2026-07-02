@@ -94,7 +94,7 @@ function StrategySection({
         <SectionHeading
           eyebrow="WEEKEND INTELLIGENCE"
           title="Who has the edge before lights out?"
-          description="Every race begins before the lights go out. Weekend Intelligence combines recent form, circuit history and season momentum to highlight the leading contenders before the race weekend unfolds."
+          description="Every race begins before the lights go out. Weekend Intelligence combines recent form and season momentum to highlight the leading contenders before the race weekend unfolds."
         />
         <GlassCard>
           <p className="mb-5 text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">
@@ -117,7 +117,7 @@ function StrategySection({
             ))}
           </div>
           <p className="mt-6 text-xs text-slate-500">
-            Based on recent form, circuit history and season momentum.
+            Based on recent form and season momentum.
           </p>
         </GlassCard>
       </div>
@@ -176,7 +176,7 @@ function MotoGpStrategySection({
         <SectionHeading
           eyebrow="WEEKEND INTELLIGENCE"
           title="Who has the edge before lights out?"
-          description="Every race begins before the lights go out. Weekend Intelligence combines recent form, circuit history and season momentum to highlight the leading contenders before the race weekend unfolds."
+          description="Every race begins before the lights go out. Weekend Intelligence combines recent form and season momentum to highlight the leading contenders before the race weekend unfolds."
         />
         <GlassCard>
           <p className="mb-5 text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">
@@ -199,7 +199,7 @@ function MotoGpStrategySection({
             ))}
           </div>
           <p className="mt-6 text-xs text-slate-500">
-            Based on recent form, circuit history and season momentum.
+            Based on recent form and season momentum.
           </p>
         </GlassCard>
       </div>

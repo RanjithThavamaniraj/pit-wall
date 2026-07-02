@@ -1,6 +1,5 @@
 import type {
   HubSession,
-  HubSport,
   WeekendPhase,
 } from "../types";
 import type { StoryContext, StorySection, WeekendStory } from "./types";
@@ -22,67 +21,15 @@ function weekendHash(context: StoryContext): number {
   return hashSeed(`${context.sport}:${context.weekendSlug}:${context.phase}`);
 }
 
-const F1_FRONT_RUNNERS = [
-  "Verstappen",
-  "Norris",
-  "Leclerc",
-  "Piastri",
-  "Russell",
-  "Hamilton",
-  "Sainz",
-  "Alonso",
+const LAST_RESORT_CIRCUIT_CLOSER_F1 = [
+  "The race has historically been won and lost on strategy, not outright pace.",
+  "DRS and a well-timed safety car have repeatedly reshaped the order.",
 ];
 
-const F1_TEAMS = [
-  "Red Bull",
-  "McLaren",
-  "Ferrari",
-  "Mercedes",
-  "Aston Martin",
+const LAST_RESORT_CIRCUIT_CLOSER_MOTOGP = [
+  "Weather often turns here, throwing the setup window open.",
+  "Overtaking is possible into the heavy braking zones, rewarding late moves.",
 ];
-
-const MOTOGP_FRONT_RUNNERS = [
-  "Bagnaia",
-  "Martín",
-  "Binder",
-  "Marini",
-  "Bastianini",
-  "Viñales",
-  "Di Giannantonio",
-  "Oliveira",
-];
-
-const MOTOGP_TEAMS = [
-  "Ducati Lenovo Team",
-  "Pramac Racing",
-  "KTM Factory Racing",
-  "Mooney VR46",
-  "Gresini Racing",
-];
-
-function driverForSport(
-  sport: HubSport,
-  seed: number,
-  salt: number
-): string {
-  return sport === "motogp"
-    ? pick(MOTOGP_FRONT_RUNNERS, seed, salt)
-    : pick(F1_FRONT_RUNNERS, seed, salt);
-}
-
-function teamForSport(
-  sport: HubSport,
-  seed: number,
-  salt: number
-): string {
-  return sport === "motogp"
-    ? pick(MOTOGP_TEAMS, seed, salt)
-    : pick(F1_TEAMS, seed, salt);
-}
-
-function competitorLabel(sport: HubSport): "driver" | "rider" {
-  return sport === "motogp" ? "rider" : "driver";
-}
 
 function sessionCountByStatus(
   sessions: HubSession[]
@@ -124,16 +71,15 @@ function weekendSubtitle(
   context: StoryContext,
   seed: number
 ): string {
-  const competitor = driverForSport(context.sport, seed, 0);
-  const team = teamForSport(context.sport, seed, 1);
+  void seed;
   if (context.phase === "upcoming") {
-    return `${team} arrive with questions to answer, while ${competitor} shapes as the figure to beat.`;
+    return `Recent form, circuit characteristics and strategy windows shape the outlook for ${context.weekendName}.`;
   }
   if (context.phase === "live") {
-    return `The story is unfolding — ${competitor} and ${team} are setting the early tone.`;
+    return `The weekend is unfolding — every session reshapes the competitive picture.`;
   }
   if (context.phase === "completed") {
-    return `The chequered flag has fallen. ${competitor} and ${team} define the weekend's narrative.`;
+    return `The chequered flag has fallen. The weekend's defining moments are captured below.`;
   }
   return `Conditions have shifted around ${context.weekendName} and the weekend will not run as planned.`;
 }
@@ -158,8 +104,8 @@ const UPCOMING_SECTION_DEFS: {
   },
   {
     id: "key-battles",
-    heading: "Key Battles",
-    icon: "⚔️",
+    heading: "Key Themes",
+    icon: "🎯",
     importance: "secondary",
   },
   {
@@ -273,35 +219,42 @@ const CANCELLED_SECTION_DEFS: {
 ];
 
 function storySoFarContent(context: StoryContext, seed: number): string {
-  const a = driverForSport(context.sport, seed, 0);
-  const b = driverForSport(context.sport, seed, 1);
-  const tA = teamForSport(context.sport, seed, 0);
-  const tB = teamForSport(context.sport, seed, 1);
+  void seed;
 
+  // When a weekend summary is available, use it as the evidence base.
+  if (context.summary?.raceResults?.length) {
+    const winner = context.summary.raceResults[0];
+    const second = context.summary.raceResults[1];
+    const closer = second
+      ? ` ahead of ${second.name}.`
+      : ".";
+    return context.sport === "motogp"
+      ? `${winner.name}#${winner.number ?? ""} took the win${closer} ${winner.team ? `The ${winner.team} package was the class of the field.` : ""}`
+      : `${winner.name} (${winner.team ?? ""}) won${closer}`;
+  }
+
+  // No summary — use circuit-focused editorial framing without
+  // fabricating driver narratives or momentum claims.
   const openers =
     context.sport === "motogp"
       ? [
-          `${a} arrives carrying momentum after a consistent run of podiums, while ${tB} continues to close the gap in the title race.`,
-          `${tA} travel here quietly confident — ${a} has been the standout across the last three rounds and the factory squad is starting to respond.`,
-          `Recent form places ${a} firmly in the conversation, but ${tB} have shown enough through practice running to believe they can close across a race distance.`,
+          `${context.weekendName} has a history of close fighting and tight margins, with tyre life and warm-up often deciding the outcome.`,
+          `The circuit rewards confidence under braking and rewards riders who can manage degradation through the second half of the race.`,
         ]
       : [
-          `${tA} arrive carrying momentum after two strong weekends, while ${tB} continue to close the gap in both championships.`,
-          `${a} travels here as the form ${competitorLabel(context.sport)}, with ${tB} quietly confident that their race pace will translate.`,
-          `The narrative this season has tightened — ${a} holds the initiative, but ${b} has been the closer of the challengers in recent rounds.`,
+          `${context.weekendName} has produced tight, strategy-influenced races in recent seasons, with track position hard to recover once lost.`,
+          `The circuit demands both outright pace and tyre management, making qualifying position and pit strategy equally consequential.`,
         ];
 
   const closers =
     context.sport === "motogp"
       ? [
-          `${tA} traditionally go well here, making this one of the most unpredictable rounds of the season.`,
-          `Tyre life and warm-up have decided this Grand Prix in the past — and both look set to shape the fight again.`,
-          `The weather can turn a session upside down, and the forecast leaves the door open for another twist.`,
+          "Weather can turn a session upside down, and the forecast leaves the door open for another twist.",
+          "Sprint qualifying on Saturday will shape expectations before Sunday's Grand Prix.",
         ]
       : [
-          `${tA} traditionally perform well here, making this one of the most unpredictable races of the season.`,
-          `Strategy around the safety car and a well-timed stop have often decided this race — expect both to loom large again.`,
-          `The circuit rewards outright pace but punishes the smallest of slides, so qualifying could set the tone for the weekend.`,
+          "Strategy around the safety car and a well-timed stop have often decided this race — expect both to loom large again.",
+          "The circuit rewards outright pace but punishes the smallest of slides, so qualifying could set the tone for the weekend.",
         ];
 
   return `${openers[seed % openers.length]} ${closers[(seed >> 3) % closers.length]}`;
@@ -311,42 +264,39 @@ function whatToWatchContent(
   context: StoryContext,
   seed: number
 ): string {
-  const a = driverForSport(context.sport, seed, 0);
-  const tA = teamForSport(context.sport, seed, 0);
-  const tB = teamForSport(context.sport, seed, 1);
+  void seed;
+  const next = nextSessionLabel(context.sessions);
 
   const lines =
     context.sport === "motogp"
       ? [
-          `Can ${a} convert ${nextSessionLabel(context.sessions)} pace into pole?`,
-          `Will ${tB} close the race-distance gap to ${tA}?`,
-          `Can the satellite runners break into the front group on a track that rewards confidence?`,
+          `Can the front-runners convert ${next} pace into pole?`,
+          "Will tyre warm-up close the gap between the factory and satellite bikes?",
+          "Can a satellite runner break into the front group on a track that rewards confidence?",
         ]
       : [
-          `Can ${tA} maintain qualifying pace through to the race?`,
-          `Will ${tB} convert race pace into victory?`,
-          `Can ${a} challenge by playing the strategy card rather than chasing outright pace?`,
+          `Can qualifying pace translate into a clean race-day execution?`,
+          "Will race pace overcome a qualifying deficit through strategy?",
+          "Can the strategic card — timing, stops, safety-car windows — trump outright pace?",
         ];
 
   return lines.map((l) => `• ${l}`).join("\n");
 }
 
 function keyBattlesContent(context: StoryContext, seed: number): string {
-  const a = driverForSport(context.sport, seed, 0);
-  const b = driverForSport(context.sport, seed, 1);
-  const tA = teamForSport(context.sport, seed, 0);
-  const tB = teamForSport(context.sport, seed, 1);
-
+  void seed;
+  // Do not fabricate driver-vs-driver rivalries — only surface contextual
+  // themes that are explainable from the weekend's general dynamics.
   return context.sport === "motogp"
     ? [
-        `${a} vs ${b}`,
-        `${tA} vs ${tB}`,
-        `Tyre degradation versus outright race pace`,
+        "• Tyre management across the race distance",
+        "• Qualifying battle for the front row",
+        "• Sprint result shaping Grand Prix confidence",
       ].join("\n")
     : [
-        `${a} vs ${b}`,
-        `${tA} vs ${tB}`,
-        `Tyre degradation versus outright pace`,
+        "• Tyre degradation versus outright pace",
+        "• Qualifying position and track-position strategy",
+        "• Safety-car timing and pit-window decisions",
       ].join("\n");
 }
 
@@ -369,14 +319,8 @@ function circuitSpotlightContent(
 
   return `${pool[seed % pool.length]} ${pick(
     context.sport === "motogp"
-      ? [
-          "Weather often turns here, throwing the setup window open.",
-          "Overtaking is possible into the heavy braking zones, rewarding late moves.",
-        ]
-      : [
-        "The race has historically been won and lost on strategy, not outright pace.",
-        "DRS and a well-timed safety car have repeatedly reshaped the order.",
-      ],
+      ? LAST_RESORT_CIRCUIT_CLOSER_MOTOGP
+      : LAST_RESORT_CIRCUIT_CLOSER_F1,
     seed,
     4
   )}`;
@@ -386,94 +330,79 @@ function weekendExpectationsContent(
   context: StoryContext,
   seed: number
 ): string {
-  const a = driverForSport(context.sport, seed, 0);
-  const tB = teamForSport(context.sport, seed, 1);
-
+  void seed;
   return context.sport === "motogp"
     ? [
-        `Expect ${a} to set the early benchmark, with ${tB} requiring a clean Saturday to displace them on the front row.`,
-        `Track limits and tyre life are the two themes most likely to decide the weekend if conditions stay stable.`,
+        "Track limits and tyre life are the two themes most likely to decide the weekend if conditions stay stable.",
         "Saturday's qualifying shapes both the Sprint and the Grand Prix, so a strong Friday takes on extra weight here.",
-      ][seed % 3]
+      ][seed % 2]
     : [
-        `Expect ${tB} to push hard on Saturday to break ${a}'s recent grip on pole.`,
         context.isSprintWeekend
           ? "With a Sprint on the schedule, Friday's running carries double weight in setting up the weekend."
-          : `Free Practice will be about collecting data, with qualifying the first real flashpoint.`,
+          : "Free Practice will be about collecting data, with qualifying the first real flashpoint.",
         "Stint management and the timing of any safety car could swing the result more than outright pace alone.",
-      ][seed % 3];
+      ][seed % 2];
 }
 
 function fridaySummaryContent(
   context: StoryContext,
   seed: number
-): string {
-  const a = driverForSport(context.sport, seed, 0);
-  const tA = teamForSport(context.sport, seed, 0);
+): string | null {
   const counts = sessionCountByStatus(context.sessions);
   const last = lastCompletedSessionLabel(context.sessions);
 
+  // Hide when no sessions have actually been completed — do not
+  // fabricate Friday running that the data does not support.
+  if (counts.completed === 0 || !last) return null;
+
+  void seed;
   return context.sport === "motogp"
-    ? [
-        `${a} topped the early running with a clean programme across both ${last ?? "opening"} sessions, building a base Sunday's Grand Prix will lean on.`,
-        `${tA} hovered near the top of the timesheets without overcommitting; the sense is that there is more to come on Saturday.`,
-      ][seed % 2]
-    : [
-        `Friday painted a familiar picture — ${a} looked comfortable straight away, while ${tA} methodically worked through long-run data.`,
-        `${counts.completed} session${counts.completed === 1 ? "" : "s"} of running offered a clear read: the field is closer than it looked on paper, and Saturday should be tight.`,
-      ][seed % 2];
+    ? `${counts.completed} session${counts.completed === 1 ? "" : "s"} of running are in the books. The field is still mapping tempo and degradation before Saturday's qualifying.`
+    : `${counts.completed} session${counts.completed === 1 ? "" : "s"} of running offered a clear read: the field is closer than it looked on paper, and Saturday should be tight.`;
 }
 
 function saturdayStoryContent(
   context: StoryContext,
   seed: number
-): string {
-  const a = driverForSport(context.sport, seed, 0);
-  const b = driverForSport(context.sport, seed, 1);
-  const tB = teamForSport(context.sport, seed, 1);
+): string | null {
+  const counts = sessionCountByStatus(context.sessions);
 
+  // Hide when qualifying hasn't produced a result yet.
+  if (counts.completed < 2) return null;
+
+  void seed;
   return context.sport === "motogp"
-    ? [
-        `Qualifying delivered on its billing — ${a} took the fight to ${b} for pole, with ${tB} forced to charge from the second row on Sunday.`,
-        `The order shuffled through Q1 and Q2, but ${a} held their nerve when the track was at its best to stamp authority on the front row.`,
-      ][seed % 2]
-    : [
-        `The headline from Saturday: ${a} out-qualified ${b} by the narrowest of margins, setting up a strategic battle for Sunday.`,
-        `Saturday asked teams to commit early to setup choices; ${tB} leaned into race pace over single-lap performance and could yet profit.`,
-      ][seed % 2];
+    ? "Qualifying shuffled the order through Q1 and Q2, with the front row decided by the narrowest of margins across the final flying laps."
+    : "Saturday asked teams to commit early to setup choices; the qualifying order suggests a strategic battle for Sunday rather than a runaway.";
 }
 
 function momentumShiftContent(
   context: StoryContext,
   seed: number
-): string {
-  const a = driverForSport(context.sport, seed, 0);
-  const tB = teamForSport(context.sport, seed, 1);
+): string | null {
+  const counts = sessionCountByStatus(context.sessions);
 
+  // Hide when there aren't enough sessions to identify a momentum shift.
+  if (counts.completed < 2) return null;
+
+  void seed;
   return context.sport === "motogp"
-    ? [
-        `The pendulum swung slightly across the most recent sessions — ${a} looked most settled, but ${tB} closed the gap in race trim.`,
-        `Confidence under braking has become the decisive currency this weekend, and the momentum has shifted toward whoever commits earliest into the corner.`,
-      ][seed % 2]
-    : [
-        `Momentum flickered between ${a} and ${tB} across Saturday; long-run averages suggest a closer race than the headline times show.`,
-        "The track rubbered in across the weekend, shifting the balance toward cars able to manage their front tyres across a stint.",
-      ][seed % 2];
+    ? "Confidence under braking has become the decisive currency this weekend, and the momentum is shifting toward whoever commits earliest into the corner."
+    : "The track rubbered in across the weekend, shifting the balance toward cars able to manage their front tyres across a stint.";
 }
 
 function strategyPictureContent(
   context: StoryContext,
   seed: number
 ): string {
-  const tA = teamForSport(context.sport, seed, 0);
-
+  void seed;
   return context.sport === "motogp"
     ? [
-        `Tyre choice looks pivotal: the softest compound is fast over a lap but degrades in the race, while the medium rewards ${tA}'s measured approach.`,
-        `Track-limits enforcement and long-lap penalties are pushing race strategies toward conservation, not aggression.`,
+        "Tyre choice looks pivotal: the softest compound is fast over a lap but degrades in the race, while the medium rewards a measured approach.",
+        "Track-limits enforcement and long-lap penalties are pushing race strategies toward conservation, not aggression.",
       ][seed % 2]
     : [
-        `The strategic question centres on the undercut — ${tA} may try to pit first and force the issue into clean air.`,
+        "The strategic question centres on the undercut — the first car to pit onto fresh rubber carries a real advantage into clean air.",
         context.isSprintWeekend
           ? "The Sprint's points make a conservative race call tempting, but the main Grand Prix still rewards the boldest strategist."
           : "One-stop vs two-stop is the live debate; a well-timed safety car could settle it single-handedly.",
@@ -483,23 +412,20 @@ function strategyPictureContent(
 function whoLooksStrongContent(
   context: StoryContext,
   seed: number
-): string {
-  const a = driverForSport(context.sport, seed, 0);
-  const tB = teamForSport(context.sport, seed, 1);
-  const next = nextSessionLabel(context.sessions);
+): string | null {
+  const counts = sessionCountByStatus(context.sessions);
 
+  // Hide when no completed sessions exist to form a read from.
+  if (counts.completed === 0) return null;
+
+  const next = nextSessionLabel(context.sessions);
+  void seed;
   return context.sport === "motogp"
-    ? [
-        `${a} carries the most convincing case across both qualifying and race simulations, but ${tB} remain within range if the conditions shift.`,
-        `Starting speed and tyre warm-up will decide ${next}; right now ${a} has the edge, with ${tB} having to find time on Sunday morning.`,
-      ][seed % 2]
-    : [
-        `${a} looks the most complete package across the weekend so far — quick over a lap and gentle on the tyres.`,
-        `${tB} have the pace to challenge in ${next}, but need a clean opening stint to live with the early leaders.`,
-      ][seed % 2];
+    ? `Starting speed and tyre warm-up will decide ${next}. The front-runners are close enough that a clean opening lap could settle it.`
+    : `Long-run averages suggest a closer race in ${next} than the headline times show. Clean opening stints will be decisive.`;
 }
 
-function weekendRecapContent(context: StoryContext, seed: number): string {
+function weekendRecapContent(context: StoryContext, seed: number): string | null {
   const summary = context.summary ?? null;
 
   if (summary?.raceResults?.length) {
@@ -519,72 +445,49 @@ function weekendRecapContent(context: StoryContext, seed: number): string {
       : `${winner.name} (${winner.team ?? ""}) won ${context.weekendName}, leading home ${podiumLine}`;
   }
 
-  const a = driverForSport(context.sport, seed, 0);
-  const tA = teamForSport(context.sport, seed, 0);
-
-  return context.sport === "motogp"
-    ? [
-        `${a} converted the weekend's strongest all-round form into the headline result, with ${tA} consolidating their championship push.`,
-        "Sunday played out on the cleaner side of the racing spectrum — a measured drive to the flag rather than a dramatic late pass.",
-      ][seed % 2]
-    : [
-        `${a} converted the weekend's pace into a controlled victory, while ${tA} quietly banked a generous haul of championship points.`,
-        "For all the pre-weekend intrigue, the race was decided by execution — clean stops, a tidy opening stint, and a calm finale.",
-      ][seed % 2];
+  // No summary data — hide instead of fabricating a winner.
+  void seed;
+  return null;
 }
 
 function turningPointContent(
   context: StoryContext,
   seed: number
-): string {
+): string | null {
   const summary = context.summary ?? null;
 
   if (summary?.fastestLap) {
     return context.sport === "motogp"
-      ? [
-          `The fastest lap of ${summary.fastestLap} flipped the dynamic late — triggered by a clean final-sector charge rather than outright risk.`,
-          `A late flying effort from ${summary.fastestLap} changed the complexion of the run to the flag, forcing pursuers to chase an answer.`,
-        ][seed % 2]
-      : [
-          `The pivotal moment was ${summary.fastestLap}'s fastest lap — one banker of an effort on used rubber that reset the order at the front.`,
-          "A safety car restart inside the final third swung the race; the leader nailed the getaway and the challengers never recovered.",
-        ][seed % 2];
+      ? `The fastest lap set by ${summary.fastestLap} flipped the dynamic late — triggered by a clean final-sector charge rather than outright risk.`
+      : `The pivotal moment was ${summary.fastestLap}'s fastest lap — one banker of an effort on used rubber that reset the order at the front.`;
   }
 
-  const a = driverForSport(context.sport, seed, 0);
-
-  return context.sport === "motogp"
-    ? [
-        `The decisive shift came on the exit of the long second corner — ${a} found drive nobody else could, and the race pivoted from there.`,
-        "Track limits hunts added up at exactly the wrong moment, promoting a rethink of attack lines in the closing laps.",
-      ][seed % 2]
-    : [
-        `The undercut proved decisive — ${a} stopped first, banked clean air, and rewrote the order before the leaders emerged.`,
-        "A textbook restart after the safety car period handed the lead back to the car that had been quietly preparing for it.",
-      ][seed % 2];
+  // No fastest-lap data — hide instead of fabricating a turning point.
+  void seed;
+  return null;
 }
 
 function strategyReviewContent(
   context: StoryContext,
   seed: number
-): string {
-  const tA = teamForSport(context.sport, seed, 0);
+): string | null {
+  const summary = context.summary ?? null;
+
+  // Hide when no summary data exists — do not fabricate strategy outcomes.
+  if (!summary?.raceResults?.length) {
+    void seed;
+    return null;
+  }
 
   return context.sport === "motogp"
-    ? [
-        `${tA} leaned on the medium rear for tyre life, while rivals chased outright pace with the soft — the delta only emerged across the final laps.`,
-        "Long-lap management and a steady opening stint shaped more of the order than any late aggression.",
-      ][seed % 2]
-    : [
-        `${tA} committed early to a two-stop and were rewarded when the virtual safety car aligned with their plan.`,
-        "Stint length told the real story — the cars that extended the middle stint carried the pace to attack at the end.",
-      ][seed % 2];
+    ? "Long-lap management and a steady opening stint shaped more of the order than any late aggression."
+    : "Stint length told the real story — the cars that extended the middle stint carried the pace to attack at the end.";
 }
 
 function driverOfTheWeekendContent(
   context: StoryContext,
   seed: number
-): string {
+): string | null {
   const summary = context.summary ?? null;
 
   if (summary?.raceResults?.length) {
@@ -595,23 +498,15 @@ function driverOfTheWeekendContent(
     return `${winner.name} takes the weekend honours ${winner.team ? `for ${winner.team}` : ""}: pole-worthy pace, clean execution, and a fastest lap to cap it off.`;
   }
 
-  const a = driverForSport(context.sport, seed, 0);
-
-  return context.sport === "motogp"
-    ? [
-        `${a} earns the weekend honours on the strength of consistent running across every session, not just the race.`,
-        "The standout of the weekend combined qualifying pace with race-day composure.",
-      ][seed % 2]
-    : [
-        `${a} emerged as the weekend's standout — fast on Saturday, measured on Sunday, and decisive at the moment that mattered.`,
-        "Driver of the weekend went to the one competitor who matched single-lap pace with race execution.",
-      ][seed % 2];
+  // No race results — hide instead of fabricating a driver-of-the-weekend pick.
+  void seed;
+  return null;
 }
 
 function championshipImpactContent(
   context: StoryContext,
   seed: number
-): string {
+): string | null {
   const summary = context.summary ?? null;
   const driversStandings = summary?.driversChampionship ?? summary?.teamsChampionship;
   const leader = driversStandings?.[0];
@@ -619,27 +514,13 @@ function championshipImpactContent(
 
   if (leader && chaser) {
     return context.sport === "motogp"
-      ? [
-          `${leader.name} extends the lead over ${chaser.name} to ${leader.points} points — a margin that begins to reshape title expectations.`,
-          `The title picture tightens subtly: ${leader.name} now sits ${Math.max(leader.points - chaser.points, 1)} clear of ${chaser.name} with the next round already in focus.`,
-        ][seed % 2]
-      : [
-          `${leader.name} pulls ${Math.max(leader.points - chaser.points, 1)} points clear of ${chaser.name} in the drivers' standings — the title narrative tilts, but with rounds to spare.`,
-          `${leader.name} consolidates top spot; ${chaser.name} stays within striking distance but needs a result soon.`,
-        ][seed % 2];
+      ? `${leader.name} extends the lead over ${chaser.name} to ${leader.points} points — a margin that begins to reshape title expectations.`
+      : `${leader.name} pulls ${Math.max(leader.points - chaser.points, 1)} points clear of ${chaser.name} in the drivers' standings — the title narrative tilts, but with rounds to spare.`;
   }
 
-  const tA = teamForSport(context.sport, seed, 0);
-
-  return context.sport === "motogp"
-    ? [
-        `Championship arithmetic shifts modestly this round; ${tA} banks more than enough to hold their position near the front of the table.`,
-        "No decisive swing in the title fight, but the points banked here will matter when the calendar tightens.",
-      ][seed % 2]
-    : [
-        `${tA} bank healthy points and consolidate their place in the constructors' fight — the real shake-up will come on a cleaner weekend.`,
-        "Championship order barely shifted, but the momentum accumulating behind the lead group is.",
-      ][seed % 2];
+  // No championship data — hide instead of fabricating an impact narrative.
+  void seed;
+  return null;
 }
 
 function weekendStatusContent(
@@ -661,16 +542,15 @@ function whyTheWeekendChangedContent(
   context: StoryContext,
   seed: number
 ): string {
-  const tA = teamForSport(context.sport, seed, 0);
-
+  void seed;
   return context.sport === "motogp"
     ? [
-        `A combination of persistent weather and concerns over track condition pushed officials past the point at which running could safely resume — ${tA} and the rest of the field were stood down.`,
-        `Schedule limits and an inability to dry or repair the affected section meant that re-staging within the window was not possible — the only responsible call was to halt the weekend.`,
+        "A combination of persistent weather and concerns over track condition pushed officials past the point at which running could safely resume — the field was stood down.",
+        "Schedule limits and an inability to dry or repair the affected section meant that re-staging within the window was not possible — the only responsible call was to halt the weekend.",
       ][seed % 2]
     : [
-        `Persistent weather and concerns over circuit conditions meant officials could not certify the track safe; ${tA} joined the rest of the field in standing down.`,
-        `The decision came down to a narrow window of viability — even running behind the safety car was not an option given the surface and forecast.`,
+        "Persistent weather and concerns over circuit conditions meant officials could not certify the track safe; the field was stood down.",
+        "The decision came down to a narrow window of viability — even running behind the safety car was not an option given the surface and forecast.",
       ][seed % 2];
 }
 
@@ -680,7 +560,7 @@ function buildSectionFactory(
   seed: number
 ) {
   return (id: string, heading: string, icon: string, importance: StorySection["importance"]): StorySection | null => {
-    let content = "";
+    let content: string | null = "";
     switch (phase) {
       case "upcoming":
         switch (id) {
@@ -758,6 +638,10 @@ function buildSectionFactory(
         }
         break;
     }
+
+    // Suppress sections that returned null — they lack the data
+    // required to produce a trustworthy narrative.
+    if (content === null) return null;
 
     return {
       id,

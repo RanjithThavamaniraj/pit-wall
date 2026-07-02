@@ -127,7 +127,7 @@ const WATCH_FOR_TEMPLATES: {
   {
     title: "Late Safety Car could change the podium fight",
     detail:
-      "A neutralisation inside the final third would bunched the field up and reset the undercut calculus in one lap.",
+      "A neutralisation inside the final third would bunch the field up and reset the undercut calculus in one lap.",
     importance: "medium",
   },
   {
