@@ -4,7 +4,11 @@ import {
   buildTimelineStages,
   type WeekendHubData,
 } from "@/lib/weekend-hub";
+import { fetchSeasonSchedule } from "@/lib/schedule";
+import { fetchMotoGpSchedule } from "@/lib/motogp";
+import { fetchDriverIntelligence } from "@/lib/driver-intelligence/selectors";
 import { CurrentSessionCard } from "./CurrentSessionCard";
+import { DriverIntelligencePanel } from "./DriverIntelligencePanel";
 import { LiveEventFeed } from "./LiveEventFeed";
 import { WeekendHubArchiveSections } from "./WeekendHubArchiveSections";
 import { WeekendScheduleSection } from "./WeekendScheduleSection";
@@ -27,13 +31,40 @@ type Props = {
   scheduleHeadingId?: string;
 };
 
-export function WeekendHub({
+export async function WeekendHub({
   data,
   summary = null,
   motogpPodium,
   scheduleHeadingId = "weekend-schedule-heading",
 }: Props) {
   const stages = buildTimelineStages(data);
+
+  let completedWeekendSlugs: string[] = [];
+  try {
+    if (data.sport === "motogp") {
+      const schedule = await fetchMotoGpSchedule();
+      completedWeekendSlugs = schedule.races
+        .filter((race) => race.isPast)
+        .map((race) => race.slug);
+    } else {
+      const schedule = await fetchSeasonSchedule("current");
+      completedWeekendSlugs = schedule.races
+        .filter((race) => race.isPast)
+        .map((race) => race.slug);
+    }
+  } catch {
+    completedWeekendSlugs = [];
+  }
+
+  let driverIntelligenceBundle = null;
+  try {
+    driverIntelligenceBundle = await fetchDriverIntelligence({
+      sport: data.sport,
+      completedWeekendSlugs,
+    });
+  } catch {
+    driverIntelligenceBundle = null;
+  }
 
   return (
     <section className="pb-12" aria-label="Race weekend hub">
@@ -72,6 +103,8 @@ export function WeekendHub({
           sessions={data.sessions}
           isSprintWeekend={data.isSprintWeekend}
         />
+
+        <DriverIntelligencePanel bundle={driverIntelligenceBundle} />
 
         <WeekendHubArchiveSections
           data={data}
