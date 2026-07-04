@@ -37,6 +37,12 @@ export {
 } from "./mock";
 
 export {
+  buildWeekendOutlook,
+  type WeekendOutlookContender,
+  type WeekendOutlookView,
+} from "./outlook";
+
+export {
   CLAUDE_WEEKEND_CONTEXT_PROVIDER,
   DEFAULT_WEEKEND_CONTEXT_PROVIDER_ID,
   GEMINI_WEEKEND_CONTEXT_PROVIDER,

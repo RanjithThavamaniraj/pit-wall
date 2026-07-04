@@ -7,63 +7,194 @@
   "shortName": "Australian GP",
   "weekendReport": "Norris converted pole into a commanding victory as McLaren opened the season with a one-two. Verstappen salvaged third after a spirited fight through the field, while Ferrari's tyre degradation again cost them a shot at the podium.",
   "raceResults": [
-    { "position": 1, "name": "Lando Norris", "team": "McLaren", "number": 4, "nationality": "United Kingdom", "countryCode": "GB", "imageSlug": "lando-norris" },
-    { "position": 2, "name": "Oscar Piastri", "team": "McLaren", "number": 81, "nationality": "Australia", "countryCode": "AU", "imageSlug": "oscar-piastri" },
-    { "position": 3, "name": "Max Verstappen", "team": "Red Bull Racing", "number": 1, "nationality": "Netherlands", "countryCode": "NL", "imageSlug": "max-verstappen" }
+    {
+      "position": 1,
+      "name": "Lando Norris",
+      "team": "McLaren",
+      "number": 4,
+      "nationality": "United Kingdom",
+      "countryCode": "GB",
+      "imageSlug": "lando-norris"
+    },
+    {
+      "position": 2,
+      "name": "Oscar Piastri",
+      "team": "McLaren",
+      "number": 81,
+      "nationality": "Australia",
+      "countryCode": "AU",
+      "imageSlug": "oscar-piastri"
+    },
+    {
+      "position": 3,
+      "name": "Max Verstappen",
+      "team": "Red Bull Racing",
+      "number": 1,
+      "nationality": "Netherlands",
+      "countryCode": "NL",
+      "imageSlug": "max-verstappen"
+    }
   ],
   "polePosition": "Lando Norris",
   "fastestLap": "Oscar Piastri",
   "sprintWinner": "Max Verstappen",
   "timeline": [
-    { "day": "Friday", "label": "FP1", "completed": true },
-    { "day": "Friday", "label": "FP2", "completed": true },
-    { "day": "Saturday", "label": "FP3", "completed": true },
-    { "day": "Saturday", "label": "Qualifying", "completed": true },
-    { "day": "Saturday", "label": "Sprint", "completed": true },
-    { "day": "Sunday", "label": "Race", "completed": true }
+    {
+      "day": "Friday",
+      "label": "FP1",
+      "completed": true
+    },
+    {
+      "day": "Friday",
+      "label": "FP2",
+      "completed": true
+    },
+    {
+      "day": "Saturday",
+      "label": "FP3",
+      "completed": true
+    },
+    {
+      "day": "Saturday",
+      "label": "Qualifying",
+      "completed": true
+    },
+    {
+      "day": "Saturday",
+      "label": "Sprint",
+      "completed": true
+    },
+    {
+      "day": "Sunday",
+      "label": "Race",
+      "completed": true
+    }
   ],
   "weather": {
-    "airTemp": "28°C",
-    "trackTemp": "42°C",
+    "airTemp": "28\u00b0C",
+    "trackTemp": "42\u00b0C",
     "conditions": "Dry"
   },
   "driversChampionship": [
-    { "position": 1, "name": "Lando Norris", "team": "McLaren", "points": 25, "movement": "up", "imageSlug": "lando-norris" },
-    { "position": 2, "name": "Oscar Piastri", "team": "McLaren", "points": 18, "movement": "up", "imageSlug": "oscar-piastri" },
-    { "position": 3, "name": "Max Verstappen", "team": "Red Bull Racing", "points": 15, "movement": "unchanged", "imageSlug": "max-verstappen" },
-    { "position": 4, "name": "Charles Leclerc", "team": "Ferrari", "points": 12, "movement": "down", "imageSlug": "charles-leclerc" },
-    { "position": 5, "name": "George Russell", "team": "Mercedes", "points": 10, "movement": "unchanged", "imageSlug": "george-russell" }
+    {
+      "position": 1,
+      "name": "Lando Norris",
+      "team": "McLaren",
+      "points": 25,
+      "movement": "up",
+      "imageSlug": "lando-norris"
+    },
+    {
+      "position": 2,
+      "name": "Oscar Piastri",
+      "team": "McLaren",
+      "points": 18,
+      "movement": "up",
+      "imageSlug": "oscar-piastri"
+    },
+    {
+      "position": 3,
+      "name": "Max Verstappen",
+      "team": "Red Bull Racing",
+      "points": 15,
+      "movement": "unchanged",
+      "imageSlug": "max-verstappen"
+    },
+    {
+      "position": 4,
+      "name": "Charles Leclerc",
+      "team": "Ferrari",
+      "points": 12,
+      "movement": "down",
+      "imageSlug": "charles-leclerc"
+    },
+    {
+      "position": 5,
+      "name": "George Russell",
+      "team": "Mercedes",
+      "points": 10,
+      "movement": "unchanged",
+      "imageSlug": "george-russell"
+    }
   ],
   "constructorsChampionship": [
-    { "position": 1, "name": "McLaren", "points": 43, "movement": "up" },
-    { "position": 2, "name": "Red Bull Racing", "points": 15, "movement": "unchanged" },
-    { "position": 3, "name": "Ferrari", "points": 12, "movement": "down" },
-    { "position": 4, "name": "Mercedes", "points": 10, "movement": "unchanged" },
-    { "position": 5, "name": "Aston Martin", "points": 4, "movement": "unchanged" }
+    {
+      "position": 1,
+      "name": "McLaren",
+      "points": 43,
+      "movement": "up"
+    },
+    {
+      "position": 2,
+      "name": "Red Bull Racing",
+      "points": 15,
+      "movement": "unchanged"
+    },
+    {
+      "position": 3,
+      "name": "Ferrari",
+      "points": 12,
+      "movement": "down"
+    },
+    {
+      "position": 4,
+      "name": "Mercedes",
+      "points": 10,
+      "movement": "unchanged"
+    },
+    {
+      "position": 5,
+      "name": "Aston Martin",
+      "points": 4,
+      "movement": "unchanged"
+    }
   ],
-  "communityPrediction": {
-    "predictedWinner": "Max Verstappen",
-    "actualWinner": "Lando Norris",
-    "accuracy": 34,
-    "totalVotes": 412,
-    "topPicks": [
-      { "name": "Max Verstappen", "percentage": 48 },
-      { "name": "Lando Norris", "percentage": 31 },
-      { "name": "Charles Leclerc", "percentage": 14 }
-    ]
-  },
   "statistics": [
-    { "label": "Race duration", "value": "1:22:14.891", "highlight": true },
-    { "label": "Laps", "value": "58" },
-    { "label": "Safety cars", "value": "1" },
-    { "label": "DNFs", "value": "3" },
-    { "label": "Fastest lap", "value": "1:18.204" },
-    { "label": "Pole time", "value": "1:16.892" },
-    { "label": "Winning margin", "value": "+4.823s" }
+    {
+      "label": "Race duration",
+      "value": "1:22:14.891",
+      "highlight": true
+    },
+    {
+      "label": "Laps",
+      "value": "58"
+    },
+    {
+      "label": "Safety cars",
+      "value": "1"
+    },
+    {
+      "label": "DNFs",
+      "value": "3"
+    },
+    {
+      "label": "Fastest lap",
+      "value": "1:18.204"
+    },
+    {
+      "label": "Pole time",
+      "value": "1:16.892"
+    },
+    {
+      "label": "Winning margin",
+      "value": "+4.823s"
+    }
   ],
   "highlights": [
-    { "title": "Greatest Overtake", "description": "Verstappen around the outside at Turn 3 on lap 34.", "type": "overtake" },
-    { "title": "Driver of the Day", "description": "Oscar Piastri — fastest lap and relentless pressure on Norris.", "type": "driver" },
-    { "title": "Key Moment", "description": "Safety car on lap 41 reshuffled the midfield battle.", "type": "moment" }
+    {
+      "title": "Greatest Overtake",
+      "description": "Verstappen around the outside at Turn 3 on lap 34.",
+      "type": "overtake"
+    },
+    {
+      "title": "Driver of the Day",
+      "description": "Oscar Piastri \u2014 fastest lap and relentless pressure on Norris.",
+      "type": "driver"
+    },
+    {
+      "title": "Key Moment",
+      "description": "Safety car on lap 41 reshuffled the midfield battle.",
+      "type": "moment"
+    }
   ]
 }

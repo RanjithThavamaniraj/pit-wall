@@ -7,72 +7,245 @@
   "shortName": "Thai GP",
   "weekendReport": "Bagnaia held off a relentless Marquez charge to open the MotoGP season with victory in Buriram. Martin claimed an important Aprilia podium while Acosta announced himself as a Sunday threat with a strong sprint and race combination.",
   "raceResults": [
-    { "position": 1, "name": "Francesco Bagnaia", "team": "Ducati Lenovo Team", "number": 63, "nationality": "Italy", "countryCode": "IT", "imageSlug": "francesco-bagnaia" },
-    { "position": 2, "name": "Marc Marquez", "team": "Ducati Lenovo Team", "number": 93, "nationality": "Spain", "countryCode": "ES", "imageSlug": "marc-marquez" },
-    { "position": 3, "name": "Jorge Martin", "team": "Aprilia Racing", "number": 89, "nationality": "Spain", "countryCode": "ES", "imageSlug": "jorge-martin" }
+    {
+      "position": 1,
+      "name": "Francesco Bagnaia",
+      "team": "Ducati Lenovo Team",
+      "number": 63,
+      "nationality": "Italy",
+      "countryCode": "IT",
+      "imageSlug": "francesco-bagnaia"
+    },
+    {
+      "position": 2,
+      "name": "Marc Marquez",
+      "team": "Ducati Lenovo Team",
+      "number": 93,
+      "nationality": "Spain",
+      "countryCode": "ES",
+      "imageSlug": "marc-marquez"
+    },
+    {
+      "position": 3,
+      "name": "Jorge Martin",
+      "team": "Aprilia Racing",
+      "number": 89,
+      "nationality": "Spain",
+      "countryCode": "ES",
+      "imageSlug": "jorge-martin"
+    }
   ],
   "sprintResults": [
-    { "position": 1, "name": "Marc Marquez", "team": "Ducati Lenovo Team", "number": 93, "nationality": "Spain", "countryCode": "ES", "imageSlug": "marc-marquez" },
-    { "position": 2, "name": "Francesco Bagnaia", "team": "Ducati Lenovo Team", "number": 63, "nationality": "Italy", "countryCode": "IT", "imageSlug": "francesco-bagnaia" },
-    { "position": 3, "name": "Pedro Acosta", "team": "Red Bull GASGAS Tech3", "number": 31, "nationality": "Spain", "countryCode": "ES", "imageSlug": "pedro-acosta" }
+    {
+      "position": 1,
+      "name": "Marc Marquez",
+      "team": "Ducati Lenovo Team",
+      "number": 93,
+      "nationality": "Spain",
+      "countryCode": "ES",
+      "imageSlug": "marc-marquez"
+    },
+    {
+      "position": 2,
+      "name": "Francesco Bagnaia",
+      "team": "Ducati Lenovo Team",
+      "number": 63,
+      "nationality": "Italy",
+      "countryCode": "IT",
+      "imageSlug": "francesco-bagnaia"
+    },
+    {
+      "position": 3,
+      "name": "Pedro Acosta",
+      "team": "Red Bull GASGAS Tech3",
+      "number": 31,
+      "nationality": "Spain",
+      "countryCode": "ES",
+      "imageSlug": "pedro-acosta"
+    }
   ],
   "polePosition": "Marc Marquez",
   "fastestLap": "Francesco Bagnaia",
   "timeline": [
-    { "day": "Friday", "label": "Practice", "completed": true },
-    { "day": "Friday", "label": "Practice", "completed": true },
-    { "day": "Saturday", "label": "Qualifying", "completed": true },
-    { "day": "Saturday", "label": "Sprint", "completed": true },
-    { "day": "Sunday", "label": "Grand Prix", "completed": true }
+    {
+      "day": "Friday",
+      "label": "Practice",
+      "completed": true
+    },
+    {
+      "day": "Friday",
+      "label": "Practice",
+      "completed": true
+    },
+    {
+      "day": "Saturday",
+      "label": "Qualifying",
+      "completed": true
+    },
+    {
+      "day": "Saturday",
+      "label": "Sprint",
+      "completed": true
+    },
+    {
+      "day": "Sunday",
+      "label": "Grand Prix",
+      "completed": true
+    }
   ],
   "weather": {
-    "airTemp": "34°C",
-    "trackTemp": "48°C",
+    "airTemp": "34\u00b0C",
+    "trackTemp": "48\u00b0C",
     "conditions": "Dry"
   },
   "driversChampionship": [
-    { "position": 1, "name": "Francesco Bagnaia", "team": "Ducati Lenovo Team", "points": 41, "movement": "up", "imageSlug": "francesco-bagnaia" },
-    { "position": 2, "name": "Marc Marquez", "team": "Ducati Lenovo Team", "points": 38, "movement": "up", "imageSlug": "marc-marquez" },
-    { "position": 3, "name": "Jorge Martin", "team": "Aprilia Racing", "points": 29, "movement": "up", "imageSlug": "jorge-martin" },
-    { "position": 4, "name": "Pedro Acosta", "team": "Red Bull GASGAS Tech3", "points": 22, "movement": "up", "imageSlug": "pedro-acosta" },
-    { "position": 5, "name": "Enea Bastianini", "team": "Ducati Lenovo Team", "points": 18, "movement": "unchanged", "imageSlug": "enea-bastianini" }
+    {
+      "position": 1,
+      "name": "Francesco Bagnaia",
+      "team": "Ducati Lenovo Team",
+      "points": 41,
+      "movement": "up",
+      "imageSlug": "francesco-bagnaia"
+    },
+    {
+      "position": 2,
+      "name": "Marc Marquez",
+      "team": "Ducati Lenovo Team",
+      "points": 38,
+      "movement": "up",
+      "imageSlug": "marc-marquez"
+    },
+    {
+      "position": 3,
+      "name": "Jorge Martin",
+      "team": "Aprilia Racing",
+      "points": 29,
+      "movement": "up",
+      "imageSlug": "jorge-martin"
+    },
+    {
+      "position": 4,
+      "name": "Pedro Acosta",
+      "team": "Red Bull GASGAS Tech3",
+      "points": 22,
+      "movement": "up",
+      "imageSlug": "pedro-acosta"
+    },
+    {
+      "position": 5,
+      "name": "Enea Bastianini",
+      "team": "Ducati Lenovo Team",
+      "points": 18,
+      "movement": "unchanged",
+      "imageSlug": "enea-bastianini"
+    }
   ],
   "constructorsChampionship": [
-    { "position": 1, "name": "Ducati", "points": 97, "movement": "up" },
-    { "position": 2, "name": "Aprilia", "points": 29, "movement": "up" },
-    { "position": 3, "name": "KTM", "points": 22, "movement": "unchanged" },
-    { "position": 4, "name": "Yamaha", "points": 14, "movement": "down" },
-    { "position": 5, "name": "Honda", "points": 8, "movement": "unchanged" }
+    {
+      "position": 1,
+      "name": "Ducati",
+      "points": 97,
+      "movement": "up"
+    },
+    {
+      "position": 2,
+      "name": "Aprilia",
+      "points": 29,
+      "movement": "up"
+    },
+    {
+      "position": 3,
+      "name": "KTM",
+      "points": 22,
+      "movement": "unchanged"
+    },
+    {
+      "position": 4,
+      "name": "Yamaha",
+      "points": 14,
+      "movement": "down"
+    },
+    {
+      "position": 5,
+      "name": "Honda",
+      "points": 8,
+      "movement": "unchanged"
+    }
   ],
   "teamsChampionship": [
-    { "position": 1, "name": "Ducati Lenovo Team", "points": 79, "movement": "up" },
-    { "position": 2, "name": "Aprilia Racing", "points": 29, "movement": "up" },
-    { "position": 3, "name": "Red Bull GASGAS Tech3", "points": 22, "movement": "up" },
-    { "position": 4, "name": "Monster Energy Yamaha", "points": 14, "movement": "down" },
-    { "position": 5, "name": "Gresini Racing", "points": 11, "movement": "unchanged" }
+    {
+      "position": 1,
+      "name": "Ducati Lenovo Team",
+      "points": 79,
+      "movement": "up"
+    },
+    {
+      "position": 2,
+      "name": "Aprilia Racing",
+      "points": 29,
+      "movement": "up"
+    },
+    {
+      "position": 3,
+      "name": "Red Bull GASGAS Tech3",
+      "points": 22,
+      "movement": "up"
+    },
+    {
+      "position": 4,
+      "name": "Monster Energy Yamaha",
+      "points": 14,
+      "movement": "down"
+    },
+    {
+      "position": 5,
+      "name": "Gresini Racing",
+      "points": 11,
+      "movement": "unchanged"
+    }
   ],
-  "communityPrediction": {
-    "predictedWinner": "Marc Marquez",
-    "actualWinner": "Francesco Bagnaia",
-    "accuracy": 41,
-    "totalVotes": 256,
-    "topPicks": [
-      { "name": "Marc Marquez", "percentage": 52 },
-      { "name": "Francesco Bagnaia", "percentage": 28 },
-      { "name": "Jorge Martin", "percentage": 11 }
-    ]
-  },
   "statistics": [
-    { "label": "Race distance", "value": "118.0 km", "highlight": true },
-    { "label": "Laps", "value": "26" },
-    { "label": "Retirements", "value": "4" },
-    { "label": "Fastest lap", "value": "1:25.881" },
-    { "label": "Pole time", "value": "1:25.102" },
-    { "label": "Winning margin", "value": "+0.412s" }
+    {
+      "label": "Race distance",
+      "value": "118.0 km",
+      "highlight": true
+    },
+    {
+      "label": "Laps",
+      "value": "26"
+    },
+    {
+      "label": "Retirements",
+      "value": "4"
+    },
+    {
+      "label": "Fastest lap",
+      "value": "1:25.881"
+    },
+    {
+      "label": "Pole time",
+      "value": "1:25.102"
+    },
+    {
+      "label": "Winning margin",
+      "value": "+0.412s"
+    }
   ],
   "highlights": [
-    { "title": "Greatest Overtake", "description": "Martin's late-brake pass into Turn 1 for the final podium spot.", "type": "overtake" },
-    { "title": "Rider of the Day", "description": "Francesco Bagnaia — defended under extreme pressure in the heat.", "type": "driver" },
-    { "title": "Key Moment", "description": "Marquez's sprint win set up a Sunday duel for the championship lead.", "type": "moment" }
+    {
+      "title": "Greatest Overtake",
+      "description": "Martin's late-brake pass into Turn 1 for the final podium spot.",
+      "type": "overtake"
+    },
+    {
+      "title": "Rider of the Day",
+      "description": "Francesco Bagnaia \u2014 defended under extreme pressure in the heat.",
+      "type": "driver"
+    },
+    {
+      "title": "Key Moment",
+      "description": "Marquez's sprint win set up a Sunday duel for the championship lead.",
+      "type": "moment"
+    }
   ]
 }

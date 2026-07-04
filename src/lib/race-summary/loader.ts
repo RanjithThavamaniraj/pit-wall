@@ -32,7 +32,6 @@ function mergeF1Summary(
   return {
     ...api,
     weekendReport: overlay.weekendReport ?? api.weekendReport,
-    communityPrediction: overlay.communityPrediction ?? api.communityPrediction,
     highlights: overlay.highlights?.length ? overlay.highlights : api.highlights,
     weather: overlay.weather ?? api.weather,
     timeline: overlay.timeline?.length ? overlay.timeline : api.timeline,

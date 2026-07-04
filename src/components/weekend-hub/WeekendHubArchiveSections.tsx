@@ -2,11 +2,7 @@ import Link from "next/link";
 import type { RaceWeekendSummary } from "@/lib/race-summary/types";
 import type { WeekendHubData } from "@/lib/weekend-hub";
 import { GlassCard } from "@/components/ui";
-import {
-  PodiumCard,
-  PredictionSummary,
-  WeekendSummary,
-} from "@/components/weekend-summary";
+import { PodiumCard, WeekendSummary } from "@/components/weekend-summary";
 
 type MotoGpPodiumFinisher = {
   position: number;
@@ -90,28 +86,12 @@ export function WeekendHubArchiveSections({
   if (!data.isPast) return null;
 
   const hasSummary = Boolean(summary);
-  const hasPrediction = Boolean(summary?.communityPrediction);
   const hasRaceResults = Boolean(summary?.raceResults?.length);
   const hasSprintResults = Boolean(summary?.sprintResults?.length);
   const hasMotogpPodium = motogpPodium.length > 0;
 
   return (
     <div className="space-y-5">
-      {hasPrediction && summary ? (
-        <section aria-labelledby="weekend-hub-predictions">
-          <h2
-            id="weekend-hub-predictions"
-            className="sr-only"
-          >
-            Predictions
-          </h2>
-          <PredictionSummary
-            sport={summary.sport}
-            prediction={summary.communityPrediction}
-          />
-        </section>
-      ) : null}
-
       {hasRaceResults && summary ? (
         <section aria-labelledby="weekend-hub-results">
           <h2
@@ -163,11 +143,7 @@ export function WeekendHubArchiveSections({
           </h2>
           <WeekendSummary
             summary={summary}
-            omit={
-              hasPrediction || hasRaceResults
-                ? ["predictions", "podium"]
-                : undefined
-            }
+            omit={hasRaceResults ? ["podium"] : undefined}
           />
         </section>
       ) : null}

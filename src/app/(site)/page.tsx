@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import { Suspense } from "react";
-import { GlassCard, PageSection, SectionHeading } from "@/components/ui";
+import { PageSection } from "@/components/ui";
 import { HomePageGate } from "@/components/HomePageGate";
 import { isValidSport, SPORT_COOKIE_KEY, type Sport } from "@/lib/sport";
 import { F1HeroBoard } from "@/components/home/F1HeroBoard";
@@ -9,16 +9,12 @@ import { MotoGpHeroBoard } from "@/components/home/MotoGpHeroBoard";
 import { HeroBoardSkeleton } from "@/components/home/HeroBoardSkeleton";
 import { F1WeekendHubSection } from "@/components/home/F1WeekendHubSection";
 import { MotoGpWeekendHubSection } from "@/components/home/MotoGpWeekendHubSection";
-import Link from "next/link";
+import { WeekendOutlookSection } from "@/components/home/WeekendOutlook";
 import { fetchSeasonSchedule, getCurrentRace, getNextRace } from "@/lib/schedule";
-import type { RaceWeekend } from "@/lib/schedule";
-import {
-  fetchMotoGpSchedule,
-  getCurrentMotoGpEvent,
-  getNextMotoGpEvent,
-} from "@/lib/motogp";
-import { getWeekendIntelligence } from "@/lib/intelligence";
-import type { IntelligenceEntry } from "@/lib/intelligence";
+import { fetchMotoGpSchedule, getCurrentMotoGpEvent, getNextMotoGpEvent } from "@/lib/motogp";
+import { weekendHubFromF1, weekendHubFromMotoGp, deriveWeekendPhase } from "@/lib/weekend-hub";
+import { getWeekendContext } from "@/lib/weekend-context";
+import { buildWeekendOutlook, type WeekendOutlookView } from "@/lib/weekend-context/outlook";
 
 function Hero() {
   return (
@@ -62,87 +58,73 @@ function WeekendHubSkeleton() {
   );
 }
 
-// ─── Strategy Section (preserved, honest) ─────────────────────────────────────
+// ─── Weekend Outlook (data-driven, not a prediction or a vote) ────────────────
 
-type IntelligenceTeaser = {
-  entries: IntelligenceEntry[];
-  raceSlug: string | null;
+type OutlookTeaser = {
+  outlook: WeekendOutlookView;
+  raceHref: string | null;
 };
 
-async function buildF1Intelligence(): Promise<IntelligenceTeaser> {
+async function buildF1Outlook(): Promise<OutlookTeaser> {
   try {
     const schedule = await fetchSeasonSchedule("current");
-    const past = schedule.races
-      .filter((r: RaceWeekend) => r.isPast)
-      .map((r: RaceWeekend) => r.slug);
-    const intelligence = await getWeekendIntelligence("f1", past);
+    const past = schedule.races.filter((r) => r.isPast).map((r) => r.slug);
     const race = getCurrentRace(schedule) ?? getNextRace(schedule);
-    return { entries: intelligence.entries, raceSlug: race?.slug ?? null };
+    if (!race) return { outlook: NO_SIGNAL_OUTLOOK, raceHref: null };
+
+    const hubData = weekendHubFromF1(race);
+    const context = await getWeekendContext({
+      sport: "f1",
+      weekendSlug: race.slug,
+      weekendName: race.name,
+      phase: deriveWeekendPhase(hubData),
+      isSprintWeekend: hubData.isSprintWeekend,
+      completedWeekendSlugs: past,
+      sessions: hubData.sessions,
+    });
+
+    return {
+      outlook: buildWeekendOutlook(context, hubData.sessions),
+      raceHref: `/races/${race.slug}`,
+    };
   } catch {
-    return { entries: [], raceSlug: null };
+    return { outlook: NO_SIGNAL_OUTLOOK, raceHref: null };
   }
 }
 
-async function buildMotoGpIntelligence(): Promise<IntelligenceTeaser> {
+async function buildMotoGpOutlook(): Promise<OutlookTeaser> {
   try {
     const schedule = await fetchMotoGpSchedule();
     const past = schedule.races.filter((r) => r.isPast).map((r) => r.slug);
-    const intelligence = await getWeekendIntelligence("motogp", past);
     const race = getCurrentMotoGpEvent(schedule) ?? getNextMotoGpEvent(schedule);
-    return { entries: intelligence.entries, raceSlug: race?.slug ?? null };
+    if (!race) return { outlook: NO_SIGNAL_OUTLOOK, raceHref: null };
+
+    const hubData = weekendHubFromMotoGp(race);
+    const context = await getWeekendContext({
+      sport: "motogp",
+      weekendSlug: race.slug,
+      weekendName: race.name,
+      phase: deriveWeekendPhase(hubData),
+      isSprintWeekend: hubData.isSprintWeekend,
+      completedWeekendSlugs: past,
+      sessions: hubData.sessions,
+    });
+
+    return {
+      outlook: buildWeekendOutlook(context, hubData.sessions),
+      raceHref: `/motogp/races/${race.slug}`,
+    };
   } catch {
-    return { entries: [], raceSlug: null };
+    return { outlook: NO_SIGNAL_OUTLOOK, raceHref: null };
   }
 }
 
-// Compact teaser only — the full breakdown lives in the Weekend Hub's
-// Strategy Centre / Driver Intelligence panels, so the homepage doesn't
-// need to repeat the entire prediction table.
-function StrategySection({
-  predictions,
-  raceSlug,
-}: {
-  predictions: IntelligenceEntry[];
-  raceSlug: string | null;
-}) {
-  const top = predictions.slice(0, 2);
-
-  return (
-    <PageSection id="strategy" variant="muted" wide>
-      <div className="grid gap-10 lg:grid-cols-2 lg:items-center lg:gap-16 xl:gap-20">
-        <SectionHeading
-          eyebrow="WEEKEND INTELLIGENCE"
-          title="Who has the edge before lights out?"
-          description="Weekend Intelligence combines recent form and season momentum to highlight the leading contenders before the race weekend unfolds."
-        />
-        <GlassCard>
-          <p className="mb-5 text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">
-            Top favourites
-          </p>
-          <div className="space-y-3">
-            {top.map((pred) => (
-              <div
-                key={pred.name}
-                className="flex items-center justify-between text-sm"
-              >
-                <span className="font-semibold text-slate-200">{pred.name}</span>
-                <span className="font-bold text-amber-300">{pred.percentage}%</span>
-              </div>
-            ))}
-          </div>
-          {raceSlug && (
-            <Link
-              href={`/races/${raceSlug}`}
-              className="mt-6 inline-flex text-sm font-semibold text-amber-300 transition hover:text-amber-200"
-            >
-              View full Weekend Intelligence →
-            </Link>
-          )}
-        </GlassCard>
-      </div>
-    </PageSection>
-  );
-}
+const NO_SIGNAL_OUTLOOK: WeekendOutlookView = {
+  hasSignal: false,
+  phaseLine: "Before FP1 — arriving on recent form",
+  message:
+    "Not enough completed-weekend data yet to project an outlook. Check back as the season builds up recent form.",
+};
 
 // ─── CTA ──────────────────────────────────────────────────────────────────────
 
@@ -184,52 +166,6 @@ function MotoGpHero() {
   );
 }
 
-function MotoGpStrategySection({
-  predictions,
-  raceSlug,
-}: {
-  predictions: IntelligenceEntry[];
-  raceSlug: string | null;
-}) {
-  const top = predictions.slice(0, 2);
-
-  return (
-    <PageSection id="strategy" variant="muted" wide>
-      <div className="grid gap-10 lg:grid-cols-2 lg:items-center lg:gap-16 xl:gap-20">
-        <SectionHeading
-          eyebrow="WEEKEND INTELLIGENCE"
-          title="Who has the edge before lights out?"
-          description="Weekend Intelligence combines recent form and season momentum to highlight the leading contenders before the race weekend unfolds."
-        />
-        <GlassCard>
-          <p className="mb-5 text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">
-            Top favourites
-          </p>
-          <div className="space-y-3">
-            {top.map((pred) => (
-              <div
-                key={pred.name}
-                className="flex items-center justify-between text-sm"
-              >
-                <span className="font-semibold text-slate-200">{pred.name}</span>
-                <span className="font-bold text-amber-300">{pred.percentage}%</span>
-              </div>
-            ))}
-          </div>
-          {raceSlug && (
-            <Link
-              href={`/motogp/races/${raceSlug}`}
-              className="mt-6 inline-flex text-sm font-semibold text-amber-300 transition hover:text-amber-200"
-            >
-              View full Weekend Intelligence →
-            </Link>
-          )}
-        </GlassCard>
-      </div>
-    </PageSection>
-  );
-}
-
 function MotoGpCTA() {
   return (
     <PageSection className="!pb-16 lg:!pb-20">
@@ -251,24 +187,24 @@ function MotoGpCTA() {
 }
 
 async function F1Home() {
-  const { entries, raceSlug } = await buildF1Intelligence();
+  const { outlook, raceHref } = await buildF1Outlook();
   return (
     <div className="page-flow">
       <Hero />
       <WeekendHub />
-      <StrategySection predictions={entries} raceSlug={raceSlug} />
+      <WeekendOutlookSection outlook={outlook} raceHref={raceHref} />
       <CTA />
     </div>
   );
 }
 
 async function MotoGpHome() {
-  const { entries, raceSlug } = await buildMotoGpIntelligence();
+  const { outlook, raceHref } = await buildMotoGpOutlook();
   return (
     <div className="page-flow">
       <MotoGpHero />
       <MotoGpWeekendHub />
-      <MotoGpStrategySection predictions={entries} raceSlug={raceSlug} />
+      <WeekendOutlookSection outlook={outlook} raceHref={raceHref} />
       <MotoGpCTA />
     </div>
   );

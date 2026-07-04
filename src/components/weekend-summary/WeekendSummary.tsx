@@ -5,7 +5,6 @@ import { motion } from "framer-motion";
 import type { RaceWeekendSummary } from "@/lib/race-summary/types";
 import { PodiumCard } from "./PodiumCard";
 import { ChampionshipStandings } from "./ChampionshipStandings";
-import { PredictionSummary } from "./PredictionSummary";
 import { WeekendStats } from "./WeekendStats";
 import { WeekendReport } from "./WeekendReport";
 import { WeekendTimeline } from "./WeekendTimeline";
@@ -17,7 +16,7 @@ import { summaryContainerVariants } from "./motion";
 type Props = {
   summary: RaceWeekendSummary;
   /** Hide sections already rendered elsewhere on the weekend hub. */
-  omit?: ("predictions" | "podium")[];
+  omit?: "podium"[];
 };
 
 function HighlightRow({
@@ -44,7 +43,6 @@ function HighlightRow({
 
 function WeekendSummaryComponent({ summary, omit }: Props) {
   const isF1 = summary.sport === "f1";
-  const hidePredictions = omit?.includes("predictions");
   const hidePodium = omit?.includes("podium");
 
   return (
@@ -80,15 +78,6 @@ function WeekendSummaryComponent({ summary, omit }: Props) {
               />
             ) : null}
           </div>
-        </SummarySection>
-      ) : null}
-
-      {!hidePredictions && summary.communityPrediction ? (
-        <SummarySection>
-          <PredictionSummary
-            sport={summary.sport}
-            prediction={summary.communityPrediction}
-          />
         </SummarySection>
       ) : null}
 

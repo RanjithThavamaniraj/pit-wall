@@ -22,19 +22,6 @@ export type ChampionshipRow = {
   imageSlug?: string;
 };
 
-export type PredictionPick = {
-  name: string;
-  percentage: number;
-};
-
-export type CommunityPredictionSummary = {
-  predictedWinner: string;
-  actualWinner: string;
-  accuracy: number;
-  totalVotes?: number;
-  topPicks?: PredictionPick[];
-};
-
 export type WeekendStat = {
   label: string;
   value: string;
@@ -79,8 +66,6 @@ export type RaceWeekendSummary = {
   driversChampionship?: ChampionshipRow[];
   constructorsChampionship?: ChampionshipRow[];
   teamsChampionship?: ChampionshipRow[];
-
-  communityPrediction?: CommunityPredictionSummary;
 
   statistics: WeekendStat[];
 
