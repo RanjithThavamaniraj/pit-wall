@@ -13,6 +13,17 @@
   .page-section--tight-top {
     padding-top: calc(var(--section-y-mobile) * 0.65);
   }
+
+  /* Mobile standings / timing card stacks (no horizontal scroll).
+     Scoped to the mobile breakpoint because this file's rules are
+     unlayered CSS loaded after Tailwind's `@layer utilities` — an
+     unscoped `display: flex` here would beat the `md:hidden` utility
+     at any viewport, since unlayered styles always win over layered
+     ones regardless of source order or specificity. */
+  .mobile-card-stack {
+    display: flex;
+    flex-direction: column;
+  }
 }
 
 /* Minimum comfortable tap target for interactive controls */
@@ -23,12 +34,6 @@
 
 .touch-target-inline {
   min-height: var(--touch-target-min);
-}
-
-/* Mobile standings / timing card stacks (no horizontal scroll) */
-.mobile-card-stack {
-  display: flex;
-  flex-direction: column;
 }
 
 .mobile-standing-card,
