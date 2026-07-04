@@ -167,12 +167,21 @@ export function applyScheduleLiveState(
   schedule: SeasonSchedule,
   now: number = Date.now()
 ): SeasonSchedule {
+  // Find the soonest upcoming race by date, not by array position — the
+  // Jolpica feed is normally round-ordered, but a postponed/rescheduled
+  // round can leave it out of chronological order. Relying on iteration
+  // order + break could then lock onto an already-past round and leave
+  // every race's `isNext` false, stranding the homepage with no target.
   let nextRaceRound = 0;
+  let nextRaceTime = Infinity;
   for (const race of schedule.races) {
     const raceSession = race.sessions.find((s) => s.key === "race");
-    if (raceSession?.dateUtc && new Date(raceSession.dateUtc).getTime() > now) {
+    const raceTime = raceSession?.dateUtc
+      ? new Date(raceSession.dateUtc).getTime()
+      : NaN;
+    if (!Number.isNaN(raceTime) && raceTime > now && raceTime < nextRaceTime) {
+      nextRaceTime = raceTime;
       nextRaceRound = race.round;
-      break;
     }
   }
 
@@ -188,7 +197,7 @@ export function applyScheduleLiveState(
 
       return {
         ...race,
-        isPast: raceDate ? raceEndMs < now : false,
+        isPast: raceDate ? raceEndMs <= now : false,
         isCurrent:
           fp1Date && raceDate
             ? new Date(fp1Date).getTime() <= now && raceEndMs > now
