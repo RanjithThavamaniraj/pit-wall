@@ -9,7 +9,6 @@ import {
   getCurrentRace,
   getNextRace,
 } from "@/lib/schedule";
-import { fetchAllStandings } from "@/lib/standings";
 
 function formatSessionDayTime(isoString: string): string {
   if (!isoString) return "TBC";
@@ -33,14 +32,9 @@ export async function F1WeekendHubSection() {
   let rows: HubBoardRow[] = [];
 
   try {
-    const [schedule, standings] = await Promise.all([
-      fetchSeasonSchedule("current"),
-      fetchAllStandings(),
-    ]);
+    const schedule = await fetchSeasonSchedule("current");
 
     const race = getCurrentRace(schedule) ?? getNextRace(schedule);
-    const leader = standings.drivers[0];
-    const p2 = standings.drivers[1];
     const liveSession = race?.sessions.find((s) => s.status === "live");
     const nextSession =
       race?.sessions.find((s) => s.status === "upcoming") ?? liveSession;
@@ -55,15 +49,6 @@ export async function F1WeekendHubSection() {
         value: `${nextSession.label} · ${formatSessionDayTime(nextSession.dateUtc)} · ${race.circuit}`,
         actionHref: `/races/${race.slug}#session-${nextSession.key}`,
         actionLabel: "Schedule →",
-      });
-    }
-
-    if (leader) {
-      briefing.push({
-        key: "WDC leader",
-        value: `${leader.lastName} · ${leader.points} pts${
-          p2 ? ` · Gap to P2 −${p2.gapToLeader}` : ""
-        }`,
       });
     }
 
@@ -83,26 +68,14 @@ export async function F1WeekendHubSection() {
             : "Weekend hub",
       },
       {
-        id: "pulse",
-        channel: "CH02",
-        tag: "FAN",
-        title: "Community pulse",
-        line: "Race-win favourites preview once predictions launch",
-        href: "/#strategy",
-        cta: "View prediction preview",
-        meta: "HAM 32% · VER 24% · ANT 18%",
-      },
-      {
         id: "standings",
-        channel: "CH03",
+        channel: "CH02",
         tag: "WDC",
         title: "Championship",
         line: "Drivers and constructors after every round",
         href: "/standings",
         cta: "View standings",
-        meta: leader
-          ? `P1 ${leader.driverCode} ${leader.points} · GAP −${p2?.gapToLeader ?? "—"}`
-          : "Season standings",
+        meta: "Full points table",
       },
     ];
 
@@ -132,18 +105,8 @@ export async function F1WeekendHubSection() {
         meta: "Live weekend hub",
       },
       {
-        id: "pulse",
-        channel: "CH02",
-        tag: "FAN",
-        title: "Community pulse",
-        line: "Race-win favourites preview once predictions launch",
-        href: "/#strategy",
-        cta: "View prediction preview",
-        meta: "Preview · not live data",
-      },
-      {
         id: "standings",
-        channel: "CH03",
+        channel: "CH02",
         tag: "WDC",
         title: "Championship",
         line: "Drivers and constructors after every round",

@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
 import LiveTimingClient from "@/components/live/LiveTimingClient";
-import { fetchSeasonSchedule, getPreviousRace } from "@/lib/schedule";
-import type { RaceWeekend } from "@/lib/schedule";
-import { fetchAllStandings } from "@/lib/standings";
+import { fetchSeasonSchedule } from "@/lib/schedule";
 import { getWeekendContext } from "@/lib/weekend";
 
 export const metadata: Metadata = {
@@ -15,31 +13,13 @@ export const revalidate = 300; // Keep in sync with F1_CACHE.STANDINGS (standing
 
 export default async function LivePage() {
   let initialContext = null;
-  let initialStandings = null;
-  let previousRace: RaceWeekend | null = null;
 
   try {
-    const [scheduleResult, standingsResult] = await Promise.allSettled([
-      fetchSeasonSchedule("current"),
-      fetchAllStandings(),
-    ]);
-
-    if (scheduleResult.status === "fulfilled") {
-      initialContext = getWeekendContext(scheduleResult.value);
-      previousRace = getPreviousRace(scheduleResult.value);
-    }
-    if (standingsResult.status === "fulfilled") {
-      initialStandings = standingsResult.value;
-    }
+    const schedule = await fetchSeasonSchedule("current");
+    initialContext = getWeekendContext(schedule);
   } catch (error) {
     console.error("Failed to fetch schedule for live page empty state", error);
   }
 
-  return (
-    <LiveTimingClient
-      initialContext={initialContext}
-      initialStandings={initialStandings}
-      previousRace={previousRace}
-    />
-  );
+  return <LiveTimingClient initialContext={initialContext} />;
 }

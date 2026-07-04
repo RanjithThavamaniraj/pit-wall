@@ -2,9 +2,7 @@
 
 import { useEffect, useState, useRef } from "react";
 import type { LiveTimingPayload } from "@/lib/timing";
-import type { Standings } from "@/lib/standings";
 import type { WeekendContext } from "@/lib/weekend";
-import type { RaceWeekend } from "@/lib/schedule";
 import { Container } from "@/components/ui";
 import { EmptyWeekendState } from "@/components/live/WeekendPreviewShared";
 import { SessionStatusHeader } from "@/components/live/SessionStatusHeader";
@@ -16,12 +14,8 @@ import { LIVE_CACHE } from "@/lib/cache/live";
 
 export default function LiveTimingClient({
   initialContext,
-  initialStandings = null,
-  previousRace = null,
 }: {
   initialContext: WeekendContext | null;
-  initialStandings?: Standings | null;
-  previousRace?: RaceWeekend | null;
 }) {
   const [data, setData] = useState<LiveTimingPayload | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -151,11 +145,7 @@ export default function LiveTimingClient({
         )}
 
         {isUpcoming ? (
-          <UpcomingSessionView
-            context={currentContext}
-            standings={initialStandings}
-            previousRace={previousRace}
-          />
+          <UpcomingSessionView context={currentContext} />
         ) : showSessionResults ? (
           <div className="space-y-5">
             <CompletedSessionView

@@ -6,7 +6,6 @@ import {
 } from "@/components/home/WeekendHubBoard";
 import {
   fetchMotoGpSchedule,
-  fetchMotoGpStandings,
   getCurrentMotoGpEvent,
   getNextMotoGpEvent,
 } from "@/lib/motogp";
@@ -33,15 +32,10 @@ export async function MotoGpWeekendHubSection() {
   let rows: HubBoardRow[] = [];
 
   try {
-    const [schedule, standings] = await Promise.all([
-      fetchMotoGpSchedule(),
-      fetchMotoGpStandings("MotoGP™"),
-    ]);
+    const schedule = await fetchMotoGpSchedule();
 
     const event =
       getCurrentMotoGpEvent(schedule) ?? getNextMotoGpEvent(schedule);
-    const leader = standings.riders[0];
-    const p2 = standings.riders[1];
     const liveSession = event?.sessions.find((s) => s.status === "live");
     const nextSession =
       event?.sessions.find((s) => s.status === "upcoming") ?? liveSession;
@@ -55,15 +49,6 @@ export async function MotoGpWeekendHubSection() {
         value: `${nextSession.label} · ${formatSessionDayTime(nextSession.dateUtc)} · ${event.circuit}`,
         actionHref: `/motogp/races/${event.slug}`,
         actionLabel: "Schedule →",
-      });
-    }
-
-    if (leader) {
-      briefing.push({
-        key: "Championship",
-        value: `#${leader.riderNumber} ${leader.riderName} · ${leader.points} pts${
-          p2 ? ` · Gap to P2 −${p2.gapToLeader}` : ""
-        }`,
       });
     }
 
@@ -83,26 +68,14 @@ export async function MotoGpWeekendHubSection() {
             : "Weekend hub",
       },
       {
-        id: "pulse",
-        channel: "CH02",
-        tag: "FAN",
-        title: "Community pulse",
-        line: "Race-win favourites preview once predictions launch",
-        href: "/#strategy",
-        cta: "View prediction preview",
-        meta: "BAG 34% · MAR 26% · BEZ 18%",
-      },
-      {
         id: "standings",
-        channel: "CH03",
+        channel: "CH02",
         tag: "MGP",
         title: "Championship",
         line: "MotoGP, Moto2, and Moto3 after every round",
         href: "/motogp/standings",
         cta: "View standings",
-        meta: leader
-          ? `P1 #${leader.riderNumber} ${leader.points} · GAP −${p2?.gapToLeader ?? "—"}`
-          : "Season standings",
+        meta: "Full points table",
       },
     ];
 
@@ -132,18 +105,8 @@ export async function MotoGpWeekendHubSection() {
         meta: "MotoGP weekend hub",
       },
       {
-        id: "pulse",
-        channel: "CH02",
-        tag: "FAN",
-        title: "Community pulse",
-        line: "Race-win favourites preview once predictions launch",
-        href: "/#strategy",
-        cta: "View prediction preview",
-        meta: "Preview · not live data",
-      },
-      {
         id: "standings",
-        channel: "CH03",
+        channel: "CH02",
         tag: "MGP",
         title: "Championship",
         line: "MotoGP, Moto2, and Moto3 after every round",

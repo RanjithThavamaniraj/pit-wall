@@ -9,9 +9,14 @@ import { MotoGpHeroBoard } from "@/components/home/MotoGpHeroBoard";
 import { HeroBoardSkeleton } from "@/components/home/HeroBoardSkeleton";
 import { F1WeekendHubSection } from "@/components/home/F1WeekendHubSection";
 import { MotoGpWeekendHubSection } from "@/components/home/MotoGpWeekendHubSection";
-import { fetchSeasonSchedule } from "@/lib/schedule";
+import Link from "next/link";
+import { fetchSeasonSchedule, getCurrentRace, getNextRace } from "@/lib/schedule";
 import type { RaceWeekend } from "@/lib/schedule";
-import { fetchMotoGpSchedule } from "@/lib/motogp";
+import {
+  fetchMotoGpSchedule,
+  getCurrentMotoGpEvent,
+  getNextMotoGpEvent,
+} from "@/lib/motogp";
 import { getWeekendIntelligence } from "@/lib/intelligence";
 import type { IntelligenceEntry } from "@/lib/intelligence";
 
@@ -59,66 +64,80 @@ function WeekendHubSkeleton() {
 
 // ─── Strategy Section (preserved, honest) ─────────────────────────────────────
 
-async function buildF1Intelligence(): Promise<IntelligenceEntry[]> {
+type IntelligenceTeaser = {
+  entries: IntelligenceEntry[];
+  raceSlug: string | null;
+};
+
+async function buildF1Intelligence(): Promise<IntelligenceTeaser> {
   try {
     const schedule = await fetchSeasonSchedule("current");
     const past = schedule.races
       .filter((r: RaceWeekend) => r.isPast)
       .map((r: RaceWeekend) => r.slug);
     const intelligence = await getWeekendIntelligence("f1", past);
-    return intelligence.entries;
+    const race = getCurrentRace(schedule) ?? getNextRace(schedule);
+    return { entries: intelligence.entries, raceSlug: race?.slug ?? null };
   } catch {
-    return [];
+    return { entries: [], raceSlug: null };
   }
 }
 
-async function buildMotoGpIntelligence(): Promise<IntelligenceEntry[]> {
+async function buildMotoGpIntelligence(): Promise<IntelligenceTeaser> {
   try {
     const schedule = await fetchMotoGpSchedule();
     const past = schedule.races.filter((r) => r.isPast).map((r) => r.slug);
     const intelligence = await getWeekendIntelligence("motogp", past);
-    return intelligence.entries;
+    const race = getCurrentMotoGpEvent(schedule) ?? getNextMotoGpEvent(schedule);
+    return { entries: intelligence.entries, raceSlug: race?.slug ?? null };
   } catch {
-    return [];
+    return { entries: [], raceSlug: null };
   }
 }
 
+// Compact teaser only — the full breakdown lives in the Weekend Hub's
+// Strategy Centre / Driver Intelligence panels, so the homepage doesn't
+// need to repeat the entire prediction table.
 function StrategySection({
   predictions,
+  raceSlug,
 }: {
   predictions: IntelligenceEntry[];
+  raceSlug: string | null;
 }) {
+  const top = predictions.slice(0, 2);
+
   return (
     <PageSection id="strategy" variant="muted" wide>
       <div className="grid gap-10 lg:grid-cols-2 lg:items-center lg:gap-16 xl:gap-20">
         <SectionHeading
           eyebrow="WEEKEND INTELLIGENCE"
           title="Who has the edge before lights out?"
-          description="Every race begins before the lights go out. Weekend Intelligence combines recent form and season momentum to highlight the leading contenders before the race weekend unfolds."
+          description="Weekend Intelligence combines recent form and season momentum to highlight the leading contenders before the race weekend unfolds."
         />
         <GlassCard>
           <p className="mb-5 text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">
-            WEEKEND FAVOURITES
+            Top favourites
           </p>
-          <div className="space-y-4">
-            {predictions.map((pred) => (
-              <div key={pred.name} className="space-y-2">
-                <div className="flex items-center justify-between text-sm">
-                  <span className="font-semibold text-slate-200">{pred.name}</span>
-                  <span className="font-bold text-amber-300">{pred.percentage}%</span>
-                </div>
-                <div className="h-2.5 w-full overflow-hidden rounded-full border border-white/5 bg-slate-950/60">
-                  <div
-                    className="h-full rounded-full bg-gradient-to-r from-amber-500 to-amber-300"
-                    style={{ width: `${pred.percentage}%` }}
-                  />
-                </div>
+          <div className="space-y-3">
+            {top.map((pred) => (
+              <div
+                key={pred.name}
+                className="flex items-center justify-between text-sm"
+              >
+                <span className="font-semibold text-slate-200">{pred.name}</span>
+                <span className="font-bold text-amber-300">{pred.percentage}%</span>
               </div>
             ))}
           </div>
-          <p className="mt-6 text-xs text-slate-500">
-            Based on recent form and season momentum.
-          </p>
+          {raceSlug && (
+            <Link
+              href={`/races/${raceSlug}`}
+              className="mt-6 inline-flex text-sm font-semibold text-amber-300 transition hover:text-amber-200"
+            >
+              View full Weekend Intelligence →
+            </Link>
+          )}
         </GlassCard>
       </div>
     </PageSection>
@@ -167,40 +186,44 @@ function MotoGpHero() {
 
 function MotoGpStrategySection({
   predictions,
+  raceSlug,
 }: {
   predictions: IntelligenceEntry[];
+  raceSlug: string | null;
 }) {
+  const top = predictions.slice(0, 2);
+
   return (
     <PageSection id="strategy" variant="muted" wide>
       <div className="grid gap-10 lg:grid-cols-2 lg:items-center lg:gap-16 xl:gap-20">
         <SectionHeading
           eyebrow="WEEKEND INTELLIGENCE"
           title="Who has the edge before lights out?"
-          description="Every race begins before the lights go out. Weekend Intelligence combines recent form and season momentum to highlight the leading contenders before the race weekend unfolds."
+          description="Weekend Intelligence combines recent form and season momentum to highlight the leading contenders before the race weekend unfolds."
         />
         <GlassCard>
           <p className="mb-5 text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">
-            WEEKEND FAVOURITES
+            Top favourites
           </p>
-          <div className="space-y-4">
-            {predictions.map((pred) => (
-              <div key={pred.name} className="space-y-2">
-                <div className="flex items-center justify-between text-sm">
-                  <span className="font-semibold text-slate-200">{pred.name}</span>
-                  <span className="font-bold text-amber-300">{pred.percentage}%</span>
-                </div>
-                <div className="h-2.5 w-full overflow-hidden rounded-full border border-white/5 bg-slate-950/60">
-                  <div
-                    className="h-full rounded-full bg-gradient-to-r from-amber-500 to-amber-300"
-                    style={{ width: `${pred.percentage}%` }}
-                  />
-                </div>
+          <div className="space-y-3">
+            {top.map((pred) => (
+              <div
+                key={pred.name}
+                className="flex items-center justify-between text-sm"
+              >
+                <span className="font-semibold text-slate-200">{pred.name}</span>
+                <span className="font-bold text-amber-300">{pred.percentage}%</span>
               </div>
             ))}
           </div>
-          <p className="mt-6 text-xs text-slate-500">
-            Based on recent form and season momentum.
-          </p>
+          {raceSlug && (
+            <Link
+              href={`/motogp/races/${raceSlug}`}
+              className="mt-6 inline-flex text-sm font-semibold text-amber-300 transition hover:text-amber-200"
+            >
+              View full Weekend Intelligence →
+            </Link>
+          )}
         </GlassCard>
       </div>
     </PageSection>
@@ -228,24 +251,24 @@ function MotoGpCTA() {
 }
 
 async function F1Home() {
-  const predictions = await buildF1Intelligence();
+  const { entries, raceSlug } = await buildF1Intelligence();
   return (
     <div className="page-flow">
       <Hero />
       <WeekendHub />
-      <StrategySection predictions={predictions} />
+      <StrategySection predictions={entries} raceSlug={raceSlug} />
       <CTA />
     </div>
   );
 }
 
 async function MotoGpHome() {
-  const predictions = await buildMotoGpIntelligence();
+  const { entries, raceSlug } = await buildMotoGpIntelligence();
   return (
     <div className="page-flow">
       <MotoGpHero />
       <MotoGpWeekendHub />
-      <MotoGpStrategySection predictions={predictions} />
+      <MotoGpStrategySection predictions={entries} raceSlug={raceSlug} />
       <MotoGpCTA />
     </div>
   );

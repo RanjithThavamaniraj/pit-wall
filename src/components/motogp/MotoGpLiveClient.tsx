@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import type { MotoGpEvent, MotoGpFinisher, MotoGpStandings } from "@/lib/motogp";
+import type { MotoGpFinisher } from "@/lib/motogp";
 import type { MotoGpWeekendContext } from "@/lib/motogp-weekend";
 import { MotoGpUpcomingView } from "@/components/motogp/MotoGpUpcomingView";
 import { EmptyWeekendState } from "@/components/live/WeekendPreviewShared";
@@ -13,15 +13,11 @@ import { LIVE_CACHE } from "@/lib/cache/live";
 type Props = {
   initialContext: MotoGpWeekendContext | null;
   initialResults: MotoGpFinisher[];
-  initialStandings?: MotoGpStandings | null;
-  previousEvent?: MotoGpEvent | null;
 };
 
 export default function MotoGpLiveClient({
   initialContext,
   initialResults,
-  initialStandings = null,
-  previousEvent = null,
 }: Props) {
   const [context, setContext] = useState(initialContext);
   const [results, setResults] = useState(initialResults);
@@ -130,11 +126,7 @@ export default function MotoGpLiveClient({
         </div>
 
         {isUpcoming ? (
-          <MotoGpUpcomingView
-            context={context}
-            standings={initialStandings}
-            previousEvent={previousEvent}
-          />
+          <MotoGpUpcomingView context={context} />
         ) : (
           <div className="grid gap-5 lg:grid-cols-2 lg:items-start">
             <div className="space-y-5">
