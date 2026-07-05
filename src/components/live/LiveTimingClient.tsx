@@ -4,11 +4,10 @@ import { useEffect, useState, useRef } from "react";
 import type { LiveTimingPayload } from "@/lib/timing";
 import type { WeekendContext } from "@/lib/weekend";
 import type { SessionBriefing } from "@/lib/session-briefing";
-import { Container, GlassCard } from "@/components/ui";
+import { Container } from "@/components/ui";
 import { EmptyWeekendState } from "@/components/live/WeekendPreviewShared";
 import { SessionStatusHeader } from "@/components/live/SessionStatusHeader";
 import { TimingBoard } from "@/components/live/TimingBoard";
-import { SessionCountdown } from "@/components/SessionCountdown";
 import { SessionBriefingPanel } from "@/components/live/SessionBriefingPanel";
 import { UpcomingSessionView } from "@/components/live/UpcomingSessionView";
 import { CompletedSessionView } from "@/components/live/CompletedSessionView";
@@ -159,27 +158,12 @@ export default function LiveTimingClient({
               betweenSessions={isBetweenSessions}
             />
             {isBetweenSessions && (
-              <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(300px,360px)] lg:items-start">
-                {currentContext.nextSession && (
-                  <GlassCard className="mx-auto w-full max-w-2xl border-amber-300/20 bg-amber-300/[0.03] p-6 text-center lg:mx-0 lg:text-left">
-                    <h4 className="mb-3 text-xs font-semibold uppercase tracking-widest text-slate-500">
-                      Coming Up Next
-                    </h4>
-                    <h3 className="mb-5 text-2xl font-semibold text-white">
-                      {currentContext.nextSession.label}
-                    </h3>
-                    <SessionCountdown
-                      targetDate={currentContext.nextSession.dateUtc}
-                      sessionLabel={currentContext.nextSession.label}
-                      variant="full"
-                    />
-                  </GlassCard>
-                )}
-                <SessionBriefingPanel
-                  briefing={currentBriefing}
-                  nextSessionData={nextSessionData}
-                />
-              </div>
+              <SessionBriefingPanel
+                briefing={currentBriefing}
+                nextSessionData={nextSessionData}
+                statusLabel="Between sessions"
+                circuit={currentContext.currentWeekend.circuit}
+              />
             )}
           </div>
         ) : (
