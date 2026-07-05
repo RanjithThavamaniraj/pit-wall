@@ -34,6 +34,7 @@ export type MotoGpEvent = {
   name: string;
   shortName: string;
   circuit: string;
+  circuitId: string; // stable PulseLive circuit UUID
   locality: string;
   country: string;
   countryCode: string;
@@ -101,6 +102,7 @@ type ApiCountry = {
 };
 
 type ApiCircuit = {
+  id?: string;
   name: string;
   place?: string;
 };
@@ -611,6 +613,7 @@ export async function fetchMotoGpSchedule(
         name: event.name,
         shortName: event.short_name,
         circuit: event.circuit.name,
+        circuitId: event.circuit.id ?? "",
         locality: event.circuit.place ?? "",
         country: event.country.name,
         countryCode: event.country.iso,

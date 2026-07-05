@@ -6,6 +6,7 @@ import { fetchSeasonSchedule, getCurrentRace, getNextRace } from "@/lib/schedule
 import type { SessionKey } from "@/lib/schedule";
 import { fetchDriverStandings } from "@/lib/standings";
 import { countryCodeToFlag } from "@/lib/utils";
+import { getCircuitOutlinePath } from "@/lib/circuit-outline";
 
 const SESSION_SHORT: Partial<Record<SessionKey, string>> = {
   fp1: "FP1",
@@ -83,6 +84,10 @@ export async function F1HeroBoard() {
         }
         detailHref={`/races/${race.slug}`}
         liveHref="/live"
+        circuitSvg={getCircuitOutlinePath("f1", {
+          id: race.circuitId,
+          name: race.circuit,
+        })}
         championship={
           leader
             ? {

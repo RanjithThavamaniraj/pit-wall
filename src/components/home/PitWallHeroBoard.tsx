@@ -40,6 +40,7 @@ export type PitWallHeroBoardProps = {
   detailHref: string;
   liveHref: string;
   championship: HeroChampionship | null;
+  circuitSvg?: string | null;
 };
 
 export function PitWallHeroBoard({
@@ -59,6 +60,7 @@ export function PitWallHeroBoard({
   detailHref,
   liveHref,
   championship,
+  circuitSvg,
 }: PitWallHeroBoardProps) {
   const roundLabel = `R${String(round).padStart(2, "0")}`;
 
@@ -74,6 +76,16 @@ export function PitWallHeroBoard({
       <div className="hero-stage-beam" aria-hidden="true" />
       <div className="hero-stage-glow" aria-hidden="true" />
       <div className="hero-stage-speedline" aria-hidden="true" />
+      {circuitSvg && (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={circuitSvg}
+          alt=""
+          aria-hidden="true"
+          draggable={false}
+          className="hero-stage-circuit"
+        />
+      )}
       <div className="hero-stage-vignette" aria-hidden="true" />
       <div className="hero-stage-checker" aria-hidden="true" />
       <div className="hero-stage-round" aria-hidden="true">

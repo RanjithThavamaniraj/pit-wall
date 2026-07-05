@@ -10,6 +10,7 @@ import {
   type MotoGpSession,
 } from "@/lib/motogp";
 import { countryCodeToFlag } from "@/lib/utils";
+import { getCircuitOutlinePath } from "@/lib/circuit-outline";
 
 function raceDisplayTitle(name: string): string {
   return name
@@ -96,6 +97,10 @@ export async function MotoGpHeroBoard() {
         }
         detailHref={`/motogp/races/${event.slug}`}
         liveHref="/motogp/live"
+        circuitSvg={getCircuitOutlinePath("motogp", {
+          id: event.circuitId,
+          name: event.circuit,
+        })}
         championship={
           leader
             ? {

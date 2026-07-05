@@ -36,6 +36,7 @@ export type RaceWeekend = {
   name: string;          // "Monaco Grand Prix"
   shortName: string;     // "Monaco GP"
   circuit: string;       // "Circuit de Monaco"
+  circuitId: string;     // "monaco" — stable Ergast/Jolpica circuit identifier
   locality: string;      // "Monte-Carlo"
   country: string;       // "Monaco"
   countryCode: string;   // "MC"
@@ -58,6 +59,7 @@ type JolpicaRace = {
   round: string;
   raceName: string;
   Circuit: {
+    circuitId: string;
     circuitName: string;
     Location: {
       locality: string;
@@ -152,6 +154,7 @@ function jolpicaToRaceWeekend(race: JolpicaRace): RaceWeekend {
     name: race.raceName,
     shortName: race.raceName.replace(" Grand Prix", " GP"),
     circuit: race.Circuit.circuitName,
+    circuitId: race.Circuit.circuitId ?? "",
     locality,
     country,
     countryCode: getCountryCode(country, locality),
