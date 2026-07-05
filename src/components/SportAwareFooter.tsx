@@ -43,6 +43,12 @@ export function SportAwareFooter() {
             >
               Disclaimer
             </Link>
+            <Link
+              href="/cookie-policy"
+              className="text-slate-400 transition hover:text-white"
+            >
+              Cookie Policy
+            </Link>
           </nav>
           <p className="hidden md:block">
             © {new Date().getFullYear()} PitWall Apex.{" "}
