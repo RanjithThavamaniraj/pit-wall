@@ -340,7 +340,12 @@
 }
 
 .hero-dial-pill--done {
-  opacity: 0.62;
+  opacity: 0.36;
+  box-shadow: none;
+}
+
+.hero-dial-pill--secondary {
+  opacity: 0.78;
 }
 
 .hero-dial-pill-time {

@@ -12,7 +12,10 @@ import {
 import { countryCodeToFlag } from "@/lib/utils";
 
 function raceDisplayTitle(name: string): string {
-  return name.replace(/\s+Grand Prix$/i, "").toUpperCase();
+  return name
+    .replace(/^Grand Prix of\s+/i, "")
+    .replace(/\s+Grand Prix$/i, "")
+    .toUpperCase();
 }
 
 function sessionShortLabel(session: MotoGpSession): string {
@@ -77,6 +80,7 @@ export async function MotoGpHeroBoard() {
         raceTitle={raceDisplayTitle(event.name)}
         circuit={event.circuit}
         locality={event.locality}
+        country={event.country}
         flag={countryCodeToFlag(event.countryCode)}
         weekendLabel={weekendLabel}
         isLive={Boolean(liveSession)}

@@ -67,6 +67,7 @@ export async function F1HeroBoard() {
         raceTitle={raceDisplayTitle(race.name)}
         circuit={race.circuit}
         locality={race.locality}
+        country={race.country}
         flag={countryCodeToFlag(race.countryCode)}
         weekendLabel={weekendLabel}
         isLive={Boolean(liveSession)}

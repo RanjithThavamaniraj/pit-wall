@@ -31,6 +31,7 @@ export type PitWallHeroBoardProps = {
   raceTitle: string;
   circuit: string;
   locality: string;
+  country: string;
   flag: string;
   weekendLabel: string;
   isLive: boolean;
@@ -49,6 +50,7 @@ export function PitWallHeroBoard({
   raceTitle,
   circuit,
   locality,
+  country,
   flag,
   weekendLabel,
   isLive,
@@ -59,6 +61,13 @@ export function PitWallHeroBoard({
   championship,
 }: PitWallHeroBoardProps) {
   const roundLabel = `R${String(round).padStart(2, "0")}`;
+
+  const secondaryLocation =
+    locality && locality.toLowerCase() !== circuit.toLowerCase()
+      ? locality
+      : country && country.toLowerCase() !== circuit.toLowerCase()
+      ? country
+      : null;
 
   return (
     <section id="top" className={`hero-stage hero-stage--${sport}`}>
@@ -102,10 +111,10 @@ export function PitWallHeroBoard({
                 {flag}
               </span>
               <span className="text-lg text-slate-200">{circuit}</span>
-              {locality ? (
+              {secondaryLocation ? (
                 <>
                   <span className="text-white/20">·</span>
-                  <span>{locality}</span>
+                  <span>{secondaryLocation}</span>
                 </>
               ) : null}
             </p>
@@ -130,10 +139,10 @@ export function PitWallHeroBoard({
                     {championship.titleLabel}
                   </p>
                   <p className="mt-2 font-brand text-2xl font-bold text-white sm:text-3xl">
-                    <span className="text-[color:var(--hero-accent)]">
-                      {championship.leaderCode}
-                    </span>{" "}
                     {championship.leaderName}
+                    <span className="ml-2 text-sm font-semibold text-[color:var(--hero-accent)]">
+                      {championship.leaderCode}
+                    </span>
                     <span className="ml-2 text-lg text-slate-500">
                       {championship.leaderPoints} pts
                     </span>

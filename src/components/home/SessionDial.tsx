@@ -227,6 +227,7 @@ export function SessionDial({
           const isLive = session.status === "live";
           const isNext = index === nextIndex && session.status === "upcoming";
           const isDone = session.status === "completed";
+          const isSecondaryUpcoming = session.status === "upcoming" && !isNext;
           const timeLabel = session.dateUtc
             ? formatCompactTime(session.dateUtc)
             : "TBC";
@@ -243,6 +244,8 @@ export function SessionDial({
                   ? "hero-dial-pill--next"
                   : isDone
                   ? "hero-dial-pill--done"
+                  : isSecondaryUpcoming
+                  ? "hero-dial-pill--secondary"
                   : ""
               }`}
               style={
