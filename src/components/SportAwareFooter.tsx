@@ -37,6 +37,12 @@ export function SportAwareFooter() {
             >
               Privacy Policy
             </Link>
+            <Link
+              href="/disclaimer"
+              className="text-slate-400 transition hover:text-white"
+            >
+              Disclaimer
+            </Link>
           </nav>
           <p className="hidden md:block">
             © {new Date().getFullYear()} PitWall Apex.{" "}
