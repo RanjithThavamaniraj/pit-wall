@@ -13,6 +13,7 @@ import {
 } from "@/lib/timing";
 import { fetchSeasonSchedule } from "@/lib/schedule";
 import { getWeekendContext } from "@/lib/weekend";
+import { buildSessionBriefing } from "@/lib/session-briefing";
 import { LIVE_CACHE } from "@/lib/cache/live";
 
 export type OpenF1Lap = {
@@ -51,6 +52,8 @@ export const GET = withApiAnalytics("/api/live/timing", async function GET() {
       return NextResponse.json({ error: "No weekend context found" }, { status: 404 });
     }
 
+    const sessionBriefing = await buildSessionBriefing(weekendContext, schedule);
+
     // 2. Fetch the OpenF1 session mapping
     const sessionRes = await fetch(`${OPENF1_BASE}/sessions?session_key=latest`, {
       next: { revalidate: LIVE_CACHE.OPENF1_SESSION },
@@ -72,6 +75,7 @@ export const GET = withApiAnalytics("/api/live/timing", async function GET() {
           weekendContext,
           session: null,
           timing: [],
+          sessionBriefing,
         },
         { headers: { "Cache-Control": `public, s-maxage=${LIVE_CACHE.TIMING_UPCOMING_S_MAXAGE}` } }
       );
@@ -246,6 +250,7 @@ export const GET = withApiAnalytics("/api/live/timing", async function GET() {
       weekendContext,
       session: sessionStatus,
       timing: timingRows,
+      sessionBriefing,
     };
 
     // Cache long if completed, short if live

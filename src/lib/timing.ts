@@ -29,11 +29,13 @@ export type TimingRowData = {
 };
 
 import type { WeekendContext } from "./weekend";
+import type { SessionBriefing } from "./session-briefing";
 
 export type LiveTimingPayload = {
   weekendContext: WeekendContext;
   session: SessionStatus | null;
   timing: TimingRowData[];
+  sessionBriefing: SessionBriefing | null;
 };
 
 // OpenF1 Types

@@ -3,26 +3,30 @@
 import { useEffect, useState, useRef } from "react";
 import type { LiveTimingPayload } from "@/lib/timing";
 import type { WeekendContext } from "@/lib/weekend";
+import type { SessionBriefing } from "@/lib/session-briefing";
 import { Container, GlassCard } from "@/components/ui";
 import { EmptyWeekendState } from "@/components/live/WeekendPreviewShared";
 import { SessionStatusHeader } from "@/components/live/SessionStatusHeader";
 import { TimingBoard } from "@/components/live/TimingBoard";
 import { SessionCountdown } from "@/components/SessionCountdown";
-import { BriefingFeed } from "@/components/live/BriefingFeed";
+import { SessionBriefingPanel } from "@/components/live/SessionBriefingPanel";
 import { UpcomingSessionView } from "@/components/live/UpcomingSessionView";
 import { CompletedSessionView } from "@/components/live/CompletedSessionView";
 import { LIVE_CACHE } from "@/lib/cache/live";
 
 export default function LiveTimingClient({
   initialContext,
+  initialBriefing,
 }: {
   initialContext: WeekendContext | null;
+  initialBriefing: SessionBriefing | null;
 }) {
   const [data, setData] = useState<LiveTimingPayload | null>(null);
   const [error, setError] = useState<string | null>(null);
   const requestIdRef = useRef(0);
 
   const currentContext = data?.weekendContext || initialContext;
+  const currentBriefing = data?.sessionBriefing ?? initialBriefing;
   const state = currentContext?.state;
   const isLive = state === "LIVE";
   const isCompleted = state === "COMPLETED";
@@ -146,7 +150,7 @@ export default function LiveTimingClient({
         )}
 
         {isUpcoming ? (
-          <UpcomingSessionView context={currentContext} />
+          <UpcomingSessionView context={currentContext} briefing={currentBriefing} />
         ) : showSessionResults ? (
           <div className="space-y-5">
             <CompletedSessionView
@@ -171,9 +175,9 @@ export default function LiveTimingClient({
                     />
                   </GlassCard>
                 )}
-                <BriefingFeed
+                <SessionBriefingPanel
+                  briefing={currentBriefing}
                   nextSessionData={nextSessionData}
-                  isActiveSession={false}
                 />
               </div>
             )}
@@ -186,9 +190,9 @@ export default function LiveTimingClient({
             </div>
 
             <div className="min-w-0">
-              <BriefingFeed
+              <SessionBriefingPanel
+                briefing={currentBriefing}
                 nextSessionData={nextSessionData}
-                isActiveSession={true}
               />
             </div>
           </div>

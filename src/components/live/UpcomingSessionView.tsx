@@ -1,15 +1,17 @@
 "use client";
 
 import type { WeekendContext } from "@/lib/weekend";
-import { BriefingFeed } from "@/components/live/BriefingFeed";
+import type { SessionBriefing } from "@/lib/session-briefing";
+import { SessionBriefingPanel } from "@/components/live/SessionBriefingPanel";
 import { WeekendHero, NextSessionPanel } from "./WeekendPreviewShared";
 import { countryCodeToFlag } from "@/lib/utils";
 
 type Props = {
   context: WeekendContext;
+  briefing: SessionBriefing | null;
 };
 
-export function UpcomingSessionView({ context }: Props) {
+export function UpcomingSessionView({ context, briefing }: Props) {
   const { currentWeekend, nextSession } = context;
   const flag = countryCodeToFlag(currentWeekend.countryCode);
   const isSprintWeekend = currentWeekend.sessions.some(
@@ -49,7 +51,7 @@ export function UpcomingSessionView({ context }: Props) {
           circuit={currentWeekend.circuit}
           dateUtc={nextSession.dateUtc}
         />
-        <BriefingFeed nextSessionData={nextSessionData} isActiveSession={false} />
+        <SessionBriefingPanel briefing={briefing} nextSessionData={nextSessionData} />
       </div>
     </div>
   );
