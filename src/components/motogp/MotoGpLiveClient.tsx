@@ -131,7 +131,7 @@ export default function MotoGpLiveClient({
           <div className="grid gap-5 lg:grid-cols-2 lg:items-start">
             <div className="space-y-5">
               {countdownSession?.dateUtc && isBetweenSessions && (
-                <GlassCard className="p-6 text-center sm:p-8">
+                <GlassCard className="border-amber-300/20 bg-amber-300/[0.03] p-6 text-center sm:p-8">
                   <p className="text-sm font-semibold uppercase tracking-[0.24em] text-emerald-400">
                     Coming up next
                   </p>

@@ -29,7 +29,7 @@ export function WeekendOutlookSection({
           title="Weekend Outlook"
           description="Based on the latest available weekend data — recent form, championship momentum, and driver intelligence — who currently looks strongest. Not a prediction, not a vote."
         />
-        <GlassCard>
+        <GlassCard className="lg:max-w-lg">
           <p className="mb-4 text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">
             {outlook.phaseLine}
           </p>

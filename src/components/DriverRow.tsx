@@ -21,13 +21,13 @@ export function DriverRow({ driver, sport = "f1" }: Props) {
 
   return (
     <tr className="group border-b border-white/[0.05] transition hover:bg-white/[0.04]">
-      <td className="w-12 py-3 pl-5 pr-2 text-left">
+      <td className="w-12 py-3.5 pl-5 pr-2 text-left">
         <span className={`font-mono text-sm font-semibold ${positionColor}`}>
           {String(driver.position).padStart(2, "0")}
         </span>
       </td>
 
-      <td className="w-12 py-3 pr-2">
+      <td className="w-12 py-3.5 pr-2">
         <PersonAvatar
           sport={sport}
           name={fullName}
@@ -36,34 +36,34 @@ export function DriverRow({ driver, sport = "f1" }: Props) {
         />
       </td>
 
-      <td className="w-10 py-3 pr-3 text-center text-lg" aria-hidden="true">
+      <td className="w-10 py-3.5 pr-3 text-center text-lg" aria-hidden="true">
         {flag}
       </td>
 
-      <td className="min-w-0 py-3 pr-4">
+      <td className="min-w-0 py-3.5 pr-4">
         <p className="truncate text-sm font-semibold text-white">
           <span className="font-mono text-amber-200">{driver.driverCode}</span>{" "}
           {fullName}
         </p>
       </td>
 
-      <td className="hidden min-w-0 py-3 pr-4 md:table-cell">
+      <td className="hidden min-w-0 py-3.5 pr-4 md:table-cell">
         <p className="truncate text-xs text-slate-500">
           {driver.constructorName}
         </p>
       </td>
 
-      <td className="hidden py-3 pr-5 text-right sm:table-cell">
+      <td className="hidden py-3.5 pr-5 text-right sm:table-cell">
         <span className="font-mono text-xs text-slate-500">
           {driver.gapToLeader === 0 ? "Leader" : `−${driver.gapToLeader}`}
         </span>
       </td>
 
-      <td className="hidden py-3 pr-5 text-right md:table-cell">
+      <td className="hidden py-3.5 pr-5 text-right md:table-cell">
         <span className="font-mono text-xs text-slate-500">{driver.wins}</span>
       </td>
 
-      <td className="py-3 pr-5 text-right">
+      <td className="py-3.5 pr-5 text-right">
         <span className="font-mono text-sm font-semibold text-white">
           {driver.points}
         </span>

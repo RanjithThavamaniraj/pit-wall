@@ -97,7 +97,7 @@
   grid-template-columns: 3rem 3.5rem 1fr auto;
   gap: 1rem;
   align-items: center;
-  padding: 0.9rem 0;
+  padding: 1.1rem 0;
   text-decoration: none;
   color: inherit;
   transition: background 0.15s;
@@ -138,9 +138,9 @@
 
 .hub-board-title {
   font-family: var(--font-geist-mono), monospace;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 600;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
   color: #f8fafc;
 }
@@ -149,7 +149,7 @@
   margin-top: 0.25rem;
   font-family: var(--font-geist-mono), monospace;
   font-size: 11px;
-  color: #64748b;
+  color: #94a3b8;
   line-height: 1.5;
 }
 

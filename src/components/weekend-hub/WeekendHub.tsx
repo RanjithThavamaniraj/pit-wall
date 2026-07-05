@@ -68,7 +68,7 @@ export async function WeekendHub({
 
   return (
     <section className="pb-12" aria-label="Race weekend hub">
-      <Container wide className="space-y-5">
+      <Container wide className="space-y-6">
         <WeekendStatus data={data} />
 
         <WeekendStageTimeline stages={stages} />

@@ -67,7 +67,7 @@ export function NextSessionPanel({
         <p className="text-sm text-slate-400">{circuit}</p>
       </div>
 
-      <GlassCard className="p-5 text-center sm:p-6">
+      <GlassCard className="border-amber-300/20 bg-amber-300/[0.03] p-5 text-center sm:p-6">
         <SessionCountdown
           targetDate={dateUtc}
           sessionLabel={sessionLabel}

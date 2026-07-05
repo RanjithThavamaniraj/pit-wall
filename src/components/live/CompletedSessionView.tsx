@@ -102,7 +102,7 @@ export function CompletedSessionView({
 
       {/* Next Session Panel */}
       {nextSession && (
-        <GlassCard className="mx-auto w-full max-w-2xl p-6 text-center lg:mx-0 lg:text-left">
+        <GlassCard className="mx-auto w-full max-w-2xl border-amber-300/20 bg-amber-300/[0.03] p-6 text-center lg:mx-0 lg:text-left">
           <h4 className="mb-3 text-xs font-semibold uppercase tracking-widest text-slate-500">
             Coming Up Next
           </h4>
