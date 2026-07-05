@@ -1,6 +1,5 @@
 import type { WeekendContext } from "@/lib/weekend";
 import type { TimingRowData } from "@/lib/timing";
-import { SessionCountdown } from "@/components/SessionCountdown";
 import { GlassCard } from "@/components/ui";
 
 type Props = {
@@ -14,7 +13,7 @@ export function CompletedSessionView({
   timing,
   betweenSessions = false,
 }: Props) {
-  const { currentWeekend, activeSession, nextSession } = context;
+  const { currentWeekend, activeSession } = context;
 
   return (
     <div className="flex flex-col gap-6">
@@ -99,21 +98,6 @@ export function CompletedSessionView({
           </table>
         </div>
       </div>
-
-      {/* Next Session Panel */}
-      {nextSession && (
-        <GlassCard className="mx-auto w-full max-w-2xl border-amber-300/20 bg-amber-300/[0.03] p-6 text-center lg:mx-0 lg:text-left">
-          <h4 className="mb-3 text-xs font-semibold uppercase tracking-widest text-slate-500">
-            Coming Up Next
-          </h4>
-          <h3 className="mb-5 text-2xl font-semibold text-white">{nextSession.label}</h3>
-          <SessionCountdown
-            targetDate={nextSession.dateUtc}
-            sessionLabel={nextSession.label}
-            variant="full"
-          />
-        </GlassCard>
-      )}
     </div>
   );
 }
