@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { PitWallBrandLockup } from "@/components/brand/PitWallBrandLockup";
 import { useSportPreference } from "@/hooks/useSportPreference";
 import { SPORT_SUBTITLES } from "@/lib/sport";
@@ -22,7 +23,15 @@ export function SportAwareFooter() {
             showSubtitle
           />
         </div>
-        <div className="flex flex-col gap-2 text-sm text-slate-400">
+        <div className="flex flex-col gap-3 text-sm text-slate-400 sm:items-end">
+          <nav aria-label="Footer" className="flex items-center gap-4">
+            <Link
+              href="/about"
+              className="text-slate-400 transition hover:text-white"
+            >
+              About
+            </Link>
+          </nav>
           <p className="hidden md:block">
             © {new Date().getFullYear()} PitWall Apex.{" "}
             {SPORT_SUBTITLES[activeSport]} Weekend Hub.
