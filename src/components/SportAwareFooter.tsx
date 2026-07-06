@@ -49,6 +49,12 @@ export function SportAwareFooter() {
             >
               Cookie Policy
             </Link>
+            <Link
+              href="/terms"
+              className="text-slate-400 transition hover:text-white"
+            >
+              Terms &amp; Conditions
+            </Link>
           </nav>
           <p className="hidden md:block">
             © {new Date().getFullYear()} PitWall Apex.{" "}
