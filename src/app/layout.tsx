@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono, Rajdhani } from "next/font/google";
+import { SITE_URL } from "@/lib/site";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -22,9 +23,7 @@ const rajdhani = Rajdhani({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(
-    process.env.NEXT_PUBLIC_SITE_URL ?? "https://pitwall-apex.vercel.app"
-  ),
+  metadataBase: new URL(SITE_URL),
   title: {
     default: "PitWall Apex — Motorsport Weekend Hub",
     template: "%s | PitWall Apex",

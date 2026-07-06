@@ -1,9 +1,7 @@
 import type { MetadataRoute } from "next";
 import { fetchMotoGpSchedule } from "@/lib/motogp";
 import { fetchSeasonSchedule } from "@/lib/schedule";
-
-const BASE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL ?? "https://pitwall-apex.vercel.app";
+import { SITE_URL } from "@/lib/site";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticPaths = [
@@ -37,7 +35,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const lastModified = new Date();
 
   return [...staticPaths, ...racePaths].map((path) => ({
-    url: `${BASE_URL}${path}`,
+    url: `${SITE_URL}${path}`,
     lastModified,
   }));
 }
