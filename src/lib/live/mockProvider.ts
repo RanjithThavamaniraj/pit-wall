@@ -1,6 +1,7 @@
 import type { LiveRaceProvider } from "./provider";
 import type {
   ActiveSector,
+  Championship,
   LiveDriverState,
   LiveRaceState,
   RaceFlag,
@@ -12,7 +13,30 @@ function advanceProgress(current: number, delta: number): number {
   return (current + delta) % 1;
 }
 
-function createInitialState(): LiveRaceState {
+function createInitialState(championship: Championship): LiveRaceState {
+  if (championship === "motogp") {
+    return {
+      championship: "motogp",
+      sessionStatus: "live",
+      lap: 8,
+      totalLaps: 25,
+      flag: "green",
+      activeSector: 1,
+      raceFinished: false,
+      progressSource: "simulated",
+      fastestLap: {
+        code: "93",
+        time: "1:30.112",
+        lap: 5,
+      },
+      drivers: [
+        { position: 1, code: "93", progress: 0.12, pit: false },
+        { position: 2, code: "63", progress: 0.08, pit: false },
+        { position: 3, code: "73", progress: 0.04, pit: false },
+      ],
+    };
+  }
+
   return {
     championship: "f1",
     sessionStatus: "live",
@@ -54,9 +78,12 @@ function sectorFromProgress(progress: number): ActiveSector {
 /**
  * Realistic local simulation for TrackMap development.
  * Moves P1–P3, advances lap, cycles sectors/flags, and occasional pits.
+ * Sport-specific: never reuse F1 driver codes for MotoGP (or vice versa).
  */
-export function createMockProvider(): LiveRaceProvider {
-  let state = createInitialState();
+export function createMockProvider(
+  championship: Championship = "f1"
+): LiveRaceProvider {
+  let state = createInitialState(championship);
   let tick = 0;
   let intervalId: ReturnType<typeof setInterval> | null = null;
   const listeners = new Set<(next: LiveRaceState | null) => void>();
@@ -128,13 +155,17 @@ export function createMockProvider(): LiveRaceProvider {
     if (tick % 41 === 0 && leader) {
       fastestLap = {
         code: leader.code,
-        time: `1:1${(tick % 9) + 1}.${String(100 + (tick % 800)).slice(0, 3)}`,
+        time:
+          championship === "motogp"
+            ? `1:3${tick % 9}.${String(100 + (tick % 800)).slice(0, 3)}`
+            : `1:1${(tick % 9) + 1}.${String(100 + (tick % 800)).slice(0, 3)}`,
         lap,
       };
     }
 
     state = {
       ...state,
+      championship,
       lap: raceFinished ? state.totalLaps : lap,
       flag: raceFinished ? "green" : flag,
       activeSector: leader ? sectorFromProgress(leader.progress) : null,

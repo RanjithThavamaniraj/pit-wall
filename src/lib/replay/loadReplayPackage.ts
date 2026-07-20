@@ -6,7 +6,8 @@ import type { ReplayPackage } from "./types";
 
 /**
  * Load a ReplayPackage from content storage.
- * Returns null when the package is missing or invalid — never fabricates data.
+ * Returns null when the package is missing, invalid, or sport/slug mismatched.
+ * Never fabricates lap movement.
  */
 export async function loadReplayPackage(
   sport: Championship,
@@ -22,7 +23,11 @@ export async function loadReplayPackage(
 
   try {
     const raw = await fs.readFile(filePath, "utf8");
-    return buildPackage(JSON.parse(raw) as unknown);
+    const pkg = buildPackage(JSON.parse(raw) as unknown);
+    if (!pkg) return null;
+    // Reject cross-sport or misfiled content (e.g. F1 package under motogp/).
+    if (pkg.sport !== sport || pkg.slug !== slug) return null;
+    return pkg;
   } catch {
     return null;
   }

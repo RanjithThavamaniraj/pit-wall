@@ -8,6 +8,7 @@ import { createMotoGpProvider } from "./motoGpProvider";
 import type { Championship, LiveRaceState } from "./types";
 
 const rawCache = new Map<LiveProviderId, LiveRaceProvider>();
+const mockCache = new Map<Championship, LiveRaceProvider>();
 const autoCache = new Map<Championship, LiveRaceProvider>();
 
 function getRawProvider(id: LiveProviderId): LiveRaceProvider {
@@ -19,9 +20,18 @@ function getRawProvider(id: LiveProviderId): LiveRaceProvider {
       ? createF1Provider()
       : id === "motogp"
       ? createMotoGpProvider()
-      : createMockProvider();
+      : createMockProvider("f1");
 
   rawCache.set(id, provider);
+  return provider;
+}
+
+/** Sport-specific mock — MotoGP must never reuse F1 driver codes. */
+function getMockProvider(championship: Championship): LiveRaceProvider {
+  const cached = mockCache.get(championship);
+  if (cached) return cached;
+  const provider = createMockProvider(championship);
+  mockCache.set(championship, provider);
   return provider;
 }
 
@@ -36,7 +46,7 @@ function getAutoProvider(championship: Championship): LiveRaceProvider {
 
   const liveProvider =
     championship === "f1" ? getRawProvider("f1") : getRawProvider("motogp");
-  const mockProvider = getRawProvider("mock");
+  const mockProvider = getMockProvider(championship);
 
   const listeners = new Set<(state: LiveRaceState | null) => void>();
   let snapshot: LiveRaceState | null = null;
@@ -56,6 +66,7 @@ function getAutoProvider(championship: Championship): LiveRaceProvider {
       return;
     }
 
+    // Mock is already sport-scoped; do not cross-stamp F1 codes onto MotoGP.
     snapshot = {
       ...mock,
       championship,

@@ -45,7 +45,9 @@ export function RaceReplaySection({
   pkg,
 }: Props) {
   const svgUrl = pkg?.circuitSvgUrl ?? circuitSvgUrl;
-  const canPlay = pkg !== null && svgUrl !== null;
+  // Sport-aware gate: never activate player with a cross-sport package.
+  const canPlay =
+    pkg !== null && pkg.sport === sport && svgUrl !== null;
 
   return (
     <section
