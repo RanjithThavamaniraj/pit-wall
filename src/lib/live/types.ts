@@ -17,7 +17,7 @@ export type RaceFlag =
 export type ActiveSector = 1 | 2 | 3 | null;
 
 /** How driver progress along the circuit was obtained. */
-export type ProgressSource = "gps" | "timing" | "simulated";
+export type ProgressSource = "gps" | "timing" | "simulated" | "replay";
 
 export type LiveDriverState = {
   position: 1 | 2 | 3;
@@ -54,7 +54,8 @@ export type LiveRaceState = {
    * Origin of driver progress values.
    * - gps: derived from location coordinates (F1 / OpenF1)
    * - timing: derived from gaps / lap clock (MotoGP)
-   * - simulated: mock provider
+   * - simulated: mock / local demo provider
+   * - replay: historical ReplayPackage projection
    */
   progressSource: ProgressSource;
 };

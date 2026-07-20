@@ -11,7 +11,8 @@ export function isValidLiveRaceState(
   if (
     v.progressSource !== "gps" &&
     v.progressSource !== "timing" &&
-    v.progressSource !== "simulated"
+    v.progressSource !== "simulated" &&
+    v.progressSource !== "replay"
   ) {
     return false;
   }

@@ -4,8 +4,11 @@ import Link from "next/link";
 import { fetchMotoGpEventBySlug, fetchMotoGpSchedule } from "@/lib/motogp";
 import { loadRaceWeekendSummary } from "@/lib/race-summary/loader";
 import { countryCodeToFlag } from "@/lib/utils";
+import { getCircuitOutlinePath } from "@/lib/circuit-outline";
+import { loadReplayPackage } from "@/lib/replay/loadReplayPackage";
 import { weekendHubFromMotoGp } from "@/lib/weekend-hub";
 import { WeekendHub } from "@/components/weekend-hub";
+import { RaceReplaySection } from "@/components/replay";
 import { Container, StatusPill } from "@/components/ui";
 
 export async function generateStaticParams() {
@@ -53,6 +56,13 @@ export default async function MotoGpRaceDetailPage({
   const summary = event.isPast
     ? await loadRaceWeekendSummary("motogp", slug)
     : null;
+  const replayPackage = event.isPast
+    ? await loadReplayPackage("motogp", slug)
+    : null;
+  const circuitSvgUrl = getCircuitOutlinePath("motogp", {
+    id: event.circuitId,
+    name: event.circuit,
+  });
 
   const flag = countryCodeToFlag(event.countryCode);
   const liveSession = event.sessions.find((s) => s.status === "live");
@@ -121,6 +131,20 @@ export default async function MotoGpRaceDetailPage({
           </div>
         </Container>
       </section>
+
+      {event.isPast ? (
+        <div className="pb-6">
+          <Container wide>
+            <RaceReplaySection
+              sport="motogp"
+              raceName={event.name}
+              circuitName={event.circuit}
+              circuitSvgUrl={circuitSvgUrl}
+              pkg={replayPackage}
+            />
+          </Container>
+        </div>
+      ) : null}
 
       <WeekendHub
         data={hubData}

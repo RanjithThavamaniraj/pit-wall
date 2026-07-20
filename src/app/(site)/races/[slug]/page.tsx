@@ -4,8 +4,11 @@ import Link from "next/link";
 import { fetchSeasonSchedule, fetchRaceBySlug } from "@/lib/schedule";
 import { loadRaceWeekendSummary } from "@/lib/race-summary/loader";
 import { countryCodeToFlag } from "@/lib/utils";
+import { getCircuitOutlinePath } from "@/lib/circuit-outline";
+import { loadReplayPackage } from "@/lib/replay/loadReplayPackage";
 import { weekendHubFromF1 } from "@/lib/weekend-hub";
 import { WeekendHub } from "@/components/weekend-hub";
+import { RaceReplaySection } from "@/components/replay";
 import { Container, StatusPill } from "@/components/ui";
 
 // ─── Static params — pre-generate all 24 race pages at build time ─────────────
@@ -59,6 +62,13 @@ export default async function RaceDetailPage({
   const summary = race.isPast
     ? await loadRaceWeekendSummary("f1", slug)
     : null;
+  const replayPackage = race.isPast
+    ? await loadReplayPackage("f1", slug)
+    : null;
+  const circuitSvgUrl = getCircuitOutlinePath("f1", {
+    id: race.circuitId,
+    name: race.circuit,
+  });
 
   const flag = countryCodeToFlag(race.countryCode);
   const liveSession = race.sessions.find((s) => s.status === "live");
@@ -130,6 +140,20 @@ export default async function RaceDetailPage({
           </div>
         </Container>
       </section>
+
+      {race.isPast ? (
+        <div className="pb-6">
+          <Container wide>
+            <RaceReplaySection
+              sport="f1"
+              raceName={race.name}
+              circuitName={race.circuit}
+              circuitSvgUrl={circuitSvgUrl}
+              pkg={replayPackage}
+            />
+          </Container>
+        </div>
+      ) : null}
 
       <WeekendHub
         data={hubData}
