@@ -2,6 +2,7 @@
 
 import { Container } from "@/components/ui";
 import { SessionDial } from "@/components/home/SessionDial";
+import { HeroCircuit } from "@/components/home/HeroCircuit";
 
 export type HeroBoardSession = {
   id: string;
@@ -76,16 +77,9 @@ export function PitWallHeroBoard({
       <div className="hero-stage-beam" aria-hidden="true" />
       <div className="hero-stage-glow" aria-hidden="true" />
       <div className="hero-stage-speedline" aria-hidden="true" />
-      {circuitSvg && (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src={circuitSvg}
-          alt=""
-          aria-hidden="true"
-          draggable={false}
-          className="hero-stage-circuit"
-        />
-      )}
+      {circuitSvg ? (
+        <HeroCircuit circuitSvgUrl={circuitSvg} circuitName={circuit} />
+      ) : null}
       <div className="hero-stage-vignette" aria-hidden="true" />
       <div className="hero-stage-checker" aria-hidden="true" />
       <div className="hero-stage-round" aria-hidden="true">
@@ -93,7 +87,10 @@ export function PitWallHeroBoard({
       </div>
       <div className="hero-stage-fade" aria-hidden="true" />
 
-      <Container wide className="relative z-[2] flex min-h-[inherit] flex-col justify-center py-12 sm:py-16 lg:py-20">
+      <Container
+        wide
+        className="relative z-[2] flex min-h-[inherit] flex-col justify-center py-12 sm:py-16 lg:py-20"
+      >
         <div className="flex flex-wrap items-center justify-center gap-3 font-mono text-[11px] uppercase tracking-[0.28em] text-slate-500 lg:justify-start">
           {isLive && (
             <span className="hero-live-dot flex items-center gap-2 text-red-400">
@@ -159,7 +156,9 @@ export function PitWallHeroBoard({
                       {championship.leaderPoints} pts
                     </span>
                   </p>
-                  <p className="mt-1 text-sm text-slate-500">{championship.leaderTeam}</p>
+                  <p className="mt-1 text-sm text-slate-500">
+                    {championship.leaderTeam}
+                  </p>
                 </div>
                 <div className="flex flex-wrap items-end justify-center gap-8 font-mono text-sm lg:justify-end">
                   <div>
