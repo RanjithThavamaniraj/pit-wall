@@ -3,5 +3,7 @@ export { WeekendStatus } from "./WeekendStatus";
 export { WeekendStageTimeline } from "./WeekendStageTimeline";
 export { CurrentSessionCard } from "./CurrentSessionCard";
 export { WeekendScheduleSection } from "./WeekendScheduleSection";
+export { WeekendSessionRow } from "./WeekendSessionRow";
+export { WeekendWeatherCard } from "./WeekendWeatherCard";
 export { WeekendHubArchiveSections } from "./WeekendHubArchiveSections";
 export { LiveEventFeed } from "./LiveEventFeed";

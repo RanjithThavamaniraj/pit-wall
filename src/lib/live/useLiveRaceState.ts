@@ -26,8 +26,9 @@ function getRawProvider(id: LiveProviderId): LiveRaceProvider {
 }
 
 /**
- * Prefers the championship's live feed; falls back to mock when the live
- * provider has no session data or has failed.
+ * Prefers the championship live feed; falls back to mock when live is null.
+ * Caches the resolved snapshot so getSnapshot stays referentially stable
+ * between notifications (required by useSyncExternalStore).
  */
 function getAutoProvider(championship: Championship): LiveRaceProvider {
   const cached = autoCache.get(championship);
@@ -36,16 +37,26 @@ function getAutoProvider(championship: Championship): LiveRaceProvider {
   const liveProvider =
     championship === "f1" ? getRawProvider("f1") : getRawProvider("motogp");
   const mockProvider = getRawProvider("mock");
-  const listeners = new Set<(state: LiveRaceState) => void>();
 
-  function resolve(): LiveRaceState | null {
+  const listeners = new Set<(state: LiveRaceState | null) => void>();
+  let snapshot: LiveRaceState | null = null;
+  let liveUnsub: (() => void) | null = null;
+  let mockUnsub: (() => void) | null = null;
+
+  function recompute() {
     const live = liveProvider.getSnapshot();
-    if (live && live.drivers.length > 0) return live;
+    if (live && live.drivers.length > 0) {
+      snapshot = live;
+      return;
+    }
 
     const mock = mockProvider.getSnapshot();
-    if (!mock) return null;
+    if (!mock) {
+      snapshot = null;
+      return;
+    }
 
-    return {
+    snapshot = {
       ...mock,
       championship,
       progressSource: "simulated",
@@ -53,25 +64,43 @@ function getAutoProvider(championship: Championship): LiveRaceProvider {
   }
 
   function emit() {
-    const next = resolve();
-    if (!next) return;
-    for (const listener of listeners) listener(next);
+    recompute();
+    for (const listener of listeners) listener(snapshot);
   }
 
-  liveProvider.subscribe(() => emit());
-  mockProvider.subscribe(() => emit());
+  function ensureUpstream() {
+    if (!liveUnsub) {
+      liveUnsub = liveProvider.subscribe(() => emit());
+    }
+    if (!mockUnsub) {
+      mockUnsub = mockProvider.subscribe(() => emit());
+    }
+  }
+
+  function releaseUpstream() {
+    if (listeners.size > 0) return;
+    liveUnsub?.();
+    liveUnsub = null;
+    mockUnsub?.();
+    mockUnsub = null;
+  }
 
   const provider: LiveRaceProvider = {
     id: championship === "f1" ? "f1" : "motogp",
     subscribe(listener) {
+      const wasEmpty = listeners.size === 0;
       listeners.add(listener);
-      const current = resolve();
-      if (current) listener(current);
+      if (wasEmpty) ensureUpstream();
+      recompute();
+      listener(snapshot);
       return () => {
         listeners.delete(listener);
+        releaseUpstream();
       };
     },
-    getSnapshot: resolve,
+    getSnapshot() {
+      return snapshot;
+    },
   };
 
   autoCache.set(championship, provider);

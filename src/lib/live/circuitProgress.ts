@@ -21,6 +21,15 @@ type ReferenceRing = {
 const MIN_SAMPLES = 24;
 const MAX_SAMPLES = 180;
 const MIN_RING_LENGTH = 500; // OpenF1 units — reject degenerate rings
+const MAX_PROJECTION_DISTANCE = 2500; // reject wild GPS outliers
+
+function isValidSample(sample: LocationSample): boolean {
+  return (
+    Number.isFinite(sample.x) &&
+    Number.isFinite(sample.y) &&
+    !(sample.x === 0 && sample.y === 0)
+  );
+}
 
 function dist(a: LocationSample, b: LocationSample): number {
   const dx = a.x - b.x;
@@ -31,7 +40,6 @@ function dist(a: LocationSample, b: LocationSample): number {
 function buildRing(samples: LocationSample[]): ReferenceRing | null {
   if (samples.length < MIN_SAMPLES) return null;
 
-  // Downsample while preserving order — keep spacing meaningful.
   const spaced: LocationSample[] = [samples[0]];
   for (let i = 1; i < samples.length; i++) {
     if (dist(spaced[spaced.length - 1], samples[i]) >= 40) {
@@ -46,7 +54,7 @@ function buildRing(samples: LocationSample[]): ReferenceRing | null {
     total += dist(spaced[i - 1], spaced[i]);
     cumulative.push(total);
   }
-  // Close the loop toward the first point when near end of lap
+
   const close = dist(spaced[spaced.length - 1], spaced[0]);
   if (close < total * 0.15) {
     total += close;
@@ -67,7 +75,7 @@ function buildRing(samples: LocationSample[]): ReferenceRing | null {
 function projectOntoRing(
   ring: ReferenceRing,
   point: LocationSample
-): number {
+): number | null {
   let bestDist = Infinity;
   let bestProgress = 0;
 
@@ -91,6 +99,10 @@ function projectOntoRing(
     }
   }
 
+  if (!Number.isFinite(bestDist) || bestDist > MAX_PROJECTION_DISTANCE) {
+    return null;
+  }
+
   return ((bestProgress % 1) + 1) % 1;
 }
 
@@ -101,6 +113,18 @@ function projectOntoRing(
 export class CircuitProgressService {
   private leaderBuffers = new Map<string, LocationSample[]>();
   private rings = new Map<string, ReferenceRing>();
+  private activeSessionKey: string | null = null;
+
+  /**
+   * Bind calibration to an OpenF1 session. Clears rings when the session changes
+   * so a new weekend does not inherit a stale path.
+   */
+  beginSession(sessionKey: string): void {
+    if (!sessionKey) return;
+    if (this.activeSessionKey === sessionKey) return;
+    this.reset();
+    this.activeSessionKey = sessionKey;
+  }
 
   /**
    * Ingest chronological leader samples to (re)build the reference ring
@@ -109,8 +133,11 @@ export class CircuitProgressService {
   ingestLeaderSamples(circuitKey: string, samples: LocationSample[]): void {
     if (!circuitKey || samples.length === 0) return;
 
+    const valid = samples.filter(isValidSample);
+    if (valid.length === 0) return;
+
     const existing = this.leaderBuffers.get(circuitKey) ?? [];
-    const merged = [...existing, ...samples].slice(-MAX_SAMPLES);
+    const merged = [...existing, ...valid].slice(-MAX_SAMPLES);
     this.leaderBuffers.set(circuitKey, merged);
 
     const ring = buildRing(merged);
@@ -126,18 +153,19 @@ export class CircuitProgressService {
 
   /**
    * Project an OpenF1 (x, y) onto the calibrated ring → progress 0–1.
-   * Returns null when calibration is insufficient.
+   * Returns null when calibration is insufficient or the sample is invalid.
    */
   progressAt(
     circuitKey: string,
     sample: LocationSample
   ): number | null {
+    if (!isValidSample(sample)) return null;
     const ring = this.rings.get(circuitKey);
     if (!ring) return null;
     return projectOntoRing(ring, sample);
   }
 
-  /** Clear calibration (tests / circuit change). */
+  /** Clear calibration (session change / tests). */
   reset(circuitKey?: string): void {
     if (circuitKey) {
       this.leaderBuffers.delete(circuitKey);
@@ -146,6 +174,7 @@ export class CircuitProgressService {
     }
     this.leaderBuffers.clear();
     this.rings.clear();
+    this.activeSessionKey = null;
   }
 }
 

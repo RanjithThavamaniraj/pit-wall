@@ -3,12 +3,15 @@ import type { SessionStatus } from "@/lib/utils";
 
 export type HubSport = RaceSummarySport;
 
+/** Session lifecycle on the weekend hub (extends schedule status with cancelled). */
+export type HubSessionStatus = SessionStatus | "cancelled";
+
 export type HubSession = {
   id: string;
   key: string;
   label: string;
   dateUtc: string;
-  status: SessionStatus;
+  status: HubSessionStatus;
 };
 
 export type WeekendPhase = "upcoming" | "live" | "completed" | "cancelled";

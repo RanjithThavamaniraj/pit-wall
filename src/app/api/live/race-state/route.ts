@@ -3,13 +3,20 @@ import { withApiAnalytics } from "@/lib/analytics/api-wrapper";
 import { LIVE_CACHE } from "@/lib/cache/live";
 import { buildF1LiveRaceState } from "@/lib/live/f1/buildLiveRaceState";
 import { buildMotoGpLiveRaceState } from "@/lib/live/motogp/buildLiveRaceState";
-import type { Championship, LiveRaceState } from "@/lib/live/types";
+import type { Championship } from "@/lib/live/types";
+import { isValidLiveRaceState } from "@/lib/live/validateState";
 
 export const dynamic = "force-dynamic";
 
 function parseSport(value: string | null): Championship | null {
   if (value === "f1" || value === "motogp") return value;
   return null;
+}
+
+function idleHeaders() {
+  return {
+    "Cache-Control": `public, s-maxage=${LIVE_CACHE.RACE_STATE_IDLE_S_MAXAGE}, stale-while-revalidate=10`,
+  };
 }
 
 export const GET = withApiAnalytics(
@@ -26,24 +33,20 @@ export const GET = withApiAnalytics(
     }
 
     try {
-      const state: LiveRaceState | null =
+      const raw =
         sport === "f1"
           ? await buildF1LiveRaceState()
           : await buildMotoGpLiveRaceState();
 
-      if (!state) {
+      if (!raw || !isValidLiveRaceState(raw)) {
         return NextResponse.json(
-          { state: null, reason: "no_live_session" },
-          {
-            headers: {
-              "Cache-Control": `public, s-maxage=${LIVE_CACHE.RACE_STATE_IDLE_S_MAXAGE}, stale-while-revalidate=10`,
-            },
-          }
+          { state: null, reason: raw ? "invalid_payload" : "no_live_session" },
+          { headers: idleHeaders() }
         );
       }
 
       return NextResponse.json(
-        { state },
+        { state: raw },
         {
           headers: {
             "Cache-Control": `public, s-maxage=${LIVE_CACHE.RACE_STATE_LIVE_S_MAXAGE}, stale-while-revalidate=${LIVE_CACHE.TIMING_STALE_WHILE_REVALIDATE}`,
@@ -54,7 +57,7 @@ export const GET = withApiAnalytics(
       console.error(`[race-state] ${sport} provider error:`, error);
       return NextResponse.json(
         { state: null, reason: "provider_error" },
-        { status: 200 }
+        { status: 200, headers: idleHeaders() }
       );
     }
   }

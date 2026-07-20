@@ -41,23 +41,32 @@ type LitePayload = {
 
 /** Process-local interpolator state for smooth timing-based progress. */
 type TimingProgressMemory = {
+  sessionId: string | null;
   progress: Map<string, number>;
   lastTick: number;
   avgLapSeconds: number;
 };
 
 const timingMemory: TimingProgressMemory = {
+  sessionId: null,
   progress: new Map(),
   lastTick: 0,
   avgLapSeconds: 110,
 };
+
+function resetTimingMemory(sessionId: string) {
+  timingMemory.sessionId = sessionId;
+  timingMemory.progress.clear();
+  timingMemory.lastTick = 0;
+  timingMemory.avgLapSeconds = 110;
+}
 
 function parseGapSeconds(raw: string | undefined): number | null {
   if (!raw) return null;
   const trimmed = raw.trim();
   if (!trimmed || trimmed === "0.000" || trimmed === "-") return 0;
   if (/lap/i.test(trimmed)) return null;
-  const normalized = trimmed.replace("'", ":").replace(/^\\+/, "");
+  const normalized = trimmed.replace("'", ":").replace(/^\+/, "");
   if (normalized.includes(":")) {
     const parts = normalized.split(":");
     const mins = Number(parts[0]);
@@ -161,7 +170,12 @@ export async function buildMotoGpLiveRaceState(): Promise<LiveRaceState | null> 
     if (!res.ok) return null;
     const text = await res.text();
     if (!text || !text.trim()) return null;
-    payload = JSON.parse(text) as LitePayload;
+    try {
+      payload = JSON.parse(text) as LitePayload;
+    } catch {
+      return null;
+    }
+    if (!payload || typeof payload !== "object") return null;
   } catch {
     return null;
   }
@@ -185,6 +199,16 @@ export async function buildMotoGpLiveRaceState(): Promise<LiveRaceState | null> 
   // Only live sessions — finished/upcoming fall through to mock.
   if (sessionStatus !== "live" && sessionStatus !== "suspended") {
     return null;
+  }
+
+  const sessionId = [
+    payload.head.session_shortname ?? "",
+    payload.head.session_name ?? "",
+    String(payload.head.num_laps ?? ""),
+  ].join("|");
+
+  if (timingMemory.sessionId !== sessionId) {
+    resetTimingMemory(sessionId);
   }
 
   // Learn average lap time from best visible lap times
@@ -234,8 +258,8 @@ export async function buildMotoGpLiveRaceState(): Promise<LiveRaceState | null> 
 
     let progress = blendProgress(prev, target, dtSeconds, confidence);
     if (rider.on_pit) {
-      // Freeze near pit entry — slow drift only
-      progress = blendProgress(prev ?? target, prev ?? target, dtSeconds, 0.15);
+      // Freeze progress while in pit — no drift
+      progress = prev ?? target;
     }
 
     timingMemory.progress.set(key, progress);

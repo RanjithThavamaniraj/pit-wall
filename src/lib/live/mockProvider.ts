@@ -59,7 +59,7 @@ export function createMockProvider(): LiveRaceProvider {
   let state = createInitialState();
   let tick = 0;
   let intervalId: ReturnType<typeof setInterval> | null = null;
-  const listeners = new Set<(next: LiveRaceState) => void>();
+  const listeners = new Set<(next: LiveRaceState | null) => void>();
 
   function emit() {
     for (const listener of listeners) listener(state);
@@ -89,8 +89,7 @@ export function createMockProvider(): LiveRaceProvider {
 
     const drivers: LiveDriverState[] = state.drivers.map((driver, index) => {
       const baseDelta =
-        (0.028 - index * 0.004 + (Math.sin(tick + index) * 0.004)) *
-        speedScale;
+        (0.028 - index * 0.004 + Math.sin(tick + index) * 0.004) * speedScale;
       const inPit = index === pitDriverIndex;
       return {
         ...driver,
@@ -109,11 +108,14 @@ export function createMockProvider(): LiveRaceProvider {
     }));
 
     const leader = ranked[0];
+    const previousLeader = leader
+      ? state.drivers.find((d) => d.code === leader.code)
+      : undefined;
     const crossedLine =
-      leader &&
-      state.drivers[0] &&
+      leader != null &&
+      previousLeader != null &&
       leader.progress < 0.05 &&
-      state.drivers.find((d) => d.code === leader.code)!.progress > 0.9;
+      previousLeader.progress > 0.9;
 
     let lap = state.lap;
     if (crossedLine && !underCaution) {

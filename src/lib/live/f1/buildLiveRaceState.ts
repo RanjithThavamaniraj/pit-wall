@@ -60,10 +60,15 @@ async function openf1Json<T>(
       next: { revalidate },
     });
     if (!res.ok) return null;
-    return (await res.json()) as T;
+    const data: unknown = await res.json();
+    return data as T;
   } catch {
     return null;
   }
+}
+
+function asArray<T>(value: T[] | null | undefined): T[] {
+  return Array.isArray(value) ? value : [];
 }
 
 function mapFlag(raceControl: OpenF1RaceControl[]): RaceFlag {
@@ -169,32 +174,41 @@ export async function buildF1LiveRaceState(): Promise<LiveRaceState | null> {
     LIVE_CACHE.OPENF1_SESSION
   );
   const session = sessions?.[0];
-  if (!session) return null;
+  if (!session?.session_key) return null;
 
-  const [drivers, positions, raceControl, laps, pits] = await Promise.all([
-    openf1Json<OpenF1Driver[]>(
-      "/drivers?session_key=latest",
-      LIVE_CACHE.OPENF1_DRIVERS
-    ),
-    openf1Json<OpenF1Position[]>(
-      "/position?session_key=latest",
-      LIVE_CACHE.OPENF1_POSITION
-    ),
-    openf1Json<OpenF1RaceControl[]>(
-      "/race_control?session_key=latest",
-      LIVE_CACHE.OPENF1_RACE_CONTROL
-    ),
-    openf1Json<OpenF1Lap[]>(
-      "/laps?session_key=latest",
-      LIVE_CACHE.OPENF1_LAPS_LIVE
-    ),
-    openf1Json<OpenF1Pit[]>(
-      "/pit?session_key=latest",
-      LIVE_CACHE.OPENF1_PIT
-    ),
-  ]);
+  circuitProgressService.beginSession(String(session.session_key));
 
-  if (!drivers?.length || !positions?.length) return null;
+  const [driversRaw, positionsRaw, raceControlRaw, lapsRaw, pitsRaw] =
+    await Promise.all([
+      openf1Json<OpenF1Driver[]>(
+        "/drivers?session_key=latest",
+        LIVE_CACHE.OPENF1_DRIVERS
+      ),
+      openf1Json<OpenF1Position[]>(
+        "/position?session_key=latest",
+        LIVE_CACHE.OPENF1_POSITION
+      ),
+      openf1Json<OpenF1RaceControl[]>(
+        "/race_control?session_key=latest",
+        LIVE_CACHE.OPENF1_RACE_CONTROL
+      ),
+      openf1Json<OpenF1Lap[]>(
+        "/laps?session_key=latest",
+        LIVE_CACHE.OPENF1_LAPS_LIVE
+      ),
+      openf1Json<OpenF1Pit[]>(
+        "/pit?session_key=latest",
+        LIVE_CACHE.OPENF1_PIT
+      ),
+    ]);
+
+  const drivers = asArray(driversRaw);
+  const positions = asArray(positionsRaw);
+  const raceControl = asArray(raceControlRaw);
+  const laps = asArray(lapsRaw);
+  const pits = asArray(pitsRaw);
+
+  if (!drivers.length || !positions.length) return null;
 
   const latestPositions = latestByDriver(positions);
   const ranked = [...latestPositions.entries()]
@@ -212,7 +226,7 @@ export async function buildF1LiveRaceState(): Promise<LiveRaceState | null> {
   );
 
   const lapsByDriver = new Map<number, OpenF1Lap[]>();
-  for (const lap of laps ?? []) {
+  for (const lap of laps) {
     const list = lapsByDriver.get(lap.driver_number) ?? [];
     list.push(lap);
     lapsByDriver.set(lap.driver_number, list);
@@ -223,12 +237,13 @@ export async function buildF1LiveRaceState(): Promise<LiveRaceState | null> {
 
   const newestLapNumber = Math.max(
     0,
-    ...(laps ?? []).map((l) => l.lap_number || 0)
+    ...laps.map((l) => l.lap_number || 0),
+    0
   );
 
   let fastest: LiveRaceState["fastestLap"] = null;
   let bestDuration = Infinity;
-  for (const lap of laps ?? []) {
+  for (const lap of laps) {
     if (!lap.lap_duration || lap.lap_duration <= 0) continue;
     if (lap.lap_duration < bestDuration) {
       bestDuration = lap.lap_duration;
@@ -243,7 +258,7 @@ export async function buildF1LiveRaceState(): Promise<LiveRaceState | null> {
 
   const recentlyPitted = new Set<number>();
   const pitCutoff = Date.now() - 90_000;
-  for (const pit of pits ?? []) {
+  for (const pit of pits) {
     const t = new Date(pit.date).getTime();
     if (Number.isFinite(t) && t >= pitCutoff) {
       recentlyPitted.add(pit.driver_number);
@@ -265,7 +280,13 @@ export async function buildF1LiveRaceState(): Promise<LiveRaceState | null> {
     session.circuit_key || session.circuit_short_name || "unknown"
   );
 
-  const leaderLocs = (locationResults[0] ?? [])
+  const leaderLocs = asArray(locationResults[0])
+    .filter(
+      (l) =>
+        Number.isFinite(l.x) &&
+        Number.isFinite(l.y) &&
+        !(l.x === 0 && l.y === 0)
+    )
     .slice()
     .sort((a, b) => a.date.localeCompare(b.date))
     .map((l) => ({ x: l.x, y: l.y } satisfies LocationSample));
@@ -284,7 +305,13 @@ export async function buildF1LiveRaceState(): Promise<LiveRaceState | null> {
       driver?.last_name?.slice(0, 3).toUpperCase() ||
       String(row.driver_number);
 
-    const locs = (locationResults[index] ?? [])
+    const locs = asArray(locationResults[index])
+      .filter(
+        (l) =>
+          Number.isFinite(l.x) &&
+          Number.isFinite(l.y) &&
+          !(l.x === 0 && l.y === 0)
+      )
       .slice()
       .sort((a, b) => a.date.localeCompare(b.date));
     const latestLoc = locs[locs.length - 1];
@@ -299,10 +326,8 @@ export async function buildF1LiveRaceState(): Promise<LiveRaceState | null> {
       if (gps != null) {
         progress = gps;
       } else {
-        // Calibration still warming — use temporal sector estimate, keep gps source intent
         const driverLaps = lapsByDriver.get(row.driver_number) ?? [];
         progress = timingProgressFromLap(driverLaps[driverLaps.length - 1]);
-        // Stagger by position so markers don't stack while calibrating
         progress = (progress - (row.position - 1) * 0.02 + 1) % 1;
       }
     } else {
@@ -331,16 +356,10 @@ export async function buildF1LiveRaceState(): Promise<LiveRaceState | null> {
   }
 
   const raceFinished =
-    mapSessionStatus(session, raceControl ?? [], false) === "finished" ||
-    (raceControl ?? []).some(
-      (rc) => (rc.flag || "").toUpperCase() === "CHEQUERED"
-    );
+    mapSessionStatus(session, raceControl, false) === "finished" ||
+    raceControl.some((rc) => (rc.flag || "").toUpperCase() === "CHEQUERED");
 
-  const sessionStatus = mapSessionStatus(
-    session,
-    raceControl ?? [],
-    raceFinished
-  );
+  const sessionStatus = mapSessionStatus(session, raceControl, raceFinished);
 
   // Only serve live (or briefly suspended) sessions — otherwise mock fallback.
   if (sessionStatus !== "live" && sessionStatus !== "suspended") {
@@ -355,7 +374,7 @@ export async function buildF1LiveRaceState(): Promise<LiveRaceState | null> {
     sessionStatus,
     lap: newestLapNumber,
     totalLaps: 0,
-    flag: raceFinished ? "green" : mapFlag(raceControl ?? []),
+    flag: raceFinished ? "green" : mapFlag(raceControl),
     activeSector,
     drivers: liveDrivers,
     raceFinished,

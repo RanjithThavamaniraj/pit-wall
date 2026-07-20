@@ -4,6 +4,7 @@ import {
   buildTimelineStages,
   type WeekendHubData,
 } from "@/lib/weekend-hub";
+import { buildSessionResultHighlights } from "@/lib/weekend-hub/session-results";
 import { fetchSeasonSchedule } from "@/lib/schedule";
 import { fetchMotoGpSchedule } from "@/lib/motogp";
 import { fetchDriverIntelligence } from "@/lib/driver-intelligence/selectors";
@@ -16,6 +17,7 @@ import { WeekendStageTimeline } from "./WeekendStageTimeline";
 import { WeekendStatus } from "./WeekendStatus";
 import { WeekendStoryEngine } from "./WeekendStoryEngine";
 import { WeekendStrategyCenter } from "./WeekendStrategyCenter";
+import { WeekendWeatherCard } from "./WeekendWeatherCard";
 
 type MotoGpPodiumFinisher = {
   position: number;
@@ -38,6 +40,7 @@ export async function WeekendHub({
   scheduleHeadingId = "weekend-schedule-heading",
 }: Props) {
   const stages = buildTimelineStages(data);
+  const resultHighlights = buildSessionResultHighlights(data.sport, summary);
 
   let completedWeekendSlugs: string[] = [];
   try {
@@ -78,7 +81,10 @@ export async function WeekendHub({
         <WeekendScheduleSection
           sessions={data.sessions}
           headingId={scheduleHeadingId}
+          resultHighlights={resultHighlights}
         />
+
+        <WeekendWeatherCard weather={summary?.weather} />
 
         <LiveEventFeed
           sport={data.sport}

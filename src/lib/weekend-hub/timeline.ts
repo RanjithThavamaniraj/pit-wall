@@ -97,7 +97,9 @@ function sessionStageStatus(sessions: HubSession[]): StageStatus {
   const matched = sessions;
   if (!matched.length) return "upcoming";
   if (matched.some((s) => s.status === "live")) return "current";
-  if (matched.every((s) => s.status === "completed")) return "completed";
+  if (matched.every((s) => s.status === "completed" || s.status === "cancelled")) {
+    return matched.some((s) => s.status === "completed") ? "completed" : "upcoming";
+  }
   if (
     matched.some((s) => s.status === "completed") &&
     matched.some((s) => s.status === "upcoming")

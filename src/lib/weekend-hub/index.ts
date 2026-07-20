@@ -1,5 +1,6 @@
 export type {
   HubSession,
+  HubSessionStatus,
   HubSport,
   StageStatus,
   TimelineStage,
@@ -17,6 +18,11 @@ export {
   phaseTone,
 } from "./state";
 export { buildTimelineStages, getTimelineStageDefs } from "./timeline";
+export {
+  buildSessionResultHighlights,
+  highlightForSession,
+  type SessionResultHighlight,
+} from "./session-results";
 
 export type {
   CommonEventType,

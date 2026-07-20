@@ -96,6 +96,49 @@ function statusSummary(state: LiveRaceState): string {
     .join(". ");
 }
 
+function liveStateEqual(a: LiveRaceState, b: LiveRaceState): boolean {
+  if (a === b) return true;
+  if (
+    a.championship !== b.championship ||
+    a.sessionStatus !== b.sessionStatus ||
+    a.lap !== b.lap ||
+    a.totalLaps !== b.totalLaps ||
+    a.flag !== b.flag ||
+    a.activeSector !== b.activeSector ||
+    a.raceFinished !== b.raceFinished ||
+    a.progressSource !== b.progressSource
+  ) {
+    return false;
+  }
+
+  const aFl = a.fastestLap;
+  const bFl = b.fastestLap;
+  if (aFl === null || bFl === null) {
+    if (aFl !== bFl) return false;
+  } else if (
+    aFl.code !== bFl.code ||
+    aFl.time !== bFl.time ||
+    aFl.lap !== bFl.lap
+  ) {
+    return false;
+  }
+
+  if (a.drivers.length !== b.drivers.length) return false;
+  for (let i = 0; i < a.drivers.length; i++) {
+    const da = a.drivers[i];
+    const db = b.drivers[i];
+    if (
+      da.position !== db.position ||
+      da.code !== db.code ||
+      da.pit !== db.pit ||
+      Math.abs(da.progress - db.progress) > 1e-6
+    ) {
+      return false;
+    }
+  }
+  return true;
+}
+
 function TrackMapComponent({
   circuitSvgUrl,
   state,
@@ -152,7 +195,8 @@ function TrackMapComponent({
   const setPathNode = (node: SVGPathElement | null) => {
     pathRef.current = node;
     if (!node) return;
-    setPathLength(getCachedPathLength(circuitSvgUrl, node));
+    const length = getCachedPathLength(circuitSvgUrl, node);
+    setPathLength((prev) => (prev === length ? prev : length));
   };
 
   const topThree = useMemo(
@@ -178,6 +222,8 @@ function TrackMapComponent({
   if (loadError || !parsed) {
     return null;
   }
+
+  const gradientId = `track-finish-gradient-${circuitSlug ?? "circuit"}`;
 
   return (
     <div
@@ -230,7 +276,7 @@ function TrackMapComponent({
           <path
             d={parsed.trackPathD}
             fill="none"
-            stroke="url(#track-finish-gradient)"
+            stroke={`url(#${gradientId})`}
             strokeWidth={10}
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -245,13 +291,7 @@ function TrackMapComponent({
         ) : null}
 
         <defs>
-          <linearGradient
-            id="track-finish-gradient"
-            x1="0%"
-            y1="0%"
-            x2="100%"
-            y2="0%"
-          >
+          <linearGradient id={gradientId} x1="0%" y1="0%" x2="100%" y2="0%">
             <stop offset="0%" stopColor="rgba(251,191,36,0)" />
             <stop offset="50%" stopColor="rgba(251,191,36,0.95)" />
             <stop offset="100%" stopColor="rgba(251,191,36,0)" />
@@ -284,4 +324,12 @@ function TrackMapComponent({
   );
 }
 
-export const TrackMap = memo(TrackMapComponent);
+export const TrackMap = memo(TrackMapComponent, (prev, next) => {
+  return (
+    prev.circuitSvgUrl === next.circuitSvgUrl &&
+    prev.className === next.className &&
+    prev.label === next.label &&
+    prev.onReady === next.onReady &&
+    liveStateEqual(prev.state, next.state)
+  );
+});

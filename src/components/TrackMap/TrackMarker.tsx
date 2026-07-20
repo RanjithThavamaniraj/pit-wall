@@ -143,4 +143,14 @@ function TrackMarkerComponent({
   );
 }
 
-export const TrackMarker = memo(TrackMarkerComponent);
+export const TrackMarker = memo(
+  TrackMarkerComponent,
+  (prev, next) =>
+    prev.pathLength === next.pathLength &&
+    prev.reducedMotion === next.reducedMotion &&
+    prev.pathRef === next.pathRef &&
+    prev.driver.position === next.driver.position &&
+    prev.driver.code === next.driver.code &&
+    prev.driver.pit === next.driver.pit &&
+    Math.abs(prev.driver.progress - next.driver.progress) < 1e-6
+);
