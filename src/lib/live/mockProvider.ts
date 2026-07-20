@@ -21,6 +21,7 @@ function createInitialState(): LiveRaceState {
     flag: "green",
     activeSector: 1,
     raceFinished: false,
+    progressSource: "simulated",
     fastestLap: {
       code: "NOR",
       time: "1:12.448",

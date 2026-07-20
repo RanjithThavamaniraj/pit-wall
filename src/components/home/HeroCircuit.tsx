@@ -2,19 +2,20 @@
 
 import { useCallback, useState } from "react";
 import { TrackMap } from "@/components/TrackMap";
-import { useLiveRaceState } from "@/lib/live";
+import { useLiveRaceState, type Championship } from "@/lib/live";
 
 type Props = {
   circuitSvgUrl: string;
   circuitName: string;
+  sport: Championship;
 };
 
 /**
  * Hero circuit layer: static outline as fallback, live TrackMap once ready.
- * Uses the mock provider until real F1 / MotoGP providers are wired.
+ * Selects F1 / MotoGP providers automatically; falls back to mock off-session.
  */
-export function HeroCircuit({ circuitSvgUrl, circuitName }: Props) {
-  const state = useLiveRaceState("mock");
+export function HeroCircuit({ circuitSvgUrl, circuitName, sport }: Props) {
+  const state = useLiveRaceState(sport);
   const [mapReady, setMapReady] = useState(false);
   const handleReady = useCallback(() => setMapReady(true), []);
 

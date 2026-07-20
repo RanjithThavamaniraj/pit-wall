@@ -2,27 +2,27 @@
 
 import { memo } from "react";
 import { TrackMap } from "./TrackMap";
-import { useLiveRaceState, type LiveProviderId } from "@/lib/live";
+import { useLiveRaceState, type Championship } from "@/lib/live";
 
 type Props = {
   circuitSvgUrl: string;
-  /** Defaults to mock until real championship providers are wired. */
-  providerId?: LiveProviderId;
+  /** Championship selects F1 / MotoGP providers with mock fallback. */
+  sport?: Championship;
   className?: string;
   label?: string;
 };
 
 /**
- * Client bridge: selects a live provider and feeds TrackMap.
+ * Client bridge: championship-aware live state → TrackMap.
  * TrackMap itself never calls APIs.
  */
 function LiveTrackMapComponent({
   circuitSvgUrl,
-  providerId = "mock",
+  sport = "f1",
   className,
   label,
 }: Props) {
-  const state = useLiveRaceState(providerId);
+  const state = useLiveRaceState(sport);
 
   if (!state || state.drivers.length === 0) {
     return null;

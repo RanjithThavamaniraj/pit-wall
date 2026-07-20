@@ -78,7 +78,11 @@ export function PitWallHeroBoard({
       <div className="hero-stage-glow" aria-hidden="true" />
       <div className="hero-stage-speedline" aria-hidden="true" />
       {circuitSvg ? (
-        <HeroCircuit circuitSvgUrl={circuitSvg} circuitName={circuit} />
+        <HeroCircuit
+          circuitSvgUrl={circuitSvg}
+          circuitName={circuit}
+          sport={sport}
+        />
       ) : null}
       <div className="hero-stage-vignette" aria-hidden="true" />
       <div className="hero-stage-checker" aria-hidden="true" />
