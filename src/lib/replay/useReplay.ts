@@ -19,6 +19,7 @@ export type UseReplayResult = {
   nextLap: () => void;
   previousLap: () => void;
   seekLap: (lap: number) => void;
+  seek: (lap: number, t?: number) => void;
   setSpeed: (speed: ReplayPlaybackSpeed) => void;
 };
 
@@ -67,6 +68,7 @@ export function useReplay(pkg: ReplayPackage): UseReplayResult {
     nextLap: engine.nextLap,
     previousLap: engine.previousLap,
     seekLap: engine.seekLap,
+    seek: engine.seek,
     setSpeed: engine.setSpeed,
   };
 }

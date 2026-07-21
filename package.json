@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "assets:check": "tsx scripts/check-assets.ts"
+    "assets:check": "tsx scripts/check-assets.ts",
+    "replay:build": "tsx scripts/build-replay-package.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.108.2",

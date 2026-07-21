@@ -3,6 +3,7 @@
 @import "./mobile.css";
 @import "./(site)/hero-stage.css";
 @import "./(site)/weekend-hub.css";
+@import "./(site)/replay.css";
 
 :root {
   --background: #07090f;

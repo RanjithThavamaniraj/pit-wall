@@ -1,0 +1,72 @@
+{
+  "sport": "f1",
+  "slug": "builder-fixture-r0",
+  "sessionKind": "race",
+  "totalLaps": 3,
+  "msPerLap": 3000,
+  "laps": [
+    {
+      "lap": 1,
+      "drivers": [
+        { "position": 1, "code": "NOR", "progress": 0.1, "pit": false },
+        { "position": 2, "code": "PIA", "progress": 0.06, "pit": false },
+        { "position": 3, "code": "VER", "progress": 0.02, "pit": false }
+      ],
+      "flag": "green",
+      "activeSector": 1
+    },
+    {
+      "lap": 2,
+      "drivers": [
+        { "position": 1, "code": "NOR", "progress": 0.2, "pit": false },
+        { "position": 2, "code": "PIA", "progress": 0.15, "pit": false },
+        { "position": 3, "code": "VER", "progress": 0.11, "pit": true }
+      ],
+      "flag": "green",
+      "activeSector": 2
+    },
+    {
+      "lap": 3,
+      "drivers": [
+        { "position": 1, "code": "NOR", "progress": 0.05, "pit": false },
+        { "position": 2, "code": "VER", "progress": 0.98, "pit": false },
+        { "position": 3, "code": "PIA", "progress": 0.94, "pit": false }
+      ],
+      "flag": "green",
+      "activeSector": 3,
+      "raceFinished": true,
+      "sessionStatus": "finished"
+    }
+  ],
+  "events": [
+    {
+      "id": "pit-ver-l2",
+      "lap": 2,
+      "t": 0.2,
+      "type": "pit",
+      "payload": { "code": "VER", "pit": true }
+    },
+    {
+      "id": "finish",
+      "lap": 3,
+      "t": 0.99,
+      "type": "finish"
+    }
+  ],
+  "bookmarks": [
+    {
+      "id": "bm-start",
+      "kind": "race_start",
+      "label": "Race Start",
+      "lap": 1,
+      "t": 0
+    },
+    {
+      "id": "bm-finish",
+      "kind": "finish",
+      "label": "Finish",
+      "lap": 3,
+      "t": 0.99
+    }
+  ]
+}
