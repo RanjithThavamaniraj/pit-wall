@@ -145,6 +145,7 @@ function TrackMapComponent({
   className = "",
   label = "Live circuit map",
   onReady,
+  focusedCode = null,
 }: TrackMapProps) {
   const reducedMotion = useReducedMotion() ?? false;
   const pathRef = useRef<SVGPathElement | null>(null);
@@ -299,15 +300,24 @@ function TrackMapComponent({
         </defs>
 
         {pathLength > 0 &&
-          topThree.map((driver) => (
-            <TrackMarker
-              key={driver.code}
-              driver={driver}
-              pathRef={pathRef}
-              pathLength={pathLength}
-              reducedMotion={reducedMotion}
-            />
-          ))}
+          topThree.map((driver) => {
+            const emphasis =
+              focusedCode == null
+                ? "normal"
+                : driver.code === focusedCode
+                ? "focus"
+                : "dim";
+            return (
+              <TrackMarker
+                key={driver.code}
+                driver={driver}
+                pathRef={pathRef}
+                pathLength={pathLength}
+                reducedMotion={reducedMotion}
+                emphasis={emphasis}
+              />
+            );
+          })}
       </svg>
 
       <div className="track-map__meta" aria-hidden="true">
@@ -330,6 +340,7 @@ export const TrackMap = memo(TrackMapComponent, (prev, next) => {
     prev.className === next.className &&
     prev.label === next.label &&
     prev.onReady === next.onReady &&
+    prev.focusedCode === next.focusedCode &&
     liveStateEqual(prev.state, next.state)
   );
 });

@@ -8,4 +8,9 @@ export type TrackMapProps = {
   label?: string;
   /** Fired once the circuit SVG has been parsed and is renderable. */
   onReady?: () => void;
+  /**
+   * Optional Focus Mode code. Presentation only — does not alter LiveRaceState.
+   * When set, that marker is emphasized and others are dimmed.
+   */
+  focusedCode?: string | null;
 };

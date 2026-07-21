@@ -1,5 +1,9 @@
 import type { HubSession } from "@/lib/weekend-hub/types";
-import type { WeekendContext } from "./types";
+import type {
+  WeekendContext,
+  WeekendContextSport,
+  WeekendFavourite,
+} from "./types";
 
 /**
  * The two `WeekendFavourite` bases that trace back to real completed-weekend
@@ -25,19 +29,49 @@ const SAFE_TREND_IDS = new Set([
 ]);
 
 export type WeekendOutlookContender = {
+  /** 1-based rank within the outlook list. */
+  rank: number;
   name: string;
   team?: string;
+  /**
+   * Normalised share of the recent-form pool (0–100), same value the
+   * intelligence engine already publishes — not a quality grade.
+   */
+  formShare: number;
+};
+
+export type OutlookInsightSlot = {
+  id: string;
+  label: string;
+  /** Present when the metric is available; otherwise reserved for future data. */
+  value: string | null;
 };
 
 export type WeekendOutlookView =
   | {
       hasSignal: true;
+      sport: WeekendContextSport;
       phaseLine: string;
-      stars: number;
+      /** Always 1 for the named leader when hasSignal. */
+      rank: number;
       name: string;
       team?: string;
+      /** Form-pool share (or momentum when that is the basis) — existing confidence. */
+      formShare: number;
+      basis: WeekendFavourite["basis"];
+      leadershipLabel: string;
+      shareLabel: string;
+      /** Stable contextual explanation — not a new metric. */
+      contextLine: string;
       reason: string;
       topContenders: WeekendOutlookContender[];
+      /** Recent trend lines from existing Driver Intelligence signals. */
+      recentTrend: string[];
+      /**
+       * Future-ready insight slots (momentum, consistency, etc.).
+       * Values stay null until engines publish them into the outlook view.
+       */
+      insightSlots: OutlookInsightSlot[];
       keyWatch: string[];
     }
   | {
@@ -46,12 +80,25 @@ export type WeekendOutlookView =
       message: string;
     };
 
-function confidenceToStars(confidence: number): number {
-  if (confidence >= 80) return 5;
-  if (confidence >= 65) return 4;
-  if (confidence >= 50) return 3;
-  if (confidence >= 35) return 2;
-  return 1;
+function leadershipCopy(
+  sport: WeekendContextSport,
+  basis: WeekendFavourite["basis"]
+): { leadershipLabel: string; shareLabel: string; contextLine: string } {
+  if (basis === "momentum") {
+    return {
+      leadershipLabel: "Leading Momentum",
+      shareLabel: "Momentum rating",
+      contextLine:
+        "Leads Driver Intelligence momentum based on recent finishing deltas across completed weekends.",
+    };
+  }
+  const competitor = sport === "motogp" ? "rider" : "driver";
+  return {
+    leadershipLabel: "#1 Recent Form",
+    shareLabel: `${competitor === "rider" ? "Rider" : "Driver"} form share`,
+    contextLine:
+      "Leads recent form based on the previous completed race weekends.",
+  };
 }
 
 /**
@@ -110,6 +157,9 @@ function buildKeyWatch(
  * results (Weekend Intelligence / Driver Intelligence) are surfaced — the
  * Strategy and Story engines' hash-seeded editorial text is intentionally
  * left out, since it isn't backed by real per-weekend data.
+ *
+ * No star rating: form share is shown as the normalised pool percentage
+ * it actually is, not remapped onto a 1–5 quality scale.
  */
 export function buildWeekendOutlook(
   context: WeekendContext,
@@ -131,15 +181,77 @@ export function buildWeekendOutlook(
 
   const top = context.topContenders.slice(0, 3);
   const excludeNames = new Set(top.map((c) => c.name));
+  const { leadershipLabel, shareLabel, contextLine } = leadershipCopy(
+    context.sport,
+    context.favourite.basis
+  );
+  const recentTrend = buildKeyWatch(context, excludeNames);
+
+  const leaderProfile = context.sources.driverIntelligence?.profiles.find(
+    (p) => p.name === context.favourite.name
+  );
+
+  const insightSlots: OutlookInsightSlot[] = [
+    {
+      id: "momentum",
+      label: "Momentum",
+      value:
+        leaderProfile != null
+          ? `${leaderProfile.ratings.momentum}`
+          : null,
+    },
+    {
+      id: "consistency",
+      label: "Consistency",
+      value:
+        leaderProfile != null
+          ? `${leaderProfile.ratings.consistency}`
+          : null,
+    },
+    {
+      id: "qualifying",
+      label: "Qualifying form",
+      value:
+        leaderProfile != null
+          ? `${leaderProfile.ratings.qualifying}`
+          : null,
+    },
+    {
+      id: "race-pace",
+      label: "Race pace",
+      value:
+        leaderProfile != null
+          ? `${leaderProfile.ratings.racePace}`
+          : null,
+    },
+    {
+      id: "wet-weather",
+      label: "Wet-weather strength",
+      value: null,
+    },
+  ];
 
   return {
     hasSignal: true,
+    sport: context.sport,
     phaseLine: line,
-    stars: confidenceToStars(context.favourite.confidence),
+    rank: 1,
     name: context.favourite.name,
     team: context.favourite.team,
+    formShare: context.favourite.confidence,
+    basis: context.favourite.basis,
+    leadershipLabel,
+    shareLabel,
+    contextLine,
     reason: context.favourite.reason,
-    topContenders: top.map((c) => ({ name: c.name, team: c.team })),
-    keyWatch: buildKeyWatch(context, excludeNames),
+    topContenders: top.map((c, index) => ({
+      rank: index + 1,
+      name: c.name,
+      team: c.team,
+      formShare: c.percentage,
+    })),
+    recentTrend,
+    insightSlots,
+    keyWatch: recentTrend,
   };
 }

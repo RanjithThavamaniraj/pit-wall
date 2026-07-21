@@ -1,18 +1,7 @@
 import Link from "next/link";
-import { GlassCard, PageSection, SectionHeading } from "@/components/ui";
+import { GlassCard, PageSection, SectionHeading, StatusPill } from "@/components/ui";
 import type { WeekendOutlookView } from "@/lib/weekend-context/outlook";
-
-function Stars({ count }: { count: number }) {
-  return (
-    <span
-      className="font-mono text-lg tracking-[0.05em] text-amber-300"
-      aria-label={`${count} out of 5`}
-    >
-      {"★".repeat(count)}
-      <span className="text-white/15">{"★".repeat(5 - count)}</span>
-    </span>
-  );
-}
+import { getSportTerms } from "@/lib/sport-terms";
 
 export function WeekendOutlookSection({
   outlook,
@@ -30,52 +19,141 @@ export function WeekendOutlookSection({
           description="Based on the latest available weekend data — recent form, championship momentum, and driver intelligence — who currently looks strongest. Not a prediction, not a vote."
         />
         <GlassCard className="lg:max-w-lg">
-          <p className="mb-4 text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">
+          <p className="mb-5 text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">
             {outlook.phaseLine}
           </p>
 
           {outlook.hasSignal ? (
             <>
-              <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-                <Stars count={outlook.stars} />
-                <span className="text-lg font-semibold text-white">
-                  {outlook.name}
+              <div className="flex flex-wrap items-center gap-2">
+                <StatusPill tone="amber">{outlook.leadershipLabel}</StatusPill>
+                <span className="font-mono text-[0.65rem] uppercase tracking-[0.2em] text-slate-500">
+                  Rank #{outlook.rank}
                 </span>
+              </div>
+
+              <div className="mt-4">
+                <p className="text-2xl font-semibold tracking-[-0.03em] text-white sm:text-3xl">
+                  {outlook.name}
+                </p>
                 {outlook.team ? (
-                  <span className="text-sm text-slate-400">
+                  <p className="mt-1 text-sm text-slate-400">
+                    <span className="text-slate-500">
+                      {getSportTerms(outlook.sport).teamOrManufacturer}
+                    </span>
+                    <span className="mx-1.5 text-slate-600">·</span>
                     {outlook.team}
-                  </span>
+                  </p>
                 ) : null}
               </div>
-              <p className="mt-2 text-sm leading-6 text-slate-400">
+
+              <div className="mt-6 rounded-2xl border border-white/10 bg-black/25 px-4 py-4 sm:px-5">
+                <p className="font-mono text-[0.6rem] uppercase tracking-[0.22em] text-slate-500">
+                  {outlook.shareLabel}
+                </p>
+                <div className="mt-2 flex items-end justify-between gap-4">
+                  <p className="font-mono text-4xl font-semibold tracking-[-0.04em] text-amber-300 tabular-nums">
+                    {outlook.formShare}
+                    <span className="ml-0.5 text-2xl text-amber-300/70">%</span>
+                  </p>
+                  <p className="max-w-[11.5rem] text-right text-xs leading-5 text-slate-500">
+                    Share of the recent-form pool across completed weekends.
+                  </p>
+                </div>
+                <div
+                  className="mt-4 h-1.5 overflow-hidden rounded-full bg-white/10"
+                  aria-hidden="true"
+                >
+                  <div
+                    className="h-full rounded-full bg-gradient-to-r from-amber-500 to-amber-300"
+                    style={{
+                      width: `${Math.max(0, Math.min(100, outlook.formShare))}%`,
+                    }}
+                  />
+                </div>
+              </div>
+
+              <p className="mt-4 text-sm leading-6 text-slate-300">
+                {outlook.contextLine}
+              </p>
+              <p className="mt-2 text-sm leading-6 text-slate-500">
                 {outlook.reason}
               </p>
 
-              {outlook.topContenders.length > 0 && (
-                <div className="mt-5">
+              {outlook.topContenders.length > 1 && (
+                <div className="mt-6">
                   <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500">
-                    Top Contenders
+                    Top challengers
                   </p>
-                  <ul className="mt-2 space-y-1 text-sm text-slate-200">
-                    {outlook.topContenders.map((contender) => (
-                      <li key={contender.name}>• {contender.name}</li>
-                    ))}
-                  </ul>
+                  <ol className="mt-3 space-y-2.5">
+                    {outlook.topContenders
+                      .filter((c) => c.rank > 1)
+                      .map((contender) => (
+                        <li
+                          key={`${contender.rank}-${contender.name}`}
+                          className="flex items-baseline justify-between gap-3 border-b border-white/5 pb-2.5 last:border-0 last:pb-0"
+                        >
+                          <div className="min-w-0">
+                            <span className="font-mono text-[0.65rem] text-slate-500">
+                              #{contender.rank}
+                            </span>
+                            <span className="ml-2 text-sm text-slate-200">
+                              {contender.name}
+                            </span>
+                            {contender.team ? (
+                              <span className="ml-2 hidden text-xs text-slate-500 sm:inline">
+                                {contender.team}
+                              </span>
+                            ) : null}
+                          </div>
+                          <span className="shrink-0 font-mono text-xs tabular-nums text-amber-200/90">
+                            {contender.formShare}%
+                          </span>
+                        </li>
+                      ))}
+                  </ol>
                 </div>
               )}
 
-              {outlook.keyWatch.length > 0 && (
-                <div className="mt-5">
+              {outlook.recentTrend.length > 0 && (
+                <div className="mt-6">
                   <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500">
-                    Key Watch
+                    Recent trend
                   </p>
                   <ul className="mt-2 space-y-1 text-sm leading-6 text-slate-400">
-                    {outlook.keyWatch.map((line) => (
+                    {outlook.recentTrend.map((line) => (
                       <li key={line}>{line}</li>
                     ))}
                   </ul>
                 </div>
               )}
+
+              <div className="mt-6">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500">
+                  Intelligence profile
+                </p>
+                <ul className="mt-3 grid grid-cols-2 gap-2">
+                  {outlook.insightSlots.map((slot) => (
+                    <li
+                      key={slot.id}
+                      className="rounded-xl border border-white/10 bg-black/20 px-3 py-2.5"
+                    >
+                      <p className="font-mono text-[0.55rem] uppercase tracking-[0.16em] text-slate-500">
+                        {slot.label}
+                      </p>
+                      <p
+                        className={`mt-1 font-mono text-sm tabular-nums ${
+                          slot.value != null
+                            ? "text-slate-100"
+                            : "text-slate-600"
+                        }`}
+                      >
+                        {slot.value ?? "—"}
+                      </p>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             </>
           ) : (
             <p className="text-sm leading-6 text-slate-400">

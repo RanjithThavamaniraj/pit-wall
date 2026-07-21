@@ -38,6 +38,7 @@ export {
 
 export {
   buildWeekendOutlook,
+  type OutlookInsightSlot,
   type WeekendOutlookContender,
   type WeekendOutlookView,
 } from "./outlook";

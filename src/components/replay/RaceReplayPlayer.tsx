@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { TrackMap } from "@/components/TrackMap";
+import { CompetitorFocusBoard } from "@/components/competitor-focus";
 import {
   deriveReplayStatus,
   replaySessionLabel,
@@ -21,7 +21,7 @@ type Props = {
 
 /**
  * Shared F1 + MotoGP replay surface.
- * TrackMap consumes LiveRaceState only; controls talk to ReplayEngine via useReplay.
+ * TrackMap + Focus Mode consume LiveRaceState from ReplayProvider.
  */
 export function RaceReplayPlayer({
   pkg,
@@ -114,14 +114,6 @@ export function RaceReplayPlayer({
     return () => node.removeEventListener("keydown", onKeyDown);
   }, [controls.playing, nextLap, pause, play, previousLap, restart]);
 
-  const leaders =
-    state?.drivers
-      .slice()
-      .sort((a, b) => a.position - b.position)
-      .slice(0, 3)
-      .map((d) => `P${d.position} ${d.code}`)
-      .join(" · ") ?? null;
-
   return (
     <div
       ref={shellRef}
@@ -139,57 +131,44 @@ export function RaceReplayPlayer({
             Circuit
           </p>
           <p className="mt-1 truncate text-sm text-slate-300">{circuitName}</p>
-          {leaders ? (
-            <p className="mt-1 font-mono text-[0.7rem] tracking-[0.08em] text-slate-500">
-              {leaders}
-            </p>
-          ) : null}
         </div>
       </div>
 
-      <div className="relative overflow-hidden rounded-[1.5rem] border border-white/10 bg-gradient-to-b from-white/[0.07] to-black/40 sm:rounded-[1.75rem]">
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_50%_18%,rgba(251,191,36,0.12),transparent_55%)]"
-        />
-        <div className="relative mx-auto flex min-h-[15rem] w-full max-w-xl items-center justify-center px-3 py-7 sm:min-h-[20rem] sm:px-6 sm:py-10">
-          {state ? (
-            <TrackMap
-              circuitSvgUrl={circuitSvgUrl}
-              state={state}
-              label={`${circuitName} ${replaySessionLabel(pkg.sessionKind).toLowerCase()} replay`}
-              onReady={handleMapReady}
-              className="!pointer-events-none !relative !left-auto !top-auto !w-full !max-w-full !translate-x-0 !translate-y-0"
-            />
-          ) : (
-            <p className="text-sm text-slate-500">Loading replay…</p>
-          )}
-        </div>
-      </div>
+      {state ? (
+        <CompetitorFocusBoard
+          state={state}
+          circuitSvgUrl={circuitSvgUrl}
+          mapLabel={`${circuitName} ${replaySessionLabel(pkg.sessionKind).toLowerCase()} replay`}
+          onMapReady={handleMapReady}
+          footer={
+            <div className="space-y-4 rounded-[1.25rem] border border-white/10 bg-black/20 p-3 sm:space-y-5 sm:rounded-[1.5rem] sm:p-5">
+              <ReplayControls
+                controls={controls}
+                onPlay={play}
+                onPause={pause}
+                onRestart={restart}
+                onPreviousLap={previousLap}
+                onNextLap={nextLap}
+                onSetSpeed={setSpeed}
+              />
 
-      <div className="space-y-4 rounded-[1.25rem] border border-white/10 bg-black/20 p-3 sm:space-y-5 sm:rounded-[1.5rem] sm:p-5">
-        <ReplayControls
-          controls={controls}
-          onPlay={play}
-          onPause={pause}
-          onRestart={restart}
-          onPreviousLap={previousLap}
-          onNextLap={nextLap}
-          onSetSpeed={setSpeed}
-        />
+              <ReplayTimeline
+                controls={controls}
+                bookmarks={pkg.bookmarks}
+                events={pkg.events}
+                onSeekCursor={seekCursor}
+                onSeekPoint={seek}
+              />
 
-        <ReplayTimeline
-          controls={controls}
-          bookmarks={pkg.bookmarks}
-          events={pkg.events}
-          onSeekCursor={seekCursor}
-          onSeekPoint={seek}
+              <p className="font-mono text-[0.6rem] leading-5 tracking-[0.12em] text-slate-600">
+                Keyboard · Space play/pause · ← → lap · Home restart
+              </p>
+            </div>
+          }
         />
-
-        <p className="font-mono text-[0.6rem] leading-5 tracking-[0.12em] text-slate-600">
-          Keyboard · Space play/pause · ← → lap · Home restart
-        </p>
-      </div>
+      ) : (
+        <p className="text-sm text-slate-500">Loading replay…</p>
+      )}
     </div>
   );
 }

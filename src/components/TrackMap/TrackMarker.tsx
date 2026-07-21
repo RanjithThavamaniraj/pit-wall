@@ -12,6 +12,8 @@ type Props = {
   pathRef: RefObject<SVGPathElement | null>;
   pathLength: number;
   reducedMotion: boolean;
+  /** Presentation emphasis when Focus Mode is active. */
+  emphasis?: "normal" | "focus" | "dim";
 };
 
 const TRAIL_LENGTH = 5;
@@ -31,6 +33,7 @@ function TrackMarkerComponent({
   pathRef,
   pathLength,
   reducedMotion,
+  emphasis = "normal",
 }: Props) {
   const prefersReduced = useReducedMotion() ?? reducedMotion;
   const [point, setPoint] = useState<Point | null>(null);
@@ -44,7 +47,7 @@ function TrackMarkerComponent({
     const next = progressToPoint(path, pathLength, driver.progress);
     setPoint(next);
 
-    if (prefersReduced) {
+    if (prefersReduced || emphasis === "dim") {
       setTrail([]);
       return;
     }
@@ -53,7 +56,7 @@ function TrackMarkerComponent({
       trailId.current += 1;
       return [...prev, { ...next, id: trailId.current }].slice(-TRAIL_LENGTH);
     });
-  }, [driver.progress, pathLength, pathRef, prefersReduced]);
+  }, [driver.progress, pathLength, pathRef, prefersReduced, emphasis]);
 
   if (!point) return null;
 
@@ -61,9 +64,20 @@ function TrackMarkerComponent({
     ? `P${driver.position} ${driver.code}, in pit`
     : `P${driver.position} ${driver.code}`;
 
+  const dimmed = emphasis === "dim";
+  const focused = emphasis === "focus";
+  const groupOpacity = dimmed ? 0.28 : 1;
+  const markerR = focused ? 6.5 : 5;
+
   return (
-    <g aria-label={label} role="img">
+    <g
+      aria-label={label}
+      role="img"
+      opacity={groupOpacity}
+      style={{ transition: "opacity 0.25s ease" }}
+    >
       {!prefersReduced &&
+        !dimmed &&
         trail.map((entry, index) => {
           const opacity = ((index + 1) / (trail.length + 1)) * 0.35;
           return (
@@ -90,7 +104,18 @@ function TrackMarkerComponent({
             : { type: "spring", stiffness: 90, damping: 22, mass: 0.6 }
         }
       >
-        {!prefersReduced ? (
+        {!prefersReduced && focused ? (
+          <motion.circle
+            r={14}
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={1.5}
+            className="text-[color:var(--track-accent)]"
+            initial={{ opacity: 0.55, scale: 0.85 }}
+            animate={{ opacity: [0.55, 0.15, 0.55], scale: [0.9, 1.35, 0.9] }}
+            transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut" }}
+          />
+        ) : !prefersReduced && !dimmed ? (
           <motion.circle
             r={10}
             fill="none"
@@ -104,7 +129,7 @@ function TrackMarkerComponent({
         ) : null}
 
         <circle
-          r={5}
+          r={markerR}
           fill="currentColor"
           className="text-[color:var(--track-accent)]"
           stroke="rgba(5,6,8,0.85)"
@@ -114,7 +139,9 @@ function TrackMarkerComponent({
         <text
           x={12}
           y={4}
-          className="fill-white font-mono text-[11px] font-semibold tracking-[0.12em]"
+          className={`fill-white font-mono font-semibold tracking-[0.12em] ${
+            focused ? "text-[12px]" : "text-[11px]"
+          }`}
           style={{
             paintOrder: "stroke",
             stroke: "rgba(5,6,8,0.75)",
@@ -149,6 +176,7 @@ export const TrackMarker = memo(
     prev.pathLength === next.pathLength &&
     prev.reducedMotion === next.reducedMotion &&
     prev.pathRef === next.pathRef &&
+    prev.emphasis === next.emphasis &&
     prev.driver.position === next.driver.position &&
     prev.driver.code === next.driver.code &&
     prev.driver.pit === next.driver.pit &&

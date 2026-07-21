@@ -1,26 +1,23 @@
 "use client";
 
 import { memo } from "react";
-import { TrackMap } from "./TrackMap";
+import { CompetitorFocusBoard } from "@/components/competitor-focus";
 import { useLiveRaceState, type Championship } from "@/lib/live";
 
 type Props = {
   circuitSvgUrl: string;
-  /** Championship selects F1 / MotoGP providers with mock fallback. */
-  sport?: Championship;
-  className?: string;
-  label?: string;
+  circuitName?: string;
+  sport: Championship;
 };
 
 /**
- * Client bridge: championship-aware live state → TrackMap.
- * TrackMap itself never calls APIs.
+ * Client bridge: championship-aware live state → Focus Mode + TrackMap.
+ * TrackMap itself never calls APIs. Focus reuses the same LiveRaceState.
  */
 function LiveTrackMapComponent({
   circuitSvgUrl,
-  sport = "f1",
-  className,
-  label,
+  circuitName = "Circuit",
+  sport,
 }: Props) {
   const state = useLiveRaceState(sport);
 
@@ -29,11 +26,10 @@ function LiveTrackMapComponent({
   }
 
   return (
-    <TrackMap
-      circuitSvgUrl={circuitSvgUrl}
+    <CompetitorFocusBoard
       state={state}
-      className={className}
-      label={label}
+      circuitSvgUrl={circuitSvgUrl}
+      mapLabel={`${circuitName} live circuit`}
     />
   );
 }
