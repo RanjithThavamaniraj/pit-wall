@@ -18,6 +18,7 @@ import { WeekendStatus } from "./WeekendStatus";
 import { WeekendStoryEngine } from "./WeekendStoryEngine";
 import { WeekendStrategyCenter } from "./WeekendStrategyCenter";
 import { WeekendWeatherCard } from "./WeekendWeatherCard";
+import { CircuitIntelligenceSection } from "@/components/circuit-intelligence";
 
 type MotoGpPodiumFinisher = {
   position: number;
@@ -84,7 +85,18 @@ export async function WeekendHub({
           resultHighlights={resultHighlights}
         />
 
-        <WeekendWeatherCard weather={summary?.weather} />
+        <CircuitIntelligenceSection
+          sport={data.sport}
+          weekendSlug={data.slug}
+          className="!p-6 sm:!p-7"
+        />
+
+        <WeekendWeatherCard
+          weather={summary?.weather}
+          sport={data.sport}
+          weekendSlug={data.slug}
+          isPast={data.isPast}
+        />
 
         <LiveEventFeed
           sport={data.sport}
